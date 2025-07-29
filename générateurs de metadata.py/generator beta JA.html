@@ -295,9 +295,9 @@
     <div id="textEditorModal" class="modal">
         <div class="modal-content"><span class="close-button" onclick="closeModal('textEditorModal')">&times;</span>
             <h2 id="textEditorModalTitle" class="text-xl font-semibold mb-4 text-gray-800"></h2>
-            <div class="scrollable-content mb-4 flex-1 pt-4">
+            <div class="scrollable-content mb-4">
                 <div id="textEditorContentDiv" contentEditable="true"
-                    class="w-full h-full text-base border border-gray-300 rounded-md p-2"
+                    class="w-full h-64 text-base border border-gray-300 rounded-md p-2 overflow-auto"
                     style="white-space: pre-wrap;"></div>
             </div>
             <div class="flex justify-between items-center pt-4">
@@ -325,11 +325,11 @@
             <div class="scrollable-content flex-1 pt-4">
                 <div class="label-frame mb-4">
                     <div class="label-frame-title">エンチャントを追加</div>
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-                        <div>
-                            <label for="enchant-type" class="block text-sm font-medium mb-1">タイプ:</label>
-                            <select id="enchant-type" class="w-full"></select>
-                        </div>
+                    <div class="mb-4">
+                        <label for="enchant-type" class="block text-sm font-medium mb-1">タイプ:</label>
+                        <select id="enchant-type" class="w-full"></select>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                         <div>
                             <label for="enchant-level-helper" class="block text-sm font-medium mb-1">レベル(選択):</label>
                             <select id="enchant-level-helper" class="w-full"></select>
@@ -424,7 +424,8 @@
             fortune: { name: 'Fortune', japanese: '幸運', maxLevel: 3, levels: { 1: 1, 2: 2, 3: 3 } }, unbreaking: { name: 'Unbreaking', japanese: '耐久力', maxLevel: 3, levels: { 1: 100, 2: 200, 3: 300 } },
             efficiency: { name: 'Efficiency', japanese: '効率強化', maxLevel: 5, levels: { 1: 25, 2: 30, 3: 35, 4: 40, 5: 45 } }, silk_touch: { name: 'Silk Touch', japanese: 'シルクタッチ', maxLevel: 1, levels: { 1: 1 } },
             knockback: { name: 'Knockback', japanese: 'ノックバック', maxLevel: 2, levels: { 1: 105, 2: 190 } }, power: { name: 'Power', japanese: '射撃ダメージ増加', maxLevel: 5, levels: { 1: 50, 2: 75, 3: 100, 4: 125, 5: 150 } },
-            punch: { name: 'Punch', japanese: 'パンチ', maxLevel: 2, levels: { 1: 3, 2: 6 } }, infinity: { name: 'Infinity', japanese: '無限', maxLevel: 1, levels: { 1: 1 } }
+            punch: { name: 'Punch', japanese: 'パンチ', maxLevel: 2, levels: { 1: 3, 2: 6 } }, infinity: { name: 'Infinity', japanese: '無限', maxLevel: 1, levels: { 1: 1 } },
+            curse_of_vanishing: { name: 'Curse of Vanishing', japanese: '消滅の呪い', maxLevel: 1, levels: { 1: 1 } }
         };
         
         function toRoman(num) {
@@ -518,12 +519,12 @@
         let currentTextEditorCallback = null;
         let showCodesInTextEditor = true;
         let isComposing = false;
-        function openTextEditorModal(title, initialText, callback) { $('textEditorModalTitle').textContent = title; const editor = $('textEditorContentDiv'); editor.textContent = initialText.replace(/\\n/g, '\n'); editor.parentElement.style.height = editor.style.height; currentTextEditorCallback = callback; showCodesInTextEditor = true; $('toggleCodeVisibilityBtn').textContent = "カラーコードを隠す"; applyRichTextFormatting(); $('textEditorModal').style.display = 'flex'; }
+        function openTextEditorModal(title, initialText, callback) { $('textEditorModalTitle').textContent = title; const editor = $('textEditorContentDiv'); editor.textContent = initialText.replace(/\\n/g, '\n'); currentTextEditorCallback = callback; showCodesInTextEditor = true; $('toggleCodeVisibilityBtn').textContent = "カラーコードを隠す"; applyRichTextFormatting(); $('textEditorModal').style.display = 'flex'; }
         function closeTextEditorModal() { $('textEditorModal').style.display = 'none'; }
         function escapeHtml(text) { const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }; return text.replace(/[&<>"']/g, function (m) { return map[m]; }); }
         function saveSelection() { const selection = window.getSelection(); if (selection.rangeCount > 0) { const range = selection.getRangeAt(0); const preCaretRange = range.cloneRange(); preCaretRange.selectNodeContents($('textEditorContentDiv')); preCaretRange.setEnd(range.endContainer, range.endOffset); return preCaretRange.toString().length; } return 0; }
         function restoreSelection(savedCaretOffset) { const selection = window.getSelection(); selection.removeAllRanges(); const range = document.createRange(); range.selectNodeContents($('textEditorContentDiv')); range.collapse(true); let nodeStack = [$('textEditorContentDiv')]; let node, charIndex = 0; let foundStart = false; while (!foundStart && (node = nodeStack.pop())) { if (node.nodeType === 3) { let nextCharIndex = charIndex + node.length; if (!foundStart && savedCaretOffset >= charIndex && savedCaretOffset <= nextCharIndex) { range.setStart(node, savedCaretOffset - charIndex); foundStart = true; } charIndex = nextCharIndex; } else { let i = node.childNodes.length; while (i--) { nodeStack.push(node.childNodes[i]); } } } range.collapse(true); selection.addRange(range); }
-        function applyRichTextFormatting() { if (!$('textEditorModal') || $('textEditorModal').style.display === 'none') return; const savedCaretOffset = saveSelection(); const contentDiv = $('textEditorContentDiv'); const content = contentDiv.textContent; const colorPattern = /(\\u001b\(c@#([0-9a-fA-F]{6})\))/g; let htmlContent = ''; let lastIndex = 0; let currentColor = 'inherit'; const matches = Array.from(content.matchAll(colorPattern)); for (const match of matches) { const fullCode = match[1]; const hexColor = "#" + match[2]; const startIndex = match.index; const textSegment = content.substring(lastIndex, startIndex); if (textSegment) { htmlContent += `<span style="color: ${currentColor};">${escapeHtml(textSegment)}</span>`; } if (showCodesInTextEditor) { htmlContent += `<span style="color: black;">${escapeHtml(fullCode)}</span>`; } else { htmlContent += `<span style="font-size: 0; user-select: none;">${escapeHtml(fullCode)}</span>`; } currentColor = hexColor; lastIndex = match.index + fullCode.length; } const remainingText = content.substring(lastIndex); if (remainingText) { htmlContent += `<span style="color: ${currentColor};">${escapeHtml(remainingText)}</span>`; } contentDiv.innerHTML = htmlContent.replace(/\n/g, '<br>'); restoreSelection(savedCaretOffset); }
+        function applyRichTextFormatting() { if (!$('textEditorModal') || $('textEditorModal').style.display === 'none') return; const savedCaretOffset = saveSelection(); const contentDiv = $('textEditorContentDiv'); const content = contentDiv.textContent; const colorPattern = /(\\u001b\(c@#([0-9a-fA-F]{6})\))/g; let htmlContent = ''; let lastIndex = 0; let currentColor = 'inherit'; const matches = Array.from(content.matchAll(colorPattern)); for (const match of matches) { const fullCode = match[1]; const hexColor = "#" + match[2]; const startIndex = match.index; const textSegment = content.substring(lastIndex, startIndex); if (textSegment) { htmlContent += `<span style="color: ${currentColor};">${escapeHtml(textSegment)}</span>`; } if (showCodesInTextEditor) { htmlContent += `<span style="color: black;">${escapeHtml(fullCode)}</span>`; } else { htmlContent += `<span style="font-size: 0; user-select: none;">${escapeHtml(fullCode)}</span>`; } currentColor = hexColor; lastIndex = match.index + fullCode.length; } const remainingText = content.substring(lastIndex); if (remainingText) { htmlContent += `<span style="color: ${currentColor};">${escapeHtml(remainingText)}</span>`; } contentDiv.innerHTML = htmlContent; restoreSelection(savedCaretOffset); }
         $('insertColorCodeBtn').addEventListener('click', () => { const tempColorInput = document.createElement('input'); tempColorInput.type = 'color'; tempColorInput.value = '#000000'; tempColorInput.style.position = 'absolute'; tempColorInput.style.left = '-9999px'; document.body.appendChild(tempColorInput); tempColorInput.click(); tempColorInput.addEventListener('change', () => { const colorCode = tempColorInput.value.toUpperCase(); const code = `\\u001b(c@${colorCode})`; document.execCommand('insertText', false, code); document.body.removeChild(tempColorInput); applyRichTextFormatting(); }, { once: true }); });
         $('toggleCodeVisibilityBtn').addEventListener('click', () => { showCodesInTextEditor = !showCodesInTextEditor; $('toggleCodeVisibilityBtn').textContent = showCodesInTextEditor ? "カラーコードを隠す" : "カラーコードを表示"; applyRichTextFormatting(); });
         $('confirmTextBtn').addEventListener('click', () => { const rawContent = $('textEditorContentDiv').textContent.replace(/\n/g, '\\n'); if (currentTextEditorCallback) { currentTextEditorCallback(rawContent); } closeModal('textEditorModal'); });
