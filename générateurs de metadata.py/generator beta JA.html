@@ -250,8 +250,8 @@
         <h1 class="text-2xl font-bold text-center mb-6 text-gray-800">メタデータジェネレーター</h1>
         <div class="label-frame">
             <div class="label-frame-title">アイテムの情報</div>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="md:col-span-1">
                     <label for="item-name" class="block text-sm font-medium text-gray-700 mb-1">アイテムの文字列:</label>
                     <div class="relative">
                         <input type="text" id="item-name" value="default:stone" class="w-full pr-10">
@@ -268,6 +268,10 @@
                 <div>
                     <label for="amount" class="block text-sm font-medium text-gray-700 mb-1">数量:</label>
                     <input type="number" id="amount" value="1" min="1" class="w-full">
+                </div>
+                <div>
+                    <label for="item-wear" class="block text-sm font-medium text-gray-700 mb-1">消耗度 (Wear):</label>
+                    <input type="number" id="item-wear" value="0" min="0" class="w-full">
                 </div>
             </div>
         </div>
@@ -443,6 +447,7 @@
 
         let descriptionContent = "", shortDescriptionContent = "", itemColorHex = "";
         let userToolCapabilities = {}, enchantments = {};
+        let tempEnchantments = {}; // For editing in the modal
         let toolRanks = { level: "", uses: "" };
         let dugValue = "";
         let includeSlash = true;
@@ -501,7 +506,8 @@
             let core = metaParts.join(""), color = itemColorHex ? `\u001bE\u0003color\u0002${itemColorHex}\u0003` : "";
             const finalMeta = core + ((core && !color) ? "\u0003" : "") + color;
             const commandPrefix = includeSlash ? '/giveme' : 'giveme';
-            $('command-display').value = `${commandPrefix} ${$('item-name').value} ${$('amount').value} 0 "${finalMeta.replace(/"/g, '\\"').replace(/\u0001/g, '\\u0001').replace(/\u0002/g, '\\u0002').replace(/\u0003/g, '\\u0003').replace(/\u001b/g, '\\u001b').replace(/\n/g, '\\n').replace(/\t/g, '\\t')}"`;
+            const wearValue = $('item-wear').value || 0;
+            $('command-display').value = `${commandPrefix} ${$('item-name').value} ${$('amount').value} ${wearValue} "${finalMeta.replace(/"/g, '\\"').replace(/\u0001/g, '\\u0001').replace(/\u0002/g, '\\u0002').replace(/\u0003/g, '\\u0003').replace(/\u001b/g, '\\u001b').replace(/\n/g, '\\n').replace(/\t/g, '\\t')}"`;
         }
 
         function openModal(id) { $(id).style.display = 'flex'; }
@@ -509,6 +515,7 @@
 
         $('item-name').addEventListener('input', updateCommandDisplay);
         $('amount').addEventListener('input', updateCommandDisplay);
+        $('item-wear').addEventListener('input', updateCommandDisplay);
         $('copy-command-btn').addEventListener('click', () => { $('command-display').select(); document.execCommand('copy') ? showMessageBox("コマンドをコピーしました") : showMessageBox("コピーに失敗しました。", true); });
 
         $('slash-toggle').addEventListener('change', (event) => {
@@ -567,11 +574,11 @@
         
         function updateCurrentEnchantsDisplay() {
             const container = $('current-enchants');
-            if (Object.keys(enchantments).length === 0) {
+            if (Object.keys(tempEnchantments).length === 0) {
                 container.innerHTML = '<p class="text-gray-500 text-center">エンチャントが設定されていません</p>';
                 return;
             }
-            container.innerHTML = Object.entries(enchantments).map(([type, data]) => {
+            container.innerHTML = Object.entries(tempEnchantments).map(([type, data]) => {
                 const def = ENCHANTMENT_DEFS[type];
                 const { level, value } = data;
                 return `
@@ -582,8 +589,7 @@
                             <label for="enchant-val-${type}" class="text-sm mr-2 text-gray-600 whitespace-nowrap">効果値:</label>
                             <input type="number" step="any" id="enchant-val-${type}"
                                 class="w-full border border-d1d5db rounded-md px-2 py-1 text-sm"
-                                value="${value}"
-                                oninput="updateEnchantmentValue('${type}', this.value)">
+                                value="${value}">
                         </div>
                     </div>
                     <button class="remove-enchant self-center" onclick="removeEnchantment('${type}')">削除</button>
@@ -593,23 +599,17 @@
 
         function removeEnchantment(type) { 
             const enchantName = ENCHANTMENT_DEFS[type].name;
-            delete enchantments[type]; 
+            delete tempEnchantments[type]; 
             updateCurrentEnchantsDisplay(); 
-            updateCommandDisplay(); 
             showMessageBox(`${enchantName}を削除しました。`); 
         }
         window.removeEnchantment = removeEnchantment;
 
-        function updateEnchantmentValue(type, newValue) {
-            const parsedValue = parseFloat(newValue);
-            if (enchantments[type] && !isNaN(parsedValue)) {
-                enchantments[type].value = parsedValue;
-                updateCommandDisplay();
-            }
-        }
-        window.updateEnchantmentValue = updateEnchantmentValue;
-
-        $('btn-enchant').addEventListener('click', () => { updateCurrentEnchantsDisplay(); openModal('enchantModal'); });
+        $('btn-enchant').addEventListener('click', () => {
+            tempEnchantments = JSON.parse(JSON.stringify(enchantments));
+            updateCurrentEnchantsDisplay();
+            openModal('enchantModal');
+        });
         
         enchantTypeSelect.addEventListener('change', updateEnchantmentInputs);
         
@@ -636,13 +636,32 @@
                 const maxLevelInDefs = Math.max(...Object.keys(def.levels).map(k => parseInt(k)));
                 value = def.levels[maxLevelInDefs] || 0;
             }
-            enchantments[type] = { level: level, value: value };
+            tempEnchantments[type] = { level: level, value: value };
             updateCurrentEnchantsDisplay();
             showMessageBox(`${def.name} をレベル ${toRoman(level)} で追加しました。`);
         });
         
-        $('clearEnchantsBtn').addEventListener('click', () => { enchantments = {}; updateCurrentEnchantsDisplay(); updateCommandDisplay(); showMessageBox('全エンチャントを削除しました。'); });
-        $('saveEnchantsBtn').addEventListener('click', () => { closeModal('enchantModal'); updateCommandDisplay(); });
+        $('clearEnchantsBtn').addEventListener('click', () => { 
+            tempEnchantments = {}; 
+            updateCurrentEnchantsDisplay(); 
+            showMessageBox('全エンチャントを削除しました。'); 
+        });
+
+        $('saveEnchantsBtn').addEventListener('click', () => {
+            const container = $('current-enchants');
+            container.querySelectorAll('.enchant-item input[type="number"]').forEach(input => {
+                const type = input.id.substring(12); // "enchant-val-".length
+                const parsedValue = parseFloat(input.value);
+                if (tempEnchantments[type] && !isNaN(parsedValue)) {
+                    tempEnchantments[type].value = parsedValue;
+                }
+            });
+
+            enchantments = JSON.parse(JSON.stringify(tempEnchantments));
+            updateCommandDisplay();
+            closeModal('enchantModal');
+            showMessageBox('エンチャント情報を保存しました。');
+        });
         // --- Enchantment Logic End ---
 
         $('btn-tool-ranks').addEventListener('click', () => { $('toolranks-level').value = toolRanks.level; $('toolranks-uses').value = toolRanks.uses; $('dug-value').value = dugValue; openModal('toolRanksModal'); });
