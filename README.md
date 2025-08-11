@@ -30,9 +30,7 @@ This tool allows you to generate `/giveme` or `/give` commands with complex meta
   2. 「タイプ」から能力を選択し、「レベル」で強度を指定して追加します。
 
 - **代表的なエンチャントの例**:
-  - `silk_touch` (シルクタッチ): 通常は別のアイテムに変わるブロック（例: 石炭鉱石→石炭）を、ブロックそのものの状態（石炭鉱石）でドロップさせます。ガラスなどを壊してもアイテムとして回収できるようになります。MODによっては、レベルに応じて発動確率が変動します。
-  - `damage` (ダメージ増加): 武器が与えるダメージを増加させます。
-  - `speed` (速度増加): ツールの採掘速度を上昇させます。
+  - `silk_touch` (シルクタッチ): 通常は別のアイテムに変わるブロック（例: 石炭鉱石→石炭）を、ブロックそのものの状態（石炭鉱石）でドロップさせます。ガラスなどを壊してもアイテムとして回収できるようになります。
   - `knockback` (ノックバック): 攻撃した相手をより遠くまで吹き飛ばします。
 
 #### ツール性能 (Tool Capabilities)
@@ -95,9 +93,7 @@ This feature adds special abilities to items. The Minetest engine provides the f
   2. Select an ability from the "Type" dropdown (e.g., `speed`, `damage`) and specify its strength in the "Level" field.
 
 - **Examples of Common Enchantments**:
-  - `silk_touch`: Allows you to collect blocks that would normally drop a different item (e.g., Coal Ore drops itself instead of a Lump of Coal). It also allows you to pick up fragile blocks like glass. The activation chance may depend on the level, as defined by the mod.
-  - `damage`: Increases the damage dealt by a weapon.
-  - `speed`: Increases the digging speed of a tool.
+  - `silk_touch`: Allows you to collect blocks that would normally drop a different item (e.g., Coal Ore drops itself instead of a Lump of Coal). It also allows you to pick up fragile blocks like glass.
   - `knockback`: Knocks back the attacked entity further.
 
 #### Tool Performance (Tool Capabilities)
