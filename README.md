@@ -2,7 +2,7 @@
 
 This is a fork of [multi-nono/Metadata-generator](https://github.com/multi-nono/Metadata-generator).
 
-This tool allows you to generate `/giveme` or `/give` commands with complex metadata for [MultiCraft](https://www.multicraft.world) right in your browser.
+This tool allows you to generate `/giveme` or `/give` commands with complex metadata for the open-source voxel game [Minetest](https://www.minetest.net/) right in your browser.
 
 - **Japanese version**: `JA v2.html`
 - **English version**: `EN v2.html`
@@ -30,7 +30,9 @@ This tool allows you to generate `/giveme` or `/give` commands with complex meta
   2. 「タイプ」から能力を選択し、「レベル」で強度を指定して追加します。
 
 - **代表的なエンチャントの例**:
-  - `silk_touch` (シルクタッチ): 通常は別のアイテムに変わるブロック（例: 石炭鉱石→石炭）を、ブロックそのものの状態（石炭鉱石）でドロップさせます。ガラスなどを壊してもアイテムとして回収できるようになります。
+  - `silk_touch` (シルクタッチ): 通常は別のアイテムに変わるブロック（例: 石炭鉱石→石炭）を、ブロックそのものの状態（石炭鉱石）でドロップさせます。ガラスなどを壊してもアイテムとして回収できるようになります。MODによっては、レベルに応じて発動確率が変動します。
+  - `damage` (ダメージ増加): 武器が与えるダメージを増加させます。
+  - `speed` (速度増加): ツールの採掘速度を上昇させます。
   - `knockback` (ノックバック): 攻撃した相手をより遠くまで吹き飛ばします。
 
 #### ツール性能 (Tool Capabilities)
@@ -47,13 +49,8 @@ This tool allows you to generate `/giveme` or `/give` commands with complex meta
     - `耐久消費 (Uses)`: 1回の使用で消費する耐久値です。
   - `ドロップLV (Drop LV)`: `max_drop_level`に相当します。設定したレベル以下のブロックからのみ、正規のドロップ品を得られるように制限する値です。例えば、MODで「ダイヤピッケルでないと黒曜石はドロップしない」という挙動を実装する際に使われます。
 
-#### ツールランク (Tool Ranks)
-人気のMOD **`toolranks`** によって追加される「ツールの成長」に関するメタデータです。ツールにレベルや経験値の概念を持たせ、使い込むことで性能が向上する仕組みを実装します。
-
-- **設定項目**:
-  - `Level (レベル)`: ツールの現在のランクです。`toolranks` MODでは、レベルが上がると主に耐久性が向上します（壊れにくくなる）。
-  - `Uses (使用回数)`: ツールの現在の経験値です。この値が一定に達するとレベルアップします。
-  - `Dug (掘削レベル)`: `toolranks`自体というより、他の様々なMODで利用されることがあるカスタム値です。「Dugレベル3のツールでないと掘れない」といった、ゲームの進行度（Tier）を管理するために使われることが多いです。
+#### ツールランク (Tool Ranks) - minenux版MODに基づく解説
+ツールにレベルと経験値の概念を追加し、使い込むことで性能が向上する仕組みを実装します。
 
 #### ツール性能表
 ページ下部にあるこの表は、Minetestに標準で存在するツールの`ツール性能 (Tool Capabilities)`を一覧にした**参照専用のデータ集**です。
@@ -93,7 +90,9 @@ This feature adds special abilities to items. The Minetest engine provides the f
   2. Select an ability from the "Type" dropdown (e.g., `speed`, `damage`) and specify its strength in the "Level" field.
 
 - **Examples of Common Enchantments**:
-  - `silk_touch`: Allows you to collect blocks that would normally drop a different item (e.g., Coal Ore drops itself instead of a Lump of Coal). It also allows you to pick up fragile blocks like glass.
+  - `silk_touch`: Allows you to collect blocks that would normally drop a different item (e.g., Coal Ore drops itself instead of a Lump of Coal). It also allows you to pick up fragile blocks like glass. The activation chance may depend on the level, as defined by the mod.
+  - `damage`: Increases the damage dealt by a weapon.
+  - `speed`: Increases the digging speed of a tool.
   - `knockback`: Knocks back the attacked entity further.
 
 #### Tool Performance (Tool Capabilities)
@@ -110,13 +109,8 @@ This is a standard Minetest feature, also known as `toolcaps`, that defines a to
     - `Uses`: The amount of wear consumed in a single use.
   - `Drop LV`: Corresponds to `max_drop_level`. This restricts the tool to only yield proper drops from blocks up to the specified level. It's used by mods to enforce progression (e.g., "Obsidian can only be dropped by a diamond pickaxe").
 
-#### Tool Ranks
-This metadata is not a standard feature but is for the popular **`toolranks`** mod, which adds a progression system to tools. It allows tools to have levels and experience points, improving as they are used.
-
-- **Parameters**:
-  - `Level`: The tool's current rank. In the `toolranks` mod, a higher level primarily increases the tool's durability (it breaks less quickly).
-  - `Uses`: The tool's current experience points. The tool levels up when this value reaches a certain threshold.
-  - `Dug`: A custom value often used by various progression mods. It defines a "digging tier," allowing mods to create blocks that can only be broken by a tool with a high enough `Dug` level.
+#### Tool Ranks (Based on the minenux version mod)
+It adds a progression system where tools improve with use.
 
 #### Tool Performance Table
 This table, located at the bottom of the page, is a **read-only reference dataset** that lists the `Tool Capabilities` of all standard tools in Minetest.
