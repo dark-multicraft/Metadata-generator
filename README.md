@@ -2,7 +2,7 @@
 
 This is a fork of [multi-nono/Metadata-generator](https://github.com/multi-nono/Metadata-generator).
 
-This tool allows you to generate `/giveme` or `/give` commands with complex metadata for the open-source voxel game [Minetest](https://www.minetest.net/) right in your browser.
+This tool allows you to generate `/giveme` or `/give` commands with complex metadata for the [MultiCraft](https://www.multicraft.world/) right in your browser.
 
 - **Japanese version**: `JA v2.html`
 - **English version**: `EN v2.html`
