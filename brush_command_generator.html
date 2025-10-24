@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ブラシコマンドジェネレーター</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            padding: 24px;
+        }
+
+        .app-container {
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 4px 16px rgba(15, 23, 42, 0.12);
+            width: 100%;
+            max-width: 960px;
+            padding: 28px;
+        }
+
+        .section-frame {
+            border: 1px solid #e5e7eb;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 24px;
+            position: relative;
+        }
+
+        .section-title {
+            position: absolute;
+            top: -14px;
+            left: 18px;
+            background-color: #ffffff;
+            padding: 0 10px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: #4b5563;
+        }
+
+        label span {
+            font-size: 0.9rem;
+            color: #374151;
+            font-weight: 500;
+        }
+
+        input[type="text"],
+        input[type="number"],
+        textarea,
+        select {
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            padding: 10px 12px;
+            font-size: 0.95rem;
+            width: 100%;
+            box-sizing: border-box;
+            transition: border-color 0.2s ease;
+            background-color: #ffffff;
+        }
+
+        input:focus,
+        textarea:focus,
+        select:focus {
+            outline: none;
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.16);
+        }
+
+        textarea {
+            resize: vertical;
+        }
+
+        .tab-button {
+            background-color: transparent;
+            border: 1px solid transparent;
+            border-bottom: none;
+            border-radius: 8px 8px 0 0;
+            color: #6b7280;
+            padding: 10px 16px;
+            font-weight: 600;
+            transition: all 0.18s ease;
+        }
+
+        .tab-button.active {
+            background-color: #ffffff;
+            color: #2563eb;
+            border-color: #d1d5db #d1d5db #ffffff;
+        }
+
+        .tab-panel {
+            display: none;
+        }
+
+        .tab-panel.active {
+            display: block;
+        }
+
+        .pill {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 9999px;
+            padding: 2px 10px;
+            font-size: 0.75rem;
+            background-color: #e0f2fe;
+            color: #0369a1;
+            margin-right: 6px;
+            margin-bottom: 6px;
+        }
+
+        .toast {
+            position: fixed;
+            top: 24px;
+            right: 32px;
+            background-color: #2563eb;
+            color: #ffffff;
+            padding: 12px 16px;
+            border-radius: 8px;
+            box-shadow: 0 10px 20px rgba(15, 23, 42, 0.15);
+            opacity: 0;
+            pointer-events: none;
+            transform: translateY(-16px);
+            transition: opacity 0.25s ease, transform 0.25s ease;
+            z-index: 2000;
+        }
+
+        .toast.show {
+            opacity: 1;
+            pointer-events: auto;
+            transform: translateY(0);
+        }
+
+        @media (max-width: 640px) {
+            body { padding: 16px; }
+            .app-container { padding: 20px; }
+            .section-frame { padding: 16px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <h1 class="text-2xl md:text-3xl font-bold text-center text-gray-800 mb-8">ブラシコマンドジェネレーター</h1>
+
+        <div class="flex flex-wrap gap-2 border-b border-gray-200 mb-6">
+            <button class="tab-button active" data-brush="terraform">Terraform ブラシ</button>
+            <button class="tab-button" data-brush="worldedit">WorldEdit ブラシ</button>
+        </div>
+
+        <div id="panel-terraform" class="tab-panel active">
+            <div class="section-frame">
+                <div class="section-title">Terraform パラメーター</div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="md:col-span-2">
+                        <span class="block mb-1">モード</span>
+                        <p class="py-2 px-3 bg-gray-100 rounded-md text-sm text-gray-700">paint</p>
+                    </div>
+                    <label>
+                        <span class="block mb-1">ターゲットノード</span>
+                        <input id="terraform-target" type="text" value="wool:white" placeholder="wool:white">
+                    </label>
+                    <label>
+                        <span class="block mb-1">シェイプ</span>
+                        <input id="terraform-shape" type="text" placeholder="例: sphere">
+                    </label>
+                    <label class="md:col-span-2">
+                        <span class="block mb-1">マスク (改行またはカンマ区切り)</span>
+                        <textarea id="terraform-mask" rows="3" placeholder="wool:violet, wool:blue">wool:violet
+wool:blue
+wool:pink
+wool:grey
+wool:red
+wool:magenta
+wool:black
+wool:brown
+wool:cyan
+wool:dark_green
+wool:dark_grey
+wool:green
+wool:orange
+wool:yellow</textarea>
+                    </label>
+                    <label>
+                        <span class="block mb-1">ブラシサイズ</span>
+                        <input id="terraform-size" type="number" min="1" value="10">
+                    </label>
+                    <label>
+                        <span class="block mb-1">モディファイア</span>
+                        <input id="terraform-modifiers" type="text" placeholder="例: replace_air">
+                    </label>
+                </div>
+            </div>
+            <div class="section-frame">
+                <div class="section-title">プレビュー</div>
+                <div id="terraform-preview" class="text-sm text-gray-600">設定されたセグメントがここに表示されます。</div>
+            </div>
+        </div>
+
+        <div id="panel-worldedit" class="tab-panel">
+            <div class="section-frame">
+                <div class="section-title">WorldEdit パラメーター</div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <label>
+                        <span class="block mb-1">コマンド (例: cube)</span>
+                        <input id="worldedit-command" type="text" value="cube" placeholder="cube">
+                    </label>
+                    <label>
+                        <span class="block mb-1">シェイプ</span>
+                        <input id="worldedit-shape" type="text" placeholder="任意">
+                    </label>
+                    <label class="md:col-span-2">
+                        <span class="block mb-1">パラメーター</span>
+                        <textarea id="worldedit-params" rows="3" placeholder="5 5 5 stone">5 5 5 stone</textarea>
+                    </label>
+                    <label class="md:col-span-2">
+                        <span class="block mb-1">モディファイア</span>
+                        <input id="worldedit-modifiers" type="text" placeholder="任意">
+                    </label>
+                </div>
+            </div>
+            <div class="section-frame">
+                <div class="section-title">プレビュー</div>
+                <div id="worldedit-preview" class="text-sm text-gray-600">設定されたセグメントがここに表示されます。</div>
+            </div>
+        </div>
+
+        <div class="section-frame">
+            <div class="section-title">生成されたコマンド</div>
+            <div class="flex flex-col gap-3">
+                <div class="flex flex-wrap items-center justify-between gap-2">
+                    <div class="text-sm text-gray-600">生成されたコマンドをコピーしてご利用ください。</div>
+                    <div class="flex items-center gap-3">
+                        <label class="flex items-center gap-2 text-sm text-gray-700">
+                            <input id="include-slash" type="checkbox" class="h-4 w-4 text-blue-600 border-gray-300 rounded" checked>
+                            <span>/ を付与</span>
+                        </label>
+                        <button id="copy-command" type="button" class="px-3 py-2 bg-blue-600 text-white rounded-md text-sm font-medium">コピー</button>
+                    </div>
+                </div>
+                <textarea id="command-display" rows="4" class="bg-gray-100 font-mono text-sm text-gray-800" readonly></textarea>
+            </div>
+        </div>
+
+        <p class="text-center text-sm text-gray-500">Author: multi_nono / Nono | Contributor: dark, 7080</p>
+    </div>
+
+    <div id="toast" class="toast"></div>
+
+    <script>
+        (function () {
+            const CONTROL = { SOH: '\u0001', STX: '\u0002', ETX: '\u0003' };
+            const brushItemIds = { terraform: 'terraform:brush', worldedit: 'worldedit:brush' };
+            const state = { activeBrush: 'terraform' };
+
+            const elements = {
+                tabButtons: Array.from(document.querySelectorAll('.tab-button')),
+                panels: {
+                    terraform: document.getElementById('panel-terraform'),
+                    worldedit: document.getElementById('panel-worldedit')
+                },
+                includeSlash: document.getElementById('include-slash'),
+                terraform: {
+                    target: document.getElementById('terraform-target'),
+                    shape: document.getElementById('terraform-shape'),
+                    mask: document.getElementById('terraform-mask'),
+                    size: document.getElementById('terraform-size'),
+                    modifiers: document.getElementById('terraform-modifiers'),
+                    preview: document.getElementById('terraform-preview')
+                },
+                worldedit: {
+                    command: document.getElementById('worldedit-command'),
+                    params: document.getElementById('worldedit-params'),
+                    shape: document.getElementById('worldedit-shape'),
+                    modifiers: document.getElementById('worldedit-modifiers'),
+                    preview: document.getElementById('worldedit-preview')
+                },
+                commandDisplay: document.getElementById('command-display'),
+                copyButton: document.getElementById('copy-command'),
+                toast: document.getElementById('toast')
+            };
+
+            function showToast(message, isError) {
+                elements.toast.textContent = message;
+                elements.toast.style.backgroundColor = isError ? '#dc2626' : '#2563eb';
+                elements.toast.classList.add('show');
+                setTimeout(() => elements.toast.classList.remove('show'), 2400);
+            }
+
+            function escapeHtml(str) {
+                return str.replace(/[&<>"']/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch] || ch));
+            }
+
+            function escapeControlCodes(str) {
+                return str
+                    .replace(/\u0001/g, '\\u0001')
+                    .replace(/\u0002/g, '\\u0002')
+                    .replace(/\u0003/g, '\\u0003');
+            }
+
+            function encodeEntries(entries) {
+                return entries
+                    .filter(entry => entry.key && entry.value !== '')
+                    .map(entry => CONTROL.SOH + entry.key + CONTROL.STX + entry.value + CONTROL.ETX)
+                    .join('');
+            }
+
+            function renderPreview(target, entries) {
+                if (!entries.length) {
+                    target.innerHTML = '<span class="text-gray-500">設定されたセグメントがありません。</span>';
+                    return;
+                }
+                target.innerHTML = entries.map(entry => {
+                    const safeKey = escapeHtml(entry.key);
+                    const safeValue = escapeHtml(entry.value);
+                    return `<div class="flex flex-wrap items-center gap-2 mb-2"><span class="pill">${safeKey}</span><code class="text-sm text-slate-700">${safeValue}</code></div>`;
+                }).join('');
+            }
+
+            function normalizeMask(value) {
+                return value
+                    .split(/\r?\n/)
+                    .map(line => line.split(',').map(part => part.trim()).filter(Boolean))
+                    .flat()
+                    .filter(Boolean)
+                    .join(',');
+            }
+
+            function gatherTerraformEntries() {
+                const entries = [];
+                const mode = 'paint';
+                const target = elements.terraform.target.value.trim();
+                const shape = elements.terraform.shape.value.trim();
+                const mask = normalizeMask(elements.terraform.mask.value);
+                const size = elements.terraform.size.value.trim();
+                const modifiers = elements.terraform.modifiers.value.trim();
+
+                if (target) entries.push({ key: mode, value: target });
+                if (shape) entries.push({ key: 'shape', value: shape });
+                if (mask) entries.push({ key: 'mask', value: mask });
+                if (size) entries.push({ key: 'size', value: size });
+                if (modifiers) entries.push({ key: 'modifiers', value: modifiers });
+
+                renderPreview(elements.terraform.preview, entries);
+                return entries;
+            }
+
+            function gatherWorldeditEntries() {
+                const entries = [];
+                const command = elements.worldedit.command.value.trim();
+                const params = elements.worldedit.params.value.trim();
+                const shape = elements.worldedit.shape.value.trim();
+                const modifiers = elements.worldedit.modifiers.value.trim();
+
+                if (command) entries.push({ key: 'command', value: command });
+                if (params) entries.push({ key: 'params', value: params });
+                if (shape) entries.push({ key: 'shape', value: shape });
+                if (modifiers) entries.push({ key: 'modifiers', value: modifiers });
+
+                renderPreview(elements.worldedit.preview, entries);
+                return entries;
+            }
+
+            function updateCommand() {
+                const includeSlash = elements.includeSlash.checked ? '/' : '';
+                const itemId = brushItemIds[state.activeBrush];
+                const amount = 1;
+                const wear = 0;
+
+                let entries = [];
+                if (state.activeBrush === 'terraform') {
+                    entries = gatherTerraformEntries();
+                } else {
+                    entries = gatherWorldeditEntries();
+                }
+
+                const payload = encodeEntries(entries);
+                let actual = `${includeSlash}giveme ${itemId} ${amount} ${wear}`.trim();
+                let display = actual;
+
+                if (payload) {
+                    actual += ` "${payload}"`;
+                    display += ` "${escapeControlCodes(payload)}"`;
+                }
+
+                elements.commandDisplay.value = display;
+                elements.commandDisplay.dataset.actual = actual;
+            }
+
+            function switchBrush(target) {
+                state.activeBrush = target;
+                elements.tabButtons.forEach(button => {
+                    const brush = button.dataset.brush;
+                    const isActive = brush === target;
+                    button.classList.toggle('active', isActive);
+                    elements.panels[brush].classList.toggle('active', isActive);
+                });
+                updateCommand();
+            }
+
+            elements.tabButtons.forEach(button => {
+                button.addEventListener('click', () => switchBrush(button.dataset.brush));
+            });
+
+            elements.includeSlash.addEventListener('change', updateCommand);
+            elements.terraform.target.addEventListener('input', updateCommand);
+            elements.terraform.shape.addEventListener('input', updateCommand);
+            elements.terraform.mask.addEventListener('input', updateCommand);
+            elements.terraform.size.addEventListener('input', updateCommand);
+            elements.terraform.modifiers.addEventListener('input', updateCommand);
+
+            elements.worldedit.command.addEventListener('input', updateCommand);
+            elements.worldedit.params.addEventListener('input', updateCommand);
+            elements.worldedit.shape.addEventListener('input', updateCommand);
+            elements.worldedit.modifiers.addEventListener('input', updateCommand);
+
+            elements.copyButton.addEventListener('click', async () => {
+                const actual = elements.commandDisplay.dataset.actual || elements.commandDisplay.value;
+                try {
+                    if (navigator.clipboard && navigator.clipboard.writeText) {
+                        await navigator.clipboard.writeText(actual);
+                    } else {
+                        const temp = document.createElement('textarea');
+                        temp.value = actual;
+                        temp.style.position = 'fixed';
+                        temp.style.left = '-9999px';
+                        document.body.appendChild(temp);
+                        temp.focus();
+                        temp.select();
+                        document.execCommand('copy');
+                        document.body.removeChild(temp);
+                    }
+                    showToast('コマンドをコピーしました', false);
+                } catch (error) {
+                    console.error(error);
+                    showToast('コピーに失敗しました', true);
+                }
+            });
+
+            switchBrush('terraform');
+        })();
+    </script>
+</body>
+</html>
