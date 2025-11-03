@@ -6881,8 +6881,8 @@
                             <input type="number" step="0.1" id="full-punch-interval" value="${caps.full_punch_interval}" class="w-full" placeholder="例: 0.9">
                         </div>
                         <div>
-                            <label class="flex items-center gap-2 text-sm font-medium mb-1" for="weapon-uses">耐久値:
-                                <span class="info-tip info-tip--right" tabindex="0"><span class="info-tip-icon">i</span><span class="info-tip-content">1回の攻撃で消費する耐久値です。空欄の場合は既定値が適用されます。</span></span>
+                            <label class="flex items-center gap-2 text-sm font-medium mb-1" for="weapon-uses">使用可能回数:
+                                <span class="info-tip info-tip--right" tabindex="0"><span class="info-tip-icon">i</span><span class="info-tip-content">攻撃できる残り回数です。設定値+1回使うとツールは壊れます。</span></span>
                             </label>
                             <input type="number" min="0" step="1" id="weapon-uses" value="${caps.punch_attack_uses ?? ''}" class="w-full" placeholder="例: 20">
                         </div>
@@ -6911,11 +6911,19 @@
             `;
 
             const groupTranslations = { "cracky": "砕き", "choppy": "伐採", "crumbly": "整地", "snappy": "切断" };
+            const groupExamples = {
+                cracky: "例: 丸石、鉱石、金属ブロック",
+                choppy: "例: 原木、木材",
+                crumbly: "例: 土、砂",
+                snappy: "例: 葉、草"
+            };
             Object.entries(groupTranslations).forEach(([group, name]) => {
                 const data = caps.groupcaps[group];
                 $(`tab-panel-${group}`).innerHTML = `
                     <div class="label-frame">
-                        <div class="label-frame-title">${name}</div>
+                        <div class="label-frame-title flex items-center gap-2">${name}
+                            <span class="info-tip info-tip--right" tabindex="0"><span class="info-tip-icon">i</span><span class="info-tip-content">採掘グループ「${name}」に対応した設定です。${groupExamples[group]}</span></span>
+                        </div>
                         <div class="space-y-4">
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
@@ -6925,8 +6933,8 @@
                                     <input type="number" id="${group}-maxlevel" value="${data.maxlevel}" class="w-full" placeholder="例: 3">
                                 </div>
                                 <div>
-                                    <label class="flex items-center gap-2 text-sm font-medium mb-1" for="${group}-uses">耐久値:
-                                        <span class="info-tip info-tip--right" tabindex="0"><span class="info-tip-icon">i</span><span class="info-tip-content">このグループのブロックを採掘できる残り回数です。数値が小さいほど壊れやすくなります。</span></span>
+                                    <label class="flex items-center gap-2 text-sm font-medium mb-1" for="${group}-uses">使用可能回数:
+                                        <span class="info-tip info-tip--left" tabindex="0"><span class="info-tip-icon">i</span><span class="info-tip-content">このグループのブロックを採掘できる残り回数です。数値が小さいほど壊れやすくなります。設定値+1回使うとツールは壊れます。</span></span>
                                     </label>
                                     <input type="number" id="${group}-uses" value="${data.uses}" class="w-full" placeholder="例: 30">
                                 </div>
