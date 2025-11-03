@@ -137,41 +137,183 @@
             transform: translateY(0);
         }
 
+        .help-text {
+            font-size: 0.8rem;
+            color: #6b7280;
+            margin-top: 4px;
+        }
+
+        .input-group {
+            position: relative;
+        }
+
+        .input-icon {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #9ca3af;
+            pointer-events: none;
+        }
+
+        .has-icon {
+            padding-left: 36px;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .badge-optional {
+            background-color: #f3f4f6;
+            color: #6b7280;
+        }
+
+        .badge-required {
+            background-color: #fee2e2;
+            color: #991b1b;
+        }
+
+        input:invalid:not(:placeholder-shown),
+        textarea:invalid:not(:placeholder-shown) {
+            border-color: #ef4444;
+        }
+
+        input:valid:not(:placeholder-shown),
+        textarea:valid:not(:placeholder-shown) {
+            border-color: #10b981;
+        }
+
+        .quick-action {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 8px;
+            background-color: #f3f4f6;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            color: #4b5563;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            border: 1px solid transparent;
+        }
+
+        .quick-action:hover {
+            background-color: #e5e7eb;
+            border-color: #d1d5db;
+        }
+
+        .preview-empty {
+            padding: 20px;
+            text-align: center;
+            color: #9ca3af;
+            font-size: 0.875rem;
+        }
+
+        .preview-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            background-color: #f9fafb;
+            border-radius: 6px;
+            margin-bottom: 8px;
+            border: 1px solid #e5e7eb;
+        }
+
+        .preview-key {
+            font-weight: 600;
+            color: #2563eb;
+            font-size: 0.8rem;
+        }
+
+        .preview-separator {
+            color: #d1d5db;
+        }
+
+        .preview-value {
+            font-family: 'Courier New', monospace;
+            color: #374151;
+            font-size: 0.8rem;
+            word-break: break-all;
+        }
+
         @media (max-width: 640px) {
             body { padding: 16px; }
             .app-container { padding: 20px; }
             .section-frame { padding: 16px; }
+            .tab-button { font-size: 0.85rem; padding: 8px 12px; }
         }
     </style>
 </head>
 <body>
     <div class="app-container">
-        <h1 class="text-2xl md:text-3xl font-bold text-center text-gray-800 mb-8">ブラシコマンドジェネレーター</h1>
+        <h1 class="text-2xl md:text-3xl font-bold text-center text-gray-800 mb-8">🖌️ ブラシコマンドジェネレーター</h1>
 
         <div class="flex flex-wrap gap-2 border-b border-gray-200 mb-6">
-            <button class="tab-button active" data-brush="terraform">Terraform ブラシ</button>
-            <button class="tab-button" data-brush="worldedit">WorldEdit ブラシ</button>
+            <button class="tab-button active" data-brush="terraform">
+                <span>🌍 Terraform ブラシ</span>
+            </button>
+            <button class="tab-button" data-brush="worldedit">
+                <span>✏️ WorldEdit ブラシ</span>
+            </button>
         </div>
 
         <div id="panel-terraform" class="tab-panel active">
             <div class="section-frame">
-                <div class="section-title">Terraform パラメーター</div>
+                <div class="section-title">🎨 Terraform パラメーター</div>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div class="md:col-span-2">
-                        <span class="block mb-1">モード</span>
-                        <p class="py-2 px-3 bg-gray-100 rounded-md text-sm text-gray-700">paint</p>
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="block font-semibold">モード</span>
+                            <span class="badge badge-required">固定値</span>
+                        </div>
+                        <div class="py-3 px-4 bg-gradient-to-r from-blue-50 to-blue-100 rounded-lg text-sm text-blue-900 font-medium border border-blue-200">
+                            🖌️ paint
+                        </div>
+                        <p class="help-text mt-2">このジェネレーターは paint モード専用です</p>
                     </div>
-                    <label>
-                        <span class="block mb-1">ターゲットノード</span>
-                        <input id="terraform-target" type="text" value="wool:white" placeholder="wool:white">
-                    </label>
-                    <label>
-                        <span class="block mb-1">シェイプ</span>
-                        <input id="terraform-shape" type="text" placeholder="例: sphere">
-                    </label>
+                    
                     <label class="md:col-span-2">
-                        <span class="block mb-1">マスク (改行またはカンマ区切り)</span>
-                        <textarea id="terraform-mask" rows="3" placeholder="wool:violet, wool:blue">wool:violet
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="block font-semibold">🎯 ターゲットノード</span>
+                            <span class="badge badge-required">必須</span>
+                        </div>
+                        <div class="input-group">
+                            <input id="terraform-target" type="text" value="wool:white" placeholder="例: wool:white" required>
+                        </div>
+                        <p class="help-text">ペイントするブロックを指定（例: default:stone, wool:red）</p>
+                    </label>
+
+                    <label>
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="block font-semibold">🔷 シェイプ</span>
+                            <span class="badge badge-optional">任意</span>
+                        </div>
+                        <input id="terraform-shape" type="text" placeholder="例: sphere, cube">
+                        <p class="help-text">ブラシの形状を指定</p>
+                    </label>
+
+                    <label>
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="block font-semibold">📏 ブラシサイズ</span>
+                            <span class="badge badge-optional">任意</span>
+                        </div>
+                        <input id="terraform-size" type="number" min="1" max="100" value="10" placeholder="1-100">
+                        <p class="help-text">ブラシの半径（1-100推奨）</p>
+                    </label>
+                    
+                    <label class="md:col-span-2">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="block font-semibold">🎭 マスク</span>
+                            <span class="badge badge-optional">任意</span>
+                        </div>
+                        <textarea id="terraform-mask" rows="4" placeholder="改行またはカンマ区切りで指定&#10;例:&#10;wool:violet&#10;wool:blue&#10;wool:pink">wool:violet
 wool:blue
 wool:pink
 wool:grey
@@ -185,69 +327,118 @@ wool:dark_grey
 wool:green
 wool:orange
 wool:yellow</textarea>
+                        <div class="flex gap-2 mt-2 flex-wrap">
+                            <span class="quick-action" data-action="clear-mask">🗑️ クリア</span>
+                            <span class="quick-action" data-action="example-wool">🧶 ウールセット</span>
+                        </div>
+                        <p class="help-text">置き換え対象のブロックを制限</p>
                     </label>
-                    <label>
-                        <span class="block mb-1">ブラシサイズ</span>
-                        <input id="terraform-size" type="number" min="1" value="10">
-                    </label>
-                    <label>
-                        <span class="block mb-1">モディファイア</span>
-                        <input id="terraform-modifiers" type="text" placeholder="例: replace_air">
+
+                    <label class="md:col-span-2">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="block font-semibold">⚙️ モディファイア</span>
+                            <span class="badge badge-optional">任意</span>
+                        </div>
+                        <input id="terraform-modifiers" type="text" placeholder="例: replace_air, ignore_liquid">
+                        <p class="help-text">ブラシの動作を変更する修飾子</p>
                     </label>
                 </div>
             </div>
             <div class="section-frame">
-                <div class="section-title">プレビュー</div>
-                <div id="terraform-preview" class="text-sm text-gray-600">設定されたセグメントがここに表示されます。</div>
+                <div class="section-title">👁️ プレビュー</div>
+                <div id="terraform-preview" class="min-h-[80px]"></div>
             </div>
         </div>
 
         <div id="panel-worldedit" class="tab-panel">
             <div class="section-frame">
-                <div class="section-title">WorldEdit パラメーター</div>
+                <div class="section-title">✏️ WorldEdit パラメーター</div>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <label>
-                        <span class="block mb-1">コマンド (例: cube)</span>
-                        <input id="worldedit-command" type="text" value="cube" placeholder="cube">
-                    </label>
-                    <label>
-                        <span class="block mb-1">シェイプ</span>
-                        <input id="worldedit-shape" type="text" placeholder="任意">
-                    </label>
                     <label class="md:col-span-2">
-                        <span class="block mb-1">パラメーター</span>
-                        <textarea id="worldedit-params" rows="3" placeholder="5 5 5 stone">5 5 5 stone</textarea>
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="block font-semibold">📝 コマンド</span>
+                            <span class="badge badge-required">必須</span>
+                        </div>
+                        <input id="worldedit-command" type="text" value="cube" placeholder="例: cube, sphere, cylinder" required>
+                        <div class="flex gap-2 mt-2 flex-wrap">
+                            <span class="quick-action" data-command="cube">📦 cube</span>
+                            <span class="quick-action" data-command="sphere">🔵 sphere</span>
+                            <span class="quick-action" data-command="cylinder">🥫 cylinder</span>
+                        </div>
+                        <p class="help-text">WorldEditのブラシコマンドを指定</p>
                     </label>
+
+                    <label>
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="block font-semibold">🔷 シェイプ</span>
+                            <span class="badge badge-optional">任意</span>
+                        </div>
+                        <input id="worldedit-shape" type="text" placeholder="例: smooth, natural">
+                        <p class="help-text">ブラシの形状修飾子</p>
+                    </label>
+
+                    <label>
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="block font-semibold">⚙️ モディファイア</span>
+                            <span class="badge badge-optional">任意</span>
+                        </div>
+                        <input id="worldedit-modifiers" type="text" placeholder="例: mask, overlay">
+                        <p class="help-text">追加の動作修飾子</p>
+                    </label>
+                    
                     <label class="md:col-span-2">
-                        <span class="block mb-1">モディファイア</span>
-                        <input id="worldedit-modifiers" type="text" placeholder="任意">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="block font-semibold">🎯 パラメーター</span>
+                            <span class="badge badge-required">必須</span>
+                        </div>
+                        <textarea id="worldedit-params" rows="3" placeholder="例: 5 5 5 stone" required>5 5 5 stone</textarea>
+                        <p class="help-text">コマンドに渡すパラメーター（サイズ、ブロックなど）</p>
                     </label>
                 </div>
             </div>
             <div class="section-frame">
-                <div class="section-title">プレビュー</div>
-                <div id="worldedit-preview" class="text-sm text-gray-600">設定されたセグメントがここに表示されます。</div>
+                <div class="section-title">👁️ プレビュー</div>
+                <div id="worldedit-preview" class="min-h-[80px]"></div>
             </div>
         </div>
 
         <div class="section-frame">
-            <div class="section-title">生成されたコマンド</div>
+            <div class="section-title">📋 生成されたコマンド</div>
             <div class="flex flex-col gap-3">
-                <div class="flex flex-wrap items-center justify-between gap-2">
-                    <div class="text-sm text-gray-600">生成されたコマンドをコピーしてご利用ください。</div>
-                    <div class="flex items-center gap-3">
-                        <label class="flex items-center gap-2 text-sm text-gray-700">
+                <div class="flex flex-wrap items-center justify-between gap-3">
+                    <div class="text-sm text-gray-600">
+                        ⬇️ 生成されたコマンドをコピーしてゲーム内で使用できます
+                    </div>
+                    <div class="flex items-center gap-3 flex-wrap">
+                        <label class="flex items-center gap-2 text-sm text-gray-700 bg-gray-50 px-3 py-2 rounded-lg border border-gray-200 cursor-pointer hover:bg-gray-100 transition-colors">
                             <input id="include-slash" type="checkbox" class="h-4 w-4 text-blue-600 border-gray-300 rounded" checked>
                             <span>/ を付与</span>
                         </label>
-                        <button id="copy-command" type="button" class="px-3 py-2 bg-blue-600 text-white rounded-md text-sm font-medium">コピー</button>
+                        <button id="copy-command" type="button" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium shadow-sm transition-all flex items-center gap-2">
+                            📋 コピー
+                        </button>
                     </div>
                 </div>
-                <textarea id="command-display" rows="4" class="bg-gray-100 font-mono text-sm text-gray-800" readonly></textarea>
+                <div class="relative">
+                    <textarea id="command-display" rows="4" class="bg-gradient-to-br from-gray-50 to-gray-100 font-mono text-sm text-gray-800 border-2 border-gray-200" readonly></textarea>
+                    <div id="char-count" class="absolute bottom-2 right-2 text-xs text-gray-500 bg-white px-2 py-1 rounded shadow-sm">0 文字</div>
+                </div>
             </div>
         </div>
 
-        <p class="text-center text-sm text-gray-500">Author: multi_nono / Nono | Contributor: dark, 7080</p>
+        <div class="mt-6 p-4 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg border border-blue-200">
+            <h3 class="font-semibold text-gray-800 mb-2">💡 使い方のヒント</h3>
+            <ul class="text-sm text-gray-600 space-y-1">
+                <li>• <strong>Terraform</strong>: ターゲットノードを設定してペイントブラシを作成</li>
+                <li>• <strong>WorldEdit</strong>: コマンドとパラメーターで様々な形状のブラシを作成</li>
+                <li>• マスクを使って特定のブロックのみを変更可能</li>
+                <li>• 生成されたコマンドをコピーしてゲーム内チャットに貼り付け</li>
+            </ul>
+        </div>
+
+        <p class="text-center text-sm text-gray-500 mt-6">
+            👨‍💻 Author: multi_nono / Nono | 🤝 Contributor: dark, 7080
+        </p>
     </div>
 
     <div id="toast" class="toast"></div>
@@ -312,13 +503,30 @@ wool:yellow</textarea>
 
             function renderPreview(target, entries) {
                 if (!entries.length) {
-                    target.innerHTML = '<span class="text-gray-500">設定されたセグメントがありません。</span>';
+                    target.innerHTML = '<div class="preview-empty">⚠️ まだパラメーターが設定されていません<br><span class="text-xs">必須項目を入力してください</span></div>';
                     return;
                 }
-                target.innerHTML = entries.map(entry => {
+                target.innerHTML = entries.map((entry, index) => {
                     const safeKey = escapeHtml(entry.key);
                     const safeValue = escapeHtml(entry.value);
-                    return `<div class="flex flex-wrap items-center gap-2 mb-2"><span class="pill">${safeKey}</span><code class="text-sm text-slate-700">${safeValue}</code></div>`;
+                    const icons = {
+                        'paint': '🎨',
+                        'command': '📝',
+                        'shape': '🔷',
+                        'mask': '🎭',
+                        'size': '📏',
+                        'modifiers': '⚙️',
+                        'params': '🎯'
+                    };
+                    const icon = icons[entry.key] || '📌';
+                    return `
+                        <div class="preview-item">
+                            <span style="font-size: 1.2em;">${icon}</span>
+                            <span class="preview-key">${safeKey}</span>
+                            <span class="preview-separator">→</span>
+                            <span class="preview-value">${safeValue}</span>
+                        </div>
+                    `;
                 }).join('');
             }
 
@@ -390,6 +598,12 @@ wool:yellow</textarea>
 
                 elements.commandDisplay.value = display;
                 elements.commandDisplay.dataset.actual = actual;
+                
+                // Update character count
+                const charCount = document.getElementById('char-count');
+                if (charCount) {
+                    charCount.textContent = `${display.length} 文字`;
+                }
             }
 
             function switchBrush(target) {
@@ -435,11 +649,50 @@ wool:yellow</textarea>
                         document.execCommand('copy');
                         document.body.removeChild(temp);
                     }
-                    showToast('コマンドをコピーしました', false);
+                    showToast('✅ コマンドをコピーしました！', false);
                 } catch (error) {
                     console.error(error);
-                    showToast('コピーに失敗しました', true);
+                    showToast('❌ コピーに失敗しました', true);
                 }
+            });
+
+            // Quick actions for Terraform
+            document.querySelectorAll('[data-action]').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const action = e.currentTarget.dataset.action;
+                    if (action === 'clear-mask') {
+                        elements.terraform.mask.value = '';
+                        updateCommand();
+                        showToast('🗑️ マスクをクリアしました', false);
+                    } else if (action === 'example-wool') {
+                        elements.terraform.mask.value = `wool:violet
+wool:blue
+wool:pink
+wool:grey
+wool:red
+wool:magenta
+wool:black
+wool:brown
+wool:cyan
+wool:dark_green
+wool:dark_grey
+wool:green
+wool:orange
+wool:yellow`;
+                        updateCommand();
+                        showToast('🧶 ウールマスクを設定しました', false);
+                    }
+                });
+            });
+
+            // Quick command buttons for WorldEdit
+            document.querySelectorAll('[data-command]').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const command = e.currentTarget.dataset.command;
+                    elements.worldedit.command.value = command;
+                    updateCommand();
+                    showToast(`📝 コマンドを「${command}」に設定しました`, false);
+                });
             });
 
             switchBrush('terraform');

@@ -736,11 +736,11 @@
     <div id="toolCapsModal" class="modal">
         <div class="modal-content"><span class="close-button" onclick="closeModal('toolCapsModal')">&times;</span>
             <h2 class="text-xl font-semibold mb-4 text-gray-800">ツール性能の編集</h2>
-            <div class="tab-container"><button class="tab-link active" data-tab="weapon">武器</button><button
-                    class="tab-link" data-tab="cracky">砕き</button><button class="tab-link"
-                    data-tab="choppy">伐採</button><button class="tab-link" data-tab="crumbly">整地</button><button
-                    class="tab-link" data-tab="snappy">切断</button><button class="tab-link"
-                    data-tab="drop_level">ドロップLV</button></div>
+        <div class="tab-container"><button class="tab-link active" data-tab="weapon">武器</button><button
+            class="tab-link" data-tab="cracky">砕き</button><button class="tab-link"
+            data-tab="choppy">伐採</button><button class="tab-link" data-tab="crumbly">整地</button><button
+            class="tab-link" data-tab="snappy">切断</button><button class="tab-link"
+            data-tab="drop_level">その他</button></div>
             <div class="scrollable-content flex-1 pt-4" id="tool-caps-panels">
                 <div id="tab-panel-weapon" class="tab-panel active"></div>
                 <div id="tab-panel-cracky" class="tab-panel"></div>
@@ -6463,10 +6463,14 @@
         ];
 
         const DEFAULT_TOOL_CAPS_DICT = {
-            damage_groups: { fleshy: 1.0 }, full_punch_interval: 0.5,
+            damage_groups: { fleshy: 1.0 },
+            full_punch_interval: 0.5,
+            punch_attack_uses: null,
             groupcaps: {
-                cracky: { maxlevel: 0, times: [null, 3.0, 2.0, 1.0], uses: 30 }, choppy: { maxlevel: 0, times: [null, 3.0, 2.0, 1.0], uses: 30 },
-                crumbly: { maxlevel: 0, times: [null, 3.0, 2.0, 1.0], uses: 30 }, snappy: { maxlevel: 0, times: [null, 3.0, 2.0, 1.0], uses: 30 }
+                cracky: { maxlevel: 0, times: [null, 3.0, 2.0, 1.0], uses: 30 },
+                choppy: { maxlevel: 0, times: [null, 3.0, 2.0, 1.0], uses: 30 },
+                crumbly: { maxlevel: 0, times: [null, 3.0, 2.0, 1.0], uses: 30 },
+                snappy: { maxlevel: 0, times: [null, 3.0, 2.0, 1.0], uses: 30 }
             },
             max_drop_level: 0
         };
@@ -6492,8 +6496,9 @@
             return str;
         }
 
-        let descriptionContent = "", shortDescriptionContent = "", itemColorHex = "";
-        let userToolCapabilities = {}, enchantments = {};
+    let descriptionContent = "", shortDescriptionContent = "", itemColorHex = "";
+    let userToolCapabilities = {}, enchantments = {};
+    let toolRange = "";
         let tempEnchantments = {}; // For editing in the modal
         let toolRanks = { level: "", uses: "" };
         let dugValue = "";
@@ -6549,6 +6554,9 @@
             if (finalDesc) metaParts.push(`\u0003description\u0002${finalDesc}`);
             if (shortDescriptionContent) metaParts.push(`\u0003short_description\u0002${shortDescriptionContent}`);
             if (dugValue) metaParts.push(`\u0003dug\u0002${dugValue}`);
+            if (toolRange !== '' && toolRange !== null && toolRange !== undefined) {
+                metaParts.push(`\u0003range\u0002${toolRange}`);
+            }
 
             let core = metaParts.join(""), color = itemColorHex ? `\u001bE\u0003color\u0002${itemColorHex}\u0003` : "";
             const finalMeta = core + ((core && !color) ? "\u0003" : "") + color;
@@ -6662,10 +6670,173 @@
         $('colorPickerInput').addEventListener('input', () => { $('colorDisplayLabel').style.backgroundColor = $('colorPickerInput').value; });
         $('confirmItemColorBtn').addEventListener('click', () => { itemColorHex = $('colorPickerInput').value.toUpperCase(); closeModal('itemColorModal'); updateCommandDisplay(); });
         $('removeItemColorBtn').addEventListener('click', () => { itemColorHex = ""; closeModal('itemColorModal'); updateCommandDisplay(); showMessageBox("アイテムの色を削除しました。"); });
-        function populateToolCapsModal() { const defaults = DEFAULT_TOOL_CAPS_DICT; const caps = deepMerge({}, defaults, userToolCapabilities); $('tab-panel-weapon').innerHTML = `<div class="label-frame"><div class="label-frame-title">武器</div><div class="grid grid-cols-1 md:grid-cols-2 gap-4"><div><label class="block text-sm font-medium mb-1">ダメージ:</label><input type="number" step="0.1" id="fleshy-damage" value="${caps.damage_groups.fleshy}" class="w-full"></div><div><label class="block text-sm font-medium mb-1">攻撃速度:</label><input type="number" step="0.1" id="full-punch-interval" value="${caps.full_punch_interval}" class="w-full"></div></div></div>`; $('tab-panel-drop_level').innerHTML = `<div class="label-frame"><div class="label-frame-title">最大ドロップレベル</div><label class="block text-sm font-medium mr-2">値を設定:</label><input type="number" id="max-drop-level" min="0" value="${caps.max_drop_level}" class="w-24"></div>`; const groupTranslations = { "cracky": "砕き", "choppy": "伐採", "crumbly": "整地", "snappy": "切断" }; Object.entries(groupTranslations).forEach(([group, name]) => { const data = caps.groupcaps[group]; $(`tab-panel-${group}`).innerHTML = `<div class="label-frame"><div class="label-frame-title">${name}</div><div class="grid grid-cols-1 md:grid-cols-2 gap-4"><div><label class="block text-sm font-medium">最大レベル:</label><input type="number" id="${group}-maxlevel" value="${data.maxlevel}" class="w-full"></div><div><label class="block text-sm font-medium">耐久値:</label><input type="number" id="${group}-uses" value="${data.uses}" class="w-full"></div></div><label class="block text-sm font-medium mt-2">時間 (lv1-3):</label><div class="flex space-x-2">${[1, 2, 3].map(i => `<input type="number" step="0.1" id="${group}-time${i}" value="${data.times[i]}" class="w-1/3">`).join('')}</div></div>`; }); }
+        function populateToolCapsModal() {
+            const defaults = DEFAULT_TOOL_CAPS_DICT;
+            const caps = deepMerge({}, defaults, userToolCapabilities);
+            const rangeFieldValue = toolRange === '' ? '' : toolRange;
+
+            $('tab-panel-weapon').innerHTML = `
+                <div class="label-frame">
+                    <div class="label-frame-title">武器</div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium mb-1">ダメージ:</label>
+                            <input type="number" step="0.1" id="fleshy-damage" value="${caps.damage_groups.fleshy}" class="w-full">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-1">攻撃速度:</label>
+                            <input type="number" step="0.1" id="full-punch-interval" value="${caps.full_punch_interval}" class="w-full">
+                        </div>
+                        <div class="md:col-span-2">
+                            <label class="block text-sm font-medium mb-1">耐久値:</label>
+                            <input type="number" min="0" step="1" id="weapon-uses" value="${caps.punch_attack_uses ?? ''}" class="w-full">
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            $('tab-panel-drop_level').innerHTML = `
+                <div class="label-frame">
+                    <div class="label-frame-title">その他</div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium mb-1">最大ドロップレベル:</label>
+                            <input type="number" id="max-drop-level" min="0" value="${caps.max_drop_level}" class="w-full">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-1">範囲:</label>
+                            <input type="number" step="0.1" id="tool-range" value="${rangeFieldValue}" class="w-full">
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            const groupTranslations = { "cracky": "砕き", "choppy": "伐採", "crumbly": "整地", "snappy": "切断" };
+            Object.entries(groupTranslations).forEach(([group, name]) => {
+                const data = caps.groupcaps[group];
+                $(`tab-panel-${group}`).innerHTML = `
+                    <div class="label-frame">
+                        <div class="label-frame-title">${name}</div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium">最大レベル:</label>
+                                <input type="number" id="${group}-maxlevel" value="${data.maxlevel}" class="w-full">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium">耐久値:</label>
+                                <input type="number" id="${group}-uses" value="${data.uses}" class="w-full">
+                            </div>
+                        </div>
+                        <label class="block text-sm font-medium mt-2">時間 (lv1-3):</label>
+                        <div class="flex space-x-2">
+                            ${[1, 2, 3].map(i => `<input type="number" step="0.1" id="${group}-time${i}" value="${data.times[i]}" class="w-1/3">`).join('')}
+                        </div>
+                    </div>
+                `;
+            });
+        }
         $('btn-tool-caps').addEventListener('click', () => { populateToolCapsModal(); openModal('toolCapsModal'); });
-        $('saveToolCapsBtn').addEventListener('click', () => { const activeTab = document.querySelector('.tab-link.active').dataset.tab; const activeTabName = document.querySelector('.tab-link.active').textContent; let updates = {}; switch (activeTab) { case 'weapon': updates.damage_groups = { fleshy: parseFloat($('fleshy-damage').value) }; updates.full_punch_interval = parseFloat($('full-punch-interval').value); break; case 'drop_level': updates.max_drop_level = parseInt($('max-drop-level').value); break; default: if (!updates.groupcaps) updates.groupcaps = {}; updates.groupcaps[activeTab] = { maxlevel: parseInt($(`${activeTab}-maxlevel`).value), uses: parseInt($(`${activeTab}-uses`).value), times: [null, parseFloat($(`${activeTab}-time1`).value), parseFloat($(`${activeTab}-time2`).value), parseFloat($(`${activeTab}-time3`).value)] }; break; } userToolCapabilities = deepMerge({}, userToolCapabilities, updates); closeModal('toolCapsModal'); updateCommandDisplay(); showMessageBox(`「${activeTabName}」の性能を更新しました。`); });
-        $('resetToolCapsBtn').addEventListener('click', () => { const activeTab = document.querySelector('.tab-link.active'); const tabId = activeTab.dataset.tab; const tabName = activeTab.textContent; switch (tabId) { case 'weapon': delete userToolCapabilities.damage_groups; delete userToolCapabilities.full_punch_interval; break; case 'drop_level': delete userToolCapabilities.max_drop_level; break; default: if (userToolCapabilities.groupcaps && userToolCapabilities.groupcaps[tabId]) { delete userToolCapabilities.groupcaps[tabId]; if (Object.keys(userToolCapabilities.groupcaps).length === 0) { delete userToolCapabilities.groupcaps; } } break; } updateCommandDisplay(); closeModal('toolCapsModal'); showMessageBox(`「${tabName}」の性能をリセットしました。`, false); });
+        $('saveToolCapsBtn').addEventListener('click', () => {
+            const activeTab = document.querySelector('.tab-link.active').dataset.tab;
+            const activeTabName = document.querySelector('.tab-link.active').textContent;
+            let updates = {};
+
+            switch (activeTab) {
+                case 'weapon': {
+                    updates.damage_groups = { fleshy: parseFloat($('fleshy-damage').value) };
+                    updates.full_punch_interval = parseFloat($('full-punch-interval').value);
+
+                    const weaponUsesValue = $('weapon-uses').value.trim();
+                    if (weaponUsesValue === '') {
+                        delete userToolCapabilities.punch_attack_uses;
+                    } else {
+                        const parsedUses = parseInt(weaponUsesValue, 10);
+                        if (Number.isNaN(parsedUses)) {
+                            showMessageBox('耐久値が正しくありません。', true);
+                            return;
+                        }
+                        updates.punch_attack_uses = parsedUses;
+                    }
+                    break;
+                }
+                case 'drop_level': {
+                    const dropLevelValue = $('max-drop-level').value.trim();
+                    if (dropLevelValue === '') {
+                        delete userToolCapabilities.max_drop_level;
+                    } else {
+                        const parsedDropLevel = parseInt(dropLevelValue, 10);
+                        if (Number.isNaN(parsedDropLevel)) {
+                            showMessageBox('最大ドロップレベルが正しくありません。', true);
+                            return;
+                        }
+                        updates.max_drop_level = parsedDropLevel;
+                    }
+
+                    const rangeValueRaw = $('tool-range').value.trim();
+                    if (rangeValueRaw === '') {
+                        toolRange = '';
+                    } else {
+                        const parsedRange = parseFloat(rangeValueRaw);
+                        if (Number.isNaN(parsedRange)) {
+                            showMessageBox('範囲が正しくありません。', true);
+                            return;
+                        }
+                        toolRange = parsedRange;
+                    }
+                    delete userToolCapabilities.range;
+                    break;
+                }
+                default: {
+                    if (!updates.groupcaps) updates.groupcaps = {};
+                    updates.groupcaps[activeTab] = {
+                        maxlevel: parseInt($(`${activeTab}-maxlevel`).value, 10),
+                        uses: parseInt($(`${activeTab}-uses`).value, 10),
+                        times: [
+                            null,
+                            parseFloat($(`${activeTab}-time1`).value),
+                            parseFloat($(`${activeTab}-time2`).value),
+                            parseFloat($(`${activeTab}-time3`).value)
+                        ]
+                    };
+                    break;
+                }
+            }
+
+            userToolCapabilities = deepMerge({}, userToolCapabilities, updates);
+            closeModal('toolCapsModal');
+            updateCommandDisplay();
+            showMessageBox(`「${activeTabName}」の性能を更新しました。`);
+        });
+        $('resetToolCapsBtn').addEventListener('click', () => {
+            const activeTab = document.querySelector('.tab-link.active');
+            const tabId = activeTab.dataset.tab;
+            const tabName = activeTab.textContent;
+
+            switch (tabId) {
+                case 'weapon':
+                    delete userToolCapabilities.damage_groups;
+                    delete userToolCapabilities.full_punch_interval;
+                    delete userToolCapabilities.punch_attack_uses;
+                    break;
+                case 'drop_level':
+                    delete userToolCapabilities.max_drop_level;
+                    delete userToolCapabilities.range;
+                    toolRange = '';
+                    break;
+                default:
+                    if (userToolCapabilities.groupcaps && userToolCapabilities.groupcaps[tabId]) {
+                        delete userToolCapabilities.groupcaps[tabId];
+                        if (Object.keys(userToolCapabilities.groupcaps).length === 0) {
+                            delete userToolCapabilities.groupcaps;
+                        }
+                    }
+                    break;
+            }
+
+            updateCommandDisplay();
+            closeModal('toolCapsModal');
+            showMessageBox(`「${tabName}」の性能をリセットしました。`, false);
+        });
         document.querySelectorAll('.tab-link').forEach(tab => tab.addEventListener('click', () => { document.querySelectorAll('.tab-link, .tab-panel').forEach(el => el.classList.remove('active')); tab.classList.add('active'); $(`tab-panel-${tab.dataset.tab}`).classList.add('active'); }));
 
         // --- Enchantment Logic Start ---
