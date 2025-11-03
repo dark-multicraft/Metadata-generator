@@ -418,7 +418,7 @@
                     <label for="item-name" class="flex items-center gap-2 text-sm font-medium text-gray-700 mb-1">アイテム名:
                         <span class="info-tip" tabindex="0">
                             <span class="info-tip-icon">i</span>
-                            <span class="info-tip-content">例: default:stone や mymod:custom_pickaxe のように入力します。</span>
+                            <span class="info-tip-content">アイテムidを入力してください。アイテム名で検索もできます。</span>
                         </span>
                     </label>
                     <div class="relative">
@@ -430,7 +430,7 @@
                     <label for="amount" class="flex items-center gap-2 text-sm font-medium text-gray-700 mb-1">数量:
                         <span class="info-tip" tabindex="0">
                             <span class="info-tip-icon">i</span>
-                            <span class="info-tip-content">スタック数に合わせて設定してください。最大スタック数はアイテムによって異なります。</span>
+                            <span class="info-tip-content">スタック数を入力してください。値の範囲は0~65535です。</span>
                         </span>
                     </label>
                     <!-- Removed fixed width on the amount input so it expands to fill its grid cell -->
@@ -440,7 +440,7 @@
                     <label for="item-wear" class="flex items-center gap-2 text-sm font-medium text-gray-700 mb-1">消耗度 (Wear):
                         <span class="info-tip info-tip--left" tabindex="0">
                             <span class="info-tip-icon">i</span>
-                            <span class="info-tip-content">0 は新品、数値が大きいほど消耗しています。ツール以外では 0 のままで問題ありません。</span>
+                            <span class="info-tip-content">0 は新品、数値が大きいほど耐久値が少ないです。ツール以外では0のままで問題ありません。</span>
                         </span>
                     </label>
                     <!-- Removed fixed width on the wear input so it expands to fill its grid cell -->
@@ -473,7 +473,7 @@
                 <label for="slash-toggle" class="ml-2 flex items-center gap-2 text-sm text-gray-900">コマンドの先頭に / を付ける
                     <span class="info-tip info-tip--left" tabindex="0">
                         <span class="info-tip-icon">i</span>
-                        <span class="info-tip-content">サーバーでコマンド権限が必要な場合はチェックを入れます。シングルプレイでは外しておくと入力しやすくなります。</span>
+                        <span class="info-tip-content">チャットに入力するときは/をつけてください。コマンドブロックに入力する場合は外してください。</span>
                     </span>
                 </label>
             </div>
@@ -908,25 +908,35 @@
                 <h2 class="text-xl font-semibold text-gray-800">ツールランク & Dug</h2>
                 <span class="info-tip" tabindex="0">
                     <span class="info-tip-icon">i</span>
-                    <span class="info-tip-content">ミネヌクス系MODで使用される追加情報です。必要な場合のみ値を入力し、「決定」で保存します。未使用なら空欄のままで構いません。</span>
+                    <span class="info-tip-content">ツールレベルや採掘数を定義します。必要な場合のみ値を入力し、「決定」で保存します。未使用なら空欄のままで構いません。</span>
                 </span>
             </div>
             <div class="scrollable-content flex-1 pt-4">
                 <div class="label-frame mb-4">
                     <div class="label-frame-title">Tool Ranks</div>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div><label for="toolranks-level"
-                                class="block text-sm font-medium text-gray-700 mb-1">Level:</label><input type="number"
-                                id="toolranks-level" placeholder="例: 1" class="w-full"></div>
-                        <div><label for="toolranks-uses"
-                                class="block text-sm font-medium text-gray-700 mb-1">Uses:</label><input type="number"
-                                id="toolranks-uses" placeholder="例: 0" class="w-full"></div>
+                        <div>
+                            <label for="toolranks-level" class="flex items-center gap-2 text-sm font-medium text-gray-700 mb-1">Level:
+                                <span class="info-tip info-tip--right" tabindex="0"><span class="info-tip-icon">i</span><span class="info-tip-content">ツールのレベルです。</span></span>
+                            </label>
+                            <input type="number" id="toolranks-level" placeholder="例: 1" class="w-full">
+                        </div>
+                        <div>
+                            <label for="toolranks-uses" class="flex items-center gap-2 text-sm font-medium text-gray-700 mb-1">Uses:
+                                <span class="info-tip info-tip--right" tabindex="0"><span class="info-tip-icon">i</span><span class="info-tip-content">ツールの使用回数です。</span></span>
+                            </label>
+                            <input type="number" id="toolranks-uses" placeholder="例: 0" class="w-full">
+                        </div>
                     </div>
                 </div>
                 <div class="label-frame">
                     <div class="label-frame-title">Dug</div>
-                    <div><label for="dug-value" class="block text-sm font-medium text-gray-700 mb-1">Dug
-                            値:</label><input type="number" id="dug-value" placeholder="例: 13" class="w-full"></div>
+                    <div>
+                        <label for="dug-value" class="flex items-center gap-2 text-sm font-medium text-gray-700 mb-1">Dug 値:
+                            <span class="info-tip info-tip--right" tabindex="0"><span class="info-tip-icon">i</span><span class="info-tip-content">このツールで掘削したブロック数のカウンターです。統計や表示に利用されます。</span></span>
+                        </label>
+                        <input type="number" id="dug-value" placeholder="例: 13" class="w-full">
+                    </div>
                 </div>
             </div>
             <div class="flex justify-between items-center mt-6"><button id="resetToolRanksBtn"
@@ -6860,7 +6870,7 @@
                     <div class="space-y-4">
                         <div>
                             <label class="flex items-center gap-2 text-sm font-medium mb-1" for="fleshy-damage">ダメージ:
-                                <span class="info-tip info-tip--right" tabindex="0"><span class="info-tip-icon">i</span><span class="info-tip-content">肉体系エンティティに与える基本ダメージです。</span></span>
+                                <span class="info-tip info-tip--right" tabindex="0"><span class="info-tip-icon">i</span><span class="info-tip-content">fleshyを持つエンティティに与える基本ダメージです。</span></span>
                             </label>
                             <input type="number" step="0.1" id="fleshy-damage" value="${caps.damage_groups.fleshy}" class="w-full" placeholder="例: 7">
                         </div>
