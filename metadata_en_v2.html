@@ -7472,7 +7472,10 @@
             }
 
             const hasBaseDescription = typeof descriptionContent === 'string' && descriptionContent.trim().length > 0;
-            const shouldAppendToolInfo = canAutoToolRanks && toolUsesValue !== null && hasBaseDescription;
+            const hasDugValueInput = dugValue !== "";
+            const shouldAppendToolInfoFromToolRanks = canAutoToolRanks && toolUsesValue !== null && hasBaseDescription;
+            const shouldAppendToolInfoFromDug = hasDugValueInput && toolUsesValue !== null;
+            const shouldAppendToolInfo = shouldAppendToolInfoFromToolRanks || shouldAppendToolInfoFromDug;
 
             if (shouldAppendToolInfo) {
                 const levelValue = calculateToolLevel(toolUsesValue);
