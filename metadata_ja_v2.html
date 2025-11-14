@@ -1114,8 +1114,8 @@
                                         <option value="default:pick_ruby">ルビーのピッケル</option>
                                     </select>
                                 </td>
-                                <td><select id="ci-cracky-speed" data-type="speed"></select></td>
-                                <td><select id="ci-cracky-durability" data-type="durability"></select></td>
+                                <td><select id="ci-cracky-speed" data-type="speed" disabled></select></td>
+                                <td><select id="ci-cracky-durability" data-type="durability" disabled></select></td>
                             </tr>
                             <tr>
                                 <td>Choppy<br>(木系)</td>
@@ -1130,8 +1130,8 @@
                                         <option value="default:axe_ruby">ルビーの斧</option>
                                     </select>
                                 </td>
-                                <td><select id="ci-choppy-speed" data-type="speed"></select></td>
-                                <td><select id="ci-choppy-durability" data-type="durability"></select></td>
+                                <td><select id="ci-choppy-speed" data-type="speed" disabled></select></td>
+                                <td><select id="ci-choppy-durability" data-type="durability" disabled></select></td>
                             </tr>
                             <tr>
                                 <td>Crumbly<br>(土系)</td>
@@ -1146,8 +1146,8 @@
                                         <option value="default:shovel_ruby">ルビーのシャベル</option>
                                     </select>
                                 </td>
-                                <td><select id="ci-crumbly-speed" data-type="speed"></select></td>
-                                <td><select id="ci-crumbly-durability" data-type="durability"></select></td>
+                                <td><select id="ci-crumbly-speed" data-type="speed" disabled></select></td>
+                                <td><select id="ci-crumbly-durability" data-type="durability" disabled></select></td>
                             </tr>
                         </tbody>
                     </table>
@@ -1172,10 +1172,6 @@
     <div id="messageBox" class="message-box"></div>
 
     <script>
-        // =================================================================
-        // ===== データ定義 (v5と同様) =================================
-        // =================================================================
-
         const allItems = [
             // ---ビルディングブロック---
             { "id": "amethyst_geode:amethyst", "name": "アメジスト" },
@@ -7479,13 +7475,15 @@
             }
 
             // 5. Custom Items (version自動化)
+            let hasCustomItemMeta = false;
             Object.entries(customItemsData).forEach(([key, value]) => {
                 if (value !== null && value !== "") {
+                    hasCustomItemMeta = true;
                     metaParts.push(`custom_items:${key}\u0002${value}`);
                 }
             });
             
-            if (customItemsVersionEnabled) {
+            if (customItemsVersionEnabled || hasCustomItemMeta) {
                 metaParts.push(`custom_items:version\u00021`);
             }
 
@@ -8297,6 +8295,42 @@
                 `<option value="${opt.value}" ${opt.value === selectedValue ? 'selected' : ''}>${opt.text}</option>`
             ).join('');
         }
+
+        function updateCustomItemRowState(type) {
+            const toolSelect = $(`ci-${type}-tool`);
+            const speedSelect = $(`ci-${type}-speed`);
+            const duraSelect = $(`ci-${type}-durability`);
+            if (!toolSelect || !speedSelect || !duraSelect) {
+                return;
+            }
+
+            const toolValue = toolSelect.value;
+            const hasTool = toolValue !== "";
+            const isRubyTool = hasTool && toolValue.includes('ruby');
+
+            if (!hasTool) {
+                speedSelect.disabled = true;
+                speedSelect.value = "";
+                duraSelect.disabled = true;
+                duraSelect.value = "";
+                return;
+            }
+
+            speedSelect.disabled = false;
+            if (!speedSelect.value) {
+                speedSelect.value = "1";
+            }
+
+            if (isRubyTool) {
+                duraSelect.disabled = true;
+                duraSelect.value = "";
+            } else {
+                duraSelect.disabled = false;
+                if (!duraSelect.value) {
+                    duraSelect.value = "1";
+                }
+            }
+        }
         $('btn-custom-items').addEventListener('click', () => {
             ['cracky', 'choppy', 'crumbly'].forEach(type => {
                 $(`ci-${type}-tool`).value = customItemsData[`${type}_tool`];
@@ -8304,8 +8338,7 @@
                 const duraSelect = $(`ci-${type}-durability`);
                 speedSelect.innerHTML = getSpeedDurabilityOptionsHtml(customItemsData[`${type}_speed`]);
                 duraSelect.innerHTML = getSpeedDurabilityOptionsHtml(customItemsData[`${type}_durability`]);
-                const toolValue = customItemsData[`${type}_tool`];
-                duraSelect.disabled = (toolValue && toolValue.includes('ruby'));
+                updateCustomItemRowState(type);
             });
             const ieToggle = $('ci-enable-ie-edit');
             if (ieToggle) {
@@ -8314,40 +8347,29 @@
             openModal('customItemsModal');
         });
         function handleToolChange(event) {
-            const toolSelect = event.target;
-            const toolValue = toolSelect.value;
-            const type = toolSelect.dataset.type; 
-            const speedSelect = $(`ci-${type}-speed`);
-            const duraSelect = $(`ci-${type}-durability`);
-            
-            if (toolValue === "") {
-                speedSelect.value = "";
-                duraSelect.value = "";
-                duraSelect.disabled = false;
-            } else {
-                speedSelect.value = "1";
-                if (toolValue.includes('ruby')) {
-                    duraSelect.value = "";
-                    duraSelect.disabled = true;
-                } else {
-                    duraSelect.value = "1";
-                    duraSelect.disabled = false;
-                }
-            }
+            const type = event.target.dataset.type;
+            updateCustomItemRowState(type);
         }
         $('ci-cracky-tool').addEventListener('change', handleToolChange);
         $('ci-choppy-tool').addEventListener('change', handleToolChange);
         $('ci-crumbly-tool').addEventListener('change', handleToolChange);
         $('saveCustomItemsBtn').addEventListener('click', () => {
+            const crackySpeed = $('ci-cracky-speed');
+            const crackyDurability = $('ci-cracky-durability');
+            const choppySpeed = $('ci-choppy-speed');
+            const choppyDurability = $('ci-choppy-durability');
+            const crumblySpeed = $('ci-crumbly-speed');
+            const crumblyDurability = $('ci-crumbly-durability');
+
             customItemsData.cracky_tool = $('ci-cracky-tool').value;
-            customItemsData.cracky_speed = $('ci-cracky-speed').value;
-            customItemsData.cracky_durability = $('ci-cracky-durability').disabled ? "" : $('ci-cracky-durability').value;
+            customItemsData.cracky_speed = crackySpeed.disabled ? "" : crackySpeed.value;
+            customItemsData.cracky_durability = crackyDurability.disabled ? "" : crackyDurability.value;
             customItemsData.choppy_tool = $('ci-choppy-tool').value;
-            customItemsData.choppy_speed = $('ci-choppy-speed').value;
-            customItemsData.choppy_durability = $('ci-choppy-durability').disabled ? "" : $('ci-choppy-durability').value;
+            customItemsData.choppy_speed = choppySpeed.disabled ? "" : choppySpeed.value;
+            customItemsData.choppy_durability = choppyDurability.disabled ? "" : choppyDurability.value;
             customItemsData.crumbly_tool = $('ci-crumbly-tool').value;
-            customItemsData.crumbly_speed = $('ci-crumbly-speed').value;
-            customItemsData.crumbly_durability = $('ci-crumbly-durability').disabled ? "" : $('ci-crumbly-durability').value;
+            customItemsData.crumbly_speed = crumblySpeed.disabled ? "" : crumblySpeed.value;
+            customItemsData.crumbly_durability = crumblyDurability.disabled ? "" : crumblyDurability.value;
             const ieToggle = $('ci-enable-ie-edit');
             customItemsVersionEnabled = ieToggle ? ieToggle.checked : false;
             updateCommandDisplay();
@@ -8365,7 +8387,7 @@
                 $(`ci-${type}-tool`).value = "";
                 $(`ci-${type}-speed`).innerHTML = getSpeedDurabilityOptionsHtml("");
                 $(`ci-${type}-durability`).innerHTML = getSpeedDurabilityOptionsHtml("");
-                $(`ci-${type}-durability`).disabled = false;
+                updateCustomItemRowState(type);
             });
             const ieToggle = $('ci-enable-ie-edit');
             if (ieToggle) {

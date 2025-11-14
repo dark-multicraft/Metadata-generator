@@ -505,7 +505,17 @@
         }
         .ci-table td:first-child {
             font-weight: 600;
-            width: 100px;
+            width: 140px;
+        }
+        .ci-group-label {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            line-height: 1.2;
+        }
+        .ci-group-note {
+            font-weight: 400;
+            white-space: nowrap;
         }
         .ci-table select {
             margin-bottom: 8px;
@@ -553,17 +563,15 @@
             <h1 class="text-2xl font-bold text-center mb-6 text-gray-800">Metadata Generator</h1>
             <div class="flex justify-end items-center gap-6 mb-4 flex-wrap">
                 <label for="tool-ranks-toggle" class="flex items-center gap-2 text-sm text-gray-600 cursor-pointer select-none">
-                    <input type="checkbox" id="tool-ranks-toggle",
-                        class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500" checked>
+                    <input type="checkbox" id="tool-ranks-toggle" class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500" checked>
                     Tool ranks
                     <span class="info-tip info-tip--left" tabindex="0">
                         <span class="info-tip-icon">i</span>
-                        <span class="info-tip-content">Automatically insert Level/Uses lines when the description is filled and the selected item supports tool ranks.</span>
+                        <span class="info-tip-content">Adds Level/Uses lines automatically for supported tools.</span>
                     </span>
                 </label>
                 <label for="info-tip-toggle" class="flex items-center gap-2 text-sm text-gray-600 cursor-pointer select-none">
-                    <input type="checkbox" id="info-tip-toggle",
-                        class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500" checked>
+                    <input type="checkbox" id="info-tip-toggle" class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500" checked>
                     Show Details
                 </label>
             </div>
@@ -576,7 +584,7 @@
                         <label for="item-name" class="flex items-center gap-2 text-sm font-medium text-gray-700 mb-1">Item Name:
                             <span class="info-tip" tabindex="0">
                                 <span class="info-tip-icon">i</span>
-                                <span class="info-tip-content">Enter the item ID. You can also search by item name.</span>
+                                <span class="info-tip-content">Enter the item ID or search by name.</span>
                             </span>
                         </label>
                         <div class="relative">
@@ -588,7 +596,7 @@
                         <label for="amount" class="flex items-center gap-2 text-sm font-medium text-gray-700 mb-1">Amount:
                             <span class="info-tip" tabindex="0">
                                 <span class="info-tip-icon">i</span>
-                                <span class="info-tip-content">Enter the stack size. The value range is 0-65535.</span>
+                                <span class="info-tip-content">Stack size (0-65535).</span>
                             </span>
                         </label>
                         <input type="number" id="amount" value="1" min="1" class="w-full">
@@ -597,7 +605,7 @@
                         <label for="item-wear" class="flex items-center gap-2 text-sm font-medium text-gray-700 mb-1">Wear:
                             <span class="info-tip info-tip--left" tabindex="0">
                                 <span class="info-tip-icon">i</span>
-                                <span class="info-tip-content">0 is brand new, a higher value means less durability. 0 is fine for non-tools.</span>
+                                <span class="info-tip-content">0 means brand new; higher values reduce durability.</span>
                             </span>
                         </label>
                         <input type="number" id="item-wear" value="0" min="0" class="w-full">
@@ -610,7 +618,7 @@
                 <div class="label-frame-title flex items-center gap-2">Metadata Modification
                     <span class="info-tip" tabindex="0">
                         <span class="info-tip-icon">i</span>
-                        <span class="info-tip-content">Click the button for the item you want to edit to open a dedicated settings dialog. You can combine multiple items for customization.</span>
+                        <span class="info-tip-content">Open the button for the section you want to edit.</span>
                     </span>
                 </div>
                 <div class="flex flex-row flex-wrap gap-2 button-container">
@@ -628,7 +636,7 @@
                 <div class="label-frame-title flex items-center gap-2">Generated Command:
                     <span class="info-tip" tabindex="0">
                         <span class="info-tip-icon">i</span>
-                        <span class="info-tip-content">The command updates immediately when you change values or settings. Copy and paste it into the in-game chat to execute.</span>
+                        <span class="info-tip-content">The command updates live. Copy it into chat to run.</span>
                     </span>
                 </div>
                 <div class="flex items-center justify-end mb-2">
@@ -637,7 +645,7 @@
                     <label for="slash-toggle" class="ml-2 flex items-center gap-2 text-sm text-gray-900">Add / to the beginning of the command
                         <span class="info-tip info-tip--left" tabindex="0">
                             <span class="info-tip-icon">i</span>
-                            <span class="info-tip-content">Add / when entering in chat. Remove it when entering in a command block.</span>
+                            <span class="info-tip-content">Use / in chat and omit it for command blocks.</span>
                         </span>
                     </label>
                 </div>
@@ -970,7 +978,7 @@
                 <h2 id="textEditorModalTitle" class="text-xl font-semibold text-gray-800"></h2>
                 <span class="info-tip" tabindex="0">
                     <span class="info-tip-icon">i</span>
-                    <span class="info-tip-content">Enter text directly and insert colors using the color code buttons as needed. Press Enter to newline, and click Confirm to save the content.</span>
+                    <span class="info-tip-content">Type your text, add color codes if needed, then press Confirm.</span>
                 </span>
             </div>
             <div class="scrollable-content mb-4">
@@ -995,7 +1003,7 @@
                 <h2 class="text-xl font-semibold text-gray-800">Item Color</h2>
                 <span class="info-tip" tabindex="0">
                     <span class="info-tip-icon">i</span>
-                    <span class="info-tip-content">You can select a color while checking the preview. Press "Remove Color" to remove the existing color.</span>
+                    <span class="info-tip-content">Pick a color, preview it, or clear it with "Remove Color".</span>
                 </span>
             </div>
             <div class="flex flex-col items-center mb-6">
@@ -1018,7 +1026,7 @@
                 <h2 class="text-xl font-semibold text-gray-800">Enchantment</h2>
                 <span class="info-tip" tabindex="0">
                     <span class="info-tip-icon">i</span>
-                    <span class="info-tip-content">Select the effect you want to add, set the level, and press "Add Enchantment". Adjust the values in the list, then press "Confirm" to save.</span>
+                    <span class="info-tip-content">Choose an effect, set its level, add it, then Confirm.</span>
                 </span>
             </div>
             <div class="scrollable-content flex-1 pt-4">
@@ -1058,7 +1066,7 @@
                 <h2 class="text-xl font-semibold text-gray-800">Tool Capability</h2>
                 <span class="info-tip" tabindex="0">
                     <span class="info-tip-icon">i</span>
-                    <span class="info-tip-content">Select the tab for the category you want to edit and enter the values. Empty fields will use default values. Press "Confirm" to save, or "Reset This Tab" to restore the initial state.</span>
+                    <span class="info-tip-content">Pick a tab, fill the values, then Confirm or Reset This Tab.</span>
                 </span>
             </div>
         <!-- ★ Add ID to prevent selector conflicts -->
@@ -1091,7 +1099,7 @@
                 <h2 class="text-xl font-semibold text-gray-800">Custom Items</h2>
                 <span class="info-tip" tabindex="0">
                     <span class="info-tip-icon">i</span>
-                    <span class="info-tip-content">Set custom items based on existing tools. Empty fields will not be included in the metadata. If necessary, enabling "/ie editing" will add custom_items:version.</span>
+                    <span class="info-tip-content">Copy stats from existing tools. "/ie editing" always forces custom_items:version.</span>
                 </span>
             </div>
             <div class="scrollable-content flex-1 pt-4 space-y-4">
@@ -1111,7 +1119,12 @@
                         <tbody>
                             <!-- ★ Wording Change (Newline Added) -->
                             <tr>
-                                <td>Cracky<br>(Stone type)</td>
+                                <td>
+                                    <div class="ci-group-label">
+                                        <span>Cracky</span>
+                                        <span class="ci-group-note">(Stone type)</span>
+                                    </div>
+                                </td>
                                 <td>
                                     <select id="ci-cracky-tool" data-type="cracky">
                                         <option value="">Not Set</option>
@@ -1123,11 +1136,16 @@
                                         <option value="default:pick_ruby">Ruby Pickaxe</option>
                                     </select>
                                 </td>
-                                <td><select id="ci-cracky-speed" data-type="speed"></select></td>
-                                <td><select id="ci-cracky-durability" data-type="durability"></select></td>
+                                <td><select id="ci-cracky-speed" data-type="speed" disabled></select></td>
+                                <td><select id="ci-cracky-durability" data-type="durability" disabled></select></td>
                             </tr>
                             <tr>
-                                <td>Choppy<br>(Wood type)</td>
+                                <td>
+                                    <div class="ci-group-label">
+                                        <span>Choppy</span>
+                                        <span class="ci-group-note">(Wood type)</span>
+                                    </div>
+                                </td>
                                 <td>
                                     <select id="ci-choppy-tool" data-type="choppy">
                                         <option value="">Not Set</option>
@@ -1139,11 +1157,16 @@
                                         <option value="default:axe_ruby">Ruby Axe</option>
                                     </select>
                                 </td>
-                                <td><select id="ci-choppy-speed" data-type="speed"></select></td>
-                                <td><select id="ci-choppy-durability" data-type="durability"></select></td>
+                                <td><select id="ci-choppy-speed" data-type="speed" disabled></select></td>
+                                <td><select id="ci-choppy-durability" data-type="durability" disabled></select></td>
                             </tr>
                             <tr>
-                                F<td>Crumbly<br>(Soil type)</td>
+                                <td>
+                                    <div class="ci-group-label">
+                                        <span>Crumbly</span>
+                                        <span class="ci-group-note">(Soil type)</span>
+                                    </div>
+                                </td>
                                 <td>
                                     <select id="ci-crumbly-tool" data-type="crumbly">
                                         <option value="">Not Set</option>
@@ -1155,8 +1178,8 @@
                                         <option value="default:shovel_ruby">Ruby Shovel</option>
                                     </select>
                                 </td>
-                                <td><select id="ci-crumbly-speed" data-type="speed"></select></td>
-                                <td><select id="ci-crumbly-durability" data-type="durability"></select></td>
+                                <td><select id="ci-crumbly-speed" data-type="speed" disabled></select></td>
+                                <td><select id="ci-crumbly-durability" data-type="durability" disabled></select></td>
                             </tr>
                         </tbody>
                     </table>
@@ -1167,7 +1190,7 @@
                             class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500">
                         <span class="ml-2">Enable /ie editing</span>
                     </label>
-                    <p class="text-xs text-gray-500">When enabled, custom_items:version will be added to the command.</p>
+                    <p class="text-xs text-gray-500">Forces custom_items:version even if no values are set.</p>
                 </div>
             </div>
             <div class="flex justify-between items-center mt-6">
@@ -1181,9 +1204,6 @@
     <div id="messageBox" class="message-box"></div>
 
     <script>
-        // =================================================================
-        // ===== Data Definitions (same as v5) =================================
-        // =================================================================
 
         const allItems = [
             // ---ビルディングブロック---
@@ -7488,13 +7508,15 @@
             }
 
             // 5. Custom Items (version automation)
+            let hasCustomItemMeta = false;
             Object.entries(customItemsData).forEach(([key, value]) => {
                 if (value !== null && value !== "") {
+                    hasCustomItemMeta = true;
                     metaParts.push(`custom_items:${key}\u0002${value}`);
                 }
             });
             
-            if (customItemsVersionEnabled) {
+            if (customItemsVersionEnabled || hasCustomItemMeta) {
                 metaParts.push(`custom_items:version\u00021`);
             }
 
@@ -8057,17 +8079,17 @@
             const rangeFieldValue = toolRange === '' ? '' : toolRange;
             const dugFieldValue = dugValue === '' ? '' : dugValue;
 
-            $('tab-panel-weapon').innerHTML = `<div class="label-frame"><div class="label-frame-title">Weapon</div><div class="space-y-4"><div><label class="flex items-center gap-2 text-sm font-medium mb-1" for="fleshy-damage">Damage: <span class="info-tip info-tip--right" tabindex="0"><span class="info-tip-icon">i</span><span class="info-tip-content">Base damage dealt to entities with 'fleshy' group.</span></span></label><input type="number" step="0.1" id="fleshy-damage" value="${caps.damage_groups?.fleshy ?? ''}" class="w-full" placeholder="e.g., 7"></div><div><label class="flex items-center gap-2 text-sm font-medium mb-1" for="full-punch-interval">Attack Speed: <span class="info-tip info-tip--right" tabindex="0"><span class="info-tip-icon">i</span><span class="info-tip-content">Cooldown in seconds for max damage. Smaller values allow faster attacks.</span></span></label><input type="number" step="0.1" id="full-punch-interval" value="${caps.full_punch_interval ?? ''}" class="w-full" placeholder="e.g., 0.9"></div><div><label class="flex items-center gap-2 text-sm font-medium mb-1" for="weapon-uses">Uses: <span class="info-tip info-tip--right" tabindex="0"><span class="info-tip-icon">i</span><span class="info-tip-content">Remaining attacks. Tool breaks after (value + 1) uses.</span></span></label><input type="number" min="0" step="1" id="weapon-uses" value="${caps.punch_attack_uses ?? ''}" class="w-full" placeholder="e.g., 20"></div></div></div>`;
+            $('tab-panel-weapon').innerHTML = `<div class="label-frame"><div class="label-frame-title">Weapon</div><div class="space-y-4"><div><label class="flex items-center gap-2 text-sm font-medium mb-1" for="fleshy-damage">Damage: <span class="info-tip info-tip--right" tabindex="0"><span class="info-tip-icon">i</span><span class="info-tip-content">Damage dealt to fleshy mobs.</span></span></label><input type="number" step="0.1" id="fleshy-damage" value="${caps.damage_groups?.fleshy ?? ''}" class="w-full" placeholder="e.g., 7"></div><div><label class="flex items-center gap-2 text-sm font-medium mb-1" for="full-punch-interval">Attack Speed: <span class="info-tip info-tip--right" tabindex="0"><span class="info-tip-icon">i</span><span class="info-tip-content">Seconds between full swings; lower is faster.</span></span></label><input type="number" step="0.1" id="full-punch-interval" value="${caps.full_punch_interval ?? ''}" class="w-full" placeholder="e.g., 0.9"></div><div><label class="flex items-center gap-2 text-sm font-medium mb-1" for="weapon-uses">Uses: <span class="info-tip info-tip--right" tabindex="0"><span class="info-tip-icon">i</span><span class="info-tip-content">Attacks left before it breaks (value + 1).</span></span></label><input type="number" min="0" step="1" id="weapon-uses" value="${caps.punch_attack_uses ?? ''}" class="w-full" placeholder="e.g., 20"></div></div></div>`;
 
             $('tab-panel-drop_level').innerHTML = `<div class="label-frame"><div class="label-frame-title">Other</div><div class="space-y-4"><div><label class="flex items-center gap-2 text-sm font-medium mb-1" for="dug-value-input">Uses (Dug):
-                <span class="info-tip info-tip--right" tabindex="0"><span class="info-tip-icon">i</span><span class="info-tip-content">Total uses for the tool. Level is auto-calculated from this.</span></span>
-            </label><input type="number" min="0" id="dug-value-input" value="${dugFieldValue}" class="w-full" placeholder="e.g., 1024"></div><div><label class="flex items-center gap-2 text-sm font-medium mb-1" for="max-drop-level">Max Drop Level: <span class="info-tip info-tip--right" tabindex="0"><span class="info-tip-icon">i</span><span class="info-tip-content">Can only get regular drops from blocks at or below this level.</span></span></label><input type="number" id="max-drop-level" min="0" value="${caps.max_drop_level ?? ''}" class="w-full" placeholder="e.g., 2"></div><div><label class="flex items-center gap-2 text-sm font-medium mb-1" for="tool-range">Range: <span class="info-tip info-tip--right" tabindex="0"><span class="info-tip-icon">i</span><span class="info-tip-content">Tool reach distance. If blank, range info is omitted from command.</span></span></label><input type="number" step="0.1" id="tool-range" value="${rangeFieldValue}" class="w-full" placeholder="e.g., 4"></div></div></div>`;
+                <span class="info-tip info-tip--right" tabindex="0"><span class="info-tip-icon">i</span><span class="info-tip-content">Total uses; tool level is based on this.</span></span>
+            </label><input type="number" min="0" id="dug-value-input" value="${dugFieldValue}" class="w-full" placeholder="e.g., 1024"></div><div><label class="flex items-center gap-2 text-sm font-medium mb-1" for="max-drop-level">Max Drop Level: <span class="info-tip info-tip--right" tabindex="0"><span class="info-tip-icon">i</span><span class="info-tip-content">Blocks above this level won't drop items.</span></span></label><input type="number" id="max-drop-level" min="0" value="${caps.max_drop_level ?? ''}" class="w-full" placeholder="e.g., 2"></div><div><label class="flex items-center gap-2 text-sm font-medium mb-1" for="tool-range">Range: <span class="info-tip info-tip--right" tabindex="0"><span class="info-tip-icon">i</span><span class="info-tip-content">Tool reach in nodes; leave blank to omit.</span></span></label><input type="number" step="0.1" id="tool-range" value="${rangeFieldValue}" class="w-full" placeholder="e.g., 4"></div></div></div>`;
 
             const groupTranslations = { "cracky": "Cracky", "choppy": "Choppy", "crumbly": "Crumbly", "snappy": "Snappy" };
             const groupExamples = { cracky: "e.g., Cobblestone, Ores", choppy: "e.g., Logs, Planks", crumbly: "e.g., Dirt, Sand", snappy: "e.g., Leaves, Grass" };
             Object.entries(groupTranslations).forEach(([group, name]) => {
                 const data = (caps.groupcaps && caps.groupcaps[group]) ? caps.groupcaps[group] : {};
-                $(`tab-panel-${group}`).innerHTML = `<div class="label-frame"><div class="label-frame-title flex items-center gap-2">${name}<span class="info-tip info-tip--right" tabindex="0"><span class="info-tip-icon">i</span><span class="info-tip-content">Settings for the "${name}" digging group. ${groupExamples[group]}</span></span></div><div class="space-y-4"><div class="grid grid-cols-1 md:grid-cols-2 gap-4"><div><label class="flex items-center gap-2 text-sm font-medium mb-1" for="${group}-maxlevel">Max Level: <span class="info-tip info-tip--right" tabindex="0"><span class="info-tip-icon">i</span><span class="info-tip-content">Max block hardness level this tool can mine.</span></span></label><input type="number" id="${group}-maxlevel" value="${data.maxlevel ?? ''}" class="w-full" placeholder="e.g., 3"></div><div><label class="flex items-center gap-2 text-sm font-medium mb-1" for="${group}-uses">Uses: <span class="info-tip info-tip--left" tabindex="0"><span class="info-tip-icon">i</span><span class="info-tip-content">Remaining uses for this group. Smaller values break faster. Tool breaks after (value + 1) uses.</span></span></label><input type="number" id="${group}-uses" value="${data.uses ?? ''}" class="w-full" placeholder="e.g., 30"></div></div><div><label class="flex items-center gap-2 text-sm font-medium" for="${group}-time1">Time (lv1-3): <span class="info-tip info-tip--right" tabindex="0"><span class="info-tip-icon">i</span><span class="info-tip-content">Digging time in seconds for each hardness level.</span></span></label><div class="grid grid-cols-3 gap-2 text-xs text-gray-500 font-medium uppercase"><span>Lv1</span><span>Lv2</span><span>Lv3</span></div><div class="grid grid-cols-3 gap-2 mt-1">${[1, 2, 3].map(i => `<input type="number" step="0.1" id="${group}-time${i}" value="${((data.times || [])[i] ?? '')}" class="w-full" placeholder="${(i * 1.0).toFixed(1)}">`).join('')}</div></div></div></div>`;
+                $(`tab-panel-${group}`).innerHTML = `<div class="label-frame"><div class="label-frame-title flex items-center gap-2">${name}<span class="info-tip info-tip--right" tabindex="0"><span class="info-tip-icon">i</span><span class="info-tip-content">Configure the "${name}" group. ${groupExamples[group]}</span></span></div><div class="space-y-4"><div class="grid grid-cols-1 md:grid-cols-2 gap-4"><div><label class="flex items-center gap-2 text-sm font-medium mb-1" for="${group}-maxlevel">Max Level: <span class="info-tip info-tip--right" tabindex="0"><span class="info-tip-icon">i</span><span class="info-tip-content">Highest hardness this tool can break.</span></span></label><input type="number" id="${group}-maxlevel" value="${data.maxlevel ?? ''}" class="w-full" placeholder="e.g., 3"></div><div><label class="flex items-center gap-2 text-sm font-medium mb-1" for="${group}-uses">Uses: <span class="info-tip info-tip--left" tabindex="0"><span class="info-tip-icon">i</span><span class="info-tip-content">Uses for this group (breaks after value + 1).</span></span></label><input type="number" id="${group}-uses" value="${data.uses ?? ''}" class="w-full" placeholder="e.g., 30"></div></div><div><label class="flex items-center gap-2 text-sm font-medium" for="${group}-time1">Time (lv1-3): <span class="info-tip info-tip--right" tabindex="0"><span class="info-tip-icon">i</span><span class="info-tip-content">Seconds to dig lv1–lv3 blocks.</span></span></label><div class="grid grid-cols-3 gap-2 text-xs text-gray-500 font-medium uppercase"><span>Lv1</span><span>Lv2</span><span>Lv3</span></div><div class="grid grid-cols-3 gap-2 mt-1">${[1, 2, 3].map(i => `<input type="number" step="0.1" id="${group}-time${i}" value="${((data.times || [])[i] ?? '')}" class="w-full" placeholder="${(i * 1.0).toFixed(1)}">`).join('')}</div></div></div></div>`;
             });
         }
         $('btn-tool-caps').addEventListener('click', () => { populateToolCapsModal(); openModal('toolCapsModal'); });
@@ -8304,6 +8326,42 @@
                 `<option value="${opt.value}" ${opt.value === selectedValue ? 'selected' : ''}>${opt.text}</option>`
             ).join('');
         }
+
+        function updateCustomItemRowState(type) {
+            const toolSelect = $(`ci-${type}-tool`);
+            const speedSelect = $(`ci-${type}-speed`);
+            const duraSelect = $(`ci-${type}-durability`);
+            if (!toolSelect || !speedSelect || !duraSelect) {
+                return;
+            }
+
+            const toolValue = toolSelect.value;
+            const hasTool = toolValue !== "";
+            const isRubyTool = hasTool && toolValue.includes('ruby');
+
+            if (!hasTool) {
+                speedSelect.disabled = true;
+                speedSelect.value = "";
+                duraSelect.disabled = true;
+                duraSelect.value = "";
+                return;
+            }
+
+            speedSelect.disabled = false;
+            if (!speedSelect.value) {
+                speedSelect.value = "1";
+            }
+
+            if (isRubyTool) {
+                duraSelect.disabled = true;
+                duraSelect.value = "";
+            } else {
+                duraSelect.disabled = false;
+                if (!duraSelect.value) {
+                    duraSelect.value = "1";
+                }
+            }
+        }
         $('btn-custom-items').addEventListener('click', () => {
             ['cracky', 'choppy', 'crumbly'].forEach(type => {
                 $(`ci-${type}-tool`).value = customItemsData[`${type}_tool`];
@@ -8311,8 +8369,7 @@
                 const duraSelect = $(`ci-${type}-durability`);
                 speedSelect.innerHTML = getSpeedDurabilityOptionsHtml(customItemsData[`${type}_speed`]);
                 duraSelect.innerHTML = getSpeedDurabilityOptionsHtml(customItemsData[`${type}_durability`]);
-                const toolValue = customItemsData[`${type}_tool`];
-                duraSelect.disabled = (toolValue && toolValue.includes('ruby'));
+                updateCustomItemRowState(type);
             });
             const ieToggle = $('ci-enable-ie-edit');
             if (ieToggle) {
@@ -8321,40 +8378,29 @@
             openModal('customItemsModal');
         });
         function handleToolChange(event) {
-            const toolSelect = event.target;
-            const toolValue = toolSelect.value;
-            const type = toolSelect.dataset.type; 
-            const speedSelect = $(`ci-${type}-speed`);
-            const duraSelect = $(`ci-${type}-durability`);
-            
-            if (toolValue === "") {
-                speedSelect.value = "";
-                duraSelect.value = "";
-                duraSelect.disabled = false;
-            } else {
-                speedSelect.value = "1";
-                if (toolValue.includes('ruby')) {
-                    duraSelect.value = "";
-                    duraSelect.disabled = true;
-                } else {
-                    duraSelect.value = "1";
-                    duraSelect.disabled = false;
-                }
-            }
+            const type = event.target.dataset.type;
+            updateCustomItemRowState(type);
         }
         $('ci-cracky-tool').addEventListener('change', handleToolChange);
         $('ci-choppy-tool').addEventListener('change', handleToolChange);
         $('ci-crumbly-tool').addEventListener('change', handleToolChange);
         $('saveCustomItemsBtn').addEventListener('click', () => {
+            const crackySpeed = $('ci-cracky-speed');
+            const crackyDurability = $('ci-cracky-durability');
+            const choppySpeed = $('ci-choppy-speed');
+            const choppyDurability = $('ci-choppy-durability');
+            const crumblySpeed = $('ci-crumbly-speed');
+            const crumblyDurability = $('ci-crumbly-durability');
+
             customItemsData.cracky_tool = $('ci-cracky-tool').value;
-            customItemsData.cracky_speed = $('ci-cracky-speed').value;
-            customItemsData.cracky_durability = $('ci-cracky-durability').disabled ? "" : $('ci-cracky-durability').value;
+            customItemsData.cracky_speed = crackySpeed.disabled ? "" : crackySpeed.value;
+            customItemsData.cracky_durability = crackyDurability.disabled ? "" : crackyDurability.value;
             customItemsData.choppy_tool = $('ci-choppy-tool').value;
-            customItemsData.choppy_speed = $('ci-choppy-speed').value;
-            customItemsData.choppy_durability = $('ci-choppy-durability').disabled ? "" : $('ci-choppy-durability').value;
+            customItemsData.choppy_speed = choppySpeed.disabled ? "" : choppySpeed.value;
+            customItemsData.choppy_durability = choppyDurability.disabled ? "" : choppyDurability.value;
             customItemsData.crumbly_tool = $('ci-crumbly-tool').value;
-            customItemsData.crumbly_speed = $('ci-crumbly-speed').value;
-            customItemsData.crumbly_durability = $('ci-crumbly-durability').disabled ? "" : $('ci-crumbly-durability').value;
+            customItemsData.crumbly_speed = crumblySpeed.disabled ? "" : crumblySpeed.value;
+            customItemsData.crumbly_durability = crumblyDurability.disabled ? "" : crumblyDurability.value;
             const ieToggle = $('ci-enable-ie-edit');
             customItemsVersionEnabled = ieToggle ? ieToggle.checked : false;
             updateCommandDisplay();
@@ -8372,7 +8418,7 @@
                 $(`ci-${type}-tool`).value = "";
                 $(`ci-${type}-speed`).innerHTML = getSpeedDurabilityOptionsHtml("");
                 $(`ci-${type}-durability`).innerHTML = getSpeedDurabilityOptionsHtml("");
-                $(`ci-${type}-durability`).disabled = false;
+                updateCustomItemRowState(type);
             });
             const ieToggle = $('ci-enable-ie-edit');
             if (ieToggle) {
