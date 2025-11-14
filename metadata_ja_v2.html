@@ -7308,9 +7308,12 @@
         });
 
         const ESC_LITERAL_SEQUENCE = '\\u001b';
+        const ESC_ACTUAL = '\u001b';
         const ESC_RESET_LITERAL = `${ESC_LITERAL_SEQUENCE}E`;
         const literalFormattingPattern = /\\u001b\((?:c|b|T)@/;
         const actualFormattingPattern = /\u001b\((?:c|b|T)@/;
+        const DEFAULT_TRANSLATION_ACTUAL = `${ESC_ACTUAL}(T@default)`;
+        const translationCodeActualPattern = /\u001b\(T@[A-Za-z0-9_]+\)/;
 
         function ensureLiteralFormattingReset(text) {
             if (typeof text !== 'string' || !text) {
@@ -7326,6 +7329,73 @@
                 return text;
             }
             return `${text}${ESC_RESET_LITERAL}`;
+        }
+
+        function applyDefaultTranslationTag(text) {
+            if (typeof text !== 'string' || !text) {
+                return text;
+            }
+
+            const normalized = text.replace(/\\u001b/g, ESC_ACTUAL);
+            let result = '';
+            let i = 0;
+            let needsDefaultBeforeText = true;
+
+            const isTranslationCode = (code) => translationCodeActualPattern.test(code);
+
+            while (i < normalized.length) {
+                const char = normalized[i];
+
+                if (char === ESC_ACTUAL) {
+                    const nextChar = normalized[i + 1];
+
+                    if (nextChar === '(') {
+                        const closingIndex = normalized.indexOf(')', i);
+                        if (closingIndex === -1) {
+                            // 不正なコードはそのまま出力
+                            if (needsDefaultBeforeText && char !== '\n') {
+                                result += DEFAULT_TRANSLATION_ACTUAL;
+                                needsDefaultBeforeText = false;
+                            }
+                            result += char;
+                            i += 1;
+                            continue;
+                        }
+                        const code = normalized.slice(i, closingIndex + 1);
+                        result += code;
+                        i = closingIndex + 1;
+                        if (isTranslationCode(code)) {
+                            needsDefaultBeforeText = false;
+                        } else {
+                            needsDefaultBeforeText = true;
+                        }
+                        continue;
+                    }
+
+                    // E や F など
+                    result += normalized.slice(i, i + 2);
+                    i += 2;
+                    needsDefaultBeforeText = true;
+                    continue;
+                }
+
+                if (char === '\n') {
+                    result += char;
+                    needsDefaultBeforeText = true;
+                    i += 1;
+                    continue;
+                }
+
+                if (needsDefaultBeforeText) {
+                    result += DEFAULT_TRANSLATION_ACTUAL;
+                    needsDefaultBeforeText = false;
+                }
+
+                result += char;
+                i += 1;
+            }
+
+            return result.replace(/\u001b/g, ESC_LITERAL_SEQUENCE);
         }
 
         let descriptionContent = "", shortDescriptionContent = "", itemColorHex = "";
@@ -7415,7 +7485,7 @@
                 const hasLevels = def.maxLevel > 1;
                 const levelText = hasLevels ? toRoman(level) : '';
                 const enchantLine = hasLevels
-                    ? `\u001b(c@#ffffff)\u001b(T@x_enchanting)${def.name} \u001bE${levelText}`
+                    ? `\u001b(c@#ffffff)\u001b(T@x_enchanting)${def.name}\u001bE ${levelText}`
                     : `\u001b(c@#ffffff)\u001b(T@x_enchanting)${def.name}\u001bE`;
                 enchantDescParts.push(enchantLine);
                 metaParts.push(`is_${type}\u0002${value}`);
@@ -7440,12 +7510,14 @@
             let enchantDescString = "";
             if (hasEnchants) {
                 const enchantHeaderText = `\u001b(c@#AE81FF)\u001b(T@x_enchanting)Enchanted\u001bE`;
-                enchantDescString = `${enchantHeaderText}\n${enchantDescParts.join('\n')}`;
+                const enchantDescBlock = `${enchantHeaderText}\n${enchantDescParts.join('\n')}`;
+                enchantDescString = `\n${enchantDescBlock}`;
                 metaParts.push(`enchant_description\u0002${enchantDescString}`);
             }
 
             const baseDescriptionRaw = typeof descriptionContent === 'string' ? descriptionContent : '';
-            const normalizedBaseDescription = baseDescriptionRaw ? ensureLiteralFormattingReset(baseDescriptionRaw) : baseDescriptionRaw;
+            const baseWithDefaultTag = baseDescriptionRaw ? applyDefaultTranslationTag(baseDescriptionRaw) : baseDescriptionRaw;
+            const normalizedBaseDescription = baseWithDefaultTag ? ensureLiteralFormattingReset(baseWithDefaultTag) : baseWithDefaultTag;
             let finalDesc = normalizedBaseDescription;
 
             const selectedItemId = $('item-name').value;
@@ -7484,7 +7556,8 @@
             }
 
             if (hasEnchants) {
-                finalDesc = (finalDesc ? finalDesc + '\n\n' : '') + enchantDescString;
+                const enchantDescBlock = enchantDescString.startsWith('\n') ? enchantDescString.slice(1) : enchantDescString;
+                finalDesc = (finalDesc ? finalDesc + '\n\n' : '') + enchantDescBlock;
             }
 
             if (finalDesc) {
@@ -7493,10 +7566,11 @@
 
             // 4. その他のフィールド
             if (shortDescriptionContent) {
-                metaParts.push(`short_description\u0002${ensureLiteralFormattingReset(shortDescriptionContent)}`);
+                const shortWithDefaultTag = applyDefaultTranslationTag(shortDescriptionContent);
+                metaParts.push(`short_description\u0002${ensureLiteralFormattingReset(shortWithDefaultTag)}`);
             }
-            if (descriptionContent) {
-                metaParts.push(`description_override\u0002${ensureLiteralFormattingReset(descriptionContent)}`);
+            if (normalizedBaseDescription) {
+                metaParts.push(`description_override\u0002${normalizedBaseDescription}`);
             }
             if (dugValue !== "") {
                 metaParts.push(`dug\u0002${dugValue}`);
