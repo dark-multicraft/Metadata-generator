@@ -4,8 +4,8 @@ This is a fork of [multi-nono/Metadata-generator](https://github.com/multi-nono/
 
 This tool allows you to generate `/giveme` or `/give` commands with complex metadata for the [MultiCraft](https://www.multicraft.world/) right in your browser.
 
-- **Japanese version**: `metadata_ja_v2.html`
-- **English version**: `metadata_en_v2.html`
+- **Japanese version**: [`metadata_ja_v2.html`](https://dark-multicraft.github.io/Metadata-generator/metadata_ja_v2.html)
+- **English version**: [`metadata_en_v2.html`](https://dark-multicraft.github.io/Metadata-generator/metadata_en_v2.html)
 
 ## 日本語
 
