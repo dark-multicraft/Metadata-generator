@@ -622,14 +622,20 @@
                         <span class="info-tip-content">数値や設定を変更するとコマンドが即時更新されます。ゲーム内チャットへコピーして実行してください。</span>
                     </span>
                 </div>
-                <div class="flex items-center justify-end mb-2">
-                    <input type="checkbox" id="slash-toggle"
-                        class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500">
-                    <label for="slash-toggle" class="ml-2 flex items-center gap-2 text-sm text-gray-900">コマンドの先頭に / を付ける
+                <div class="flex items-center justify-end gap-6 flex-wrap mb-2">
+                    <label for="slash-toggle" class="flex items-center gap-2 text-sm text-gray-900">
+                        <input type="checkbox" id="slash-toggle"
+                            class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500">
+                        /を付ける
                         <span class="info-tip info-tip--left" tabindex="0">
                             <span class="info-tip-icon">i</span>
                             <span class="info-tip-content">チャットに入力するときは/をつけてください。コマンドブロックに入力する場合は外してください。</span>
                         </span>
+                    </label>
+                    <label for="command-edit-toggle" class="flex items-center gap-2 text-sm text-gray-900">
+                        <input type="checkbox" id="command-edit-toggle"
+                            class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500">
+                        編集
                     </label>
                 </div>
                 <textarea id="command-display" rows="5" class="bg-gray-100 font-mono text-sm text-gray-700 resize-y"
@@ -7842,6 +7848,20 @@
             updateCommandDisplay();
         });
 
+        const commandDisplay = $('command-display');
+        const commandEditToggle = $('command-edit-toggle');
+        if (commandEditToggle && commandDisplay) {
+            const syncCommandEditableState = (isEditable) => {
+                commandDisplay.classList.toggle('bg-gray-100', !isEditable);
+                commandDisplay.classList.toggle('bg-white', isEditable);
+                commandDisplay.toggleAttribute('readonly', !isEditable);
+            };
+            commandEditToggle.addEventListener('change', (event) => {
+                syncCommandEditableState(event.target.checked);
+            });
+            syncCommandEditableState(commandEditToggle.checked);
+        }
+
         // --- テキストエディタ (変更なし) ---
         let currentTextEditorCallback = null;
         let showCodesInTextEditor = true;
@@ -8409,6 +8429,11 @@
           if (!input || !box) return;
           var items = (typeof allItems !== 'undefined' && Array.isArray(allItems)) ? allItems : [];
           var currentIndex = -1, visible = false, lastResults = [];
+                    function selectFullItemId(){
+                        requestAnimationFrame(function(){
+                            try { input.select(); } catch (e) {}
+                        });
+                    }
           function normalizeId(s){ return (s||'').toLowerCase(); }
           function includesId(hay, needle){ return normalizeId(hay).indexOf(normalizeId(needle)) !== -1; }
           function includesName(hay, needle){ return (hay||'').toLowerCase().indexOf((needle||'').toLowerCase()) !== -1; }
@@ -8464,7 +8489,8 @@
             try{ input.setSelectionRange(input.value.length, input.value.length); }catch(e){}
           }
           input.addEventListener('input', function(e){ doSearch(e.target.value); updateCommandDisplay(); });
-          input.addEventListener('focus', function(){ if (input.value.trim()) doSearch(input.value); });
+          input.addEventListener('focus', function(){ selectFullItemId(); if (input.value.trim()) doSearch(input.value); });
+          input.addEventListener('click', function(){ selectFullItemId(); });
           input.addEventListener('keydown', function(e){
             if (!visible) return;
             var count = box.querySelectorAll('.item-suggest-item').length;

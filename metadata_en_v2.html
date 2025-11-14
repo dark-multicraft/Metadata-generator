@@ -639,17 +639,23 @@
                         <span class="info-tip-content">The command updates live. Copy it into chat to run.</span>
                     </span>
                 </div>
-                <div class="flex items-center justify-end mb-2">
-                    <input type="checkbox" id="slash-toggle",
-                        class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500">
-                    <label for="slash-toggle" class="ml-2 flex items-center gap-2 text-sm text-gray-900">Add / to the beginning of the command
+                <div class="flex items-center justify-end gap-6 flex-wrap mb-2">
+                    <label for="slash-toggle" class="flex items-center gap-2 text-sm text-gray-900">
+                        <input type="checkbox" id="slash-toggle"
+                            class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500">
+                        Include /
                         <span class="info-tip info-tip--left" tabindex="0">
                             <span class="info-tip-icon">i</span>
                             <span class="info-tip-content">Use / in chat and omit it for command blocks.</span>
                         </span>
                     </label>
+                    <label for="command-edit-toggle" class="flex items-center gap-2 text-sm text-gray-900">
+                        <input type="checkbox" id="command-edit-toggle"
+                            class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500">
+                        Edit
+                    </label>
                 </div>
-                <textarea id="command-display" rows="5" class="bg-gray-100 font-mono text-sm text-gray-700 resize-y",
+                <textarea id="command-display" rows="5" class="bg-gray-100 font-mono text-sm text-gray-700 resize-y"
                     readonly></textarea>
                 <div class="flex justify-center mt-4"><button id="copy-command-btn">Copy Command</button></div>
             </div>
@@ -7873,6 +7879,20 @@
             updateCommandDisplay();
         });
 
+        const commandDisplay = $('command-display');
+        const commandEditToggle = $('command-edit-toggle');
+        if (commandDisplay && commandEditToggle) {
+            const syncCommandEditableState = (isEditable) => {
+                commandDisplay.classList.toggle('bg-gray-100', !isEditable);
+                commandDisplay.classList.toggle('bg-white', isEditable);
+                commandDisplay.toggleAttribute('readonly', !isEditable);
+            };
+            commandEditToggle.addEventListener('change', (event) => {
+                syncCommandEditableState(event.target.checked);
+            });
+            syncCommandEditableState(commandEditToggle.checked);
+        }
+
         // --- Text Editor (no changes) ---
         let currentTextEditorCallback = null;
         let showCodesInTextEditor = true;
@@ -8440,6 +8460,11 @@
           if (!input || !box) return;
           var items = (typeof allItems !== 'undefined' && Array.isArray(allItems)) ? allItems : [];
           var currentIndex = -1, visible = false, lastResults = [];
+                    function selectFullItemId(){
+                        requestAnimationFrame(function(){
+                            try { input.select(); } catch (e) {}
+                        });
+                    }
           function normalizeId(s){ return (s||'').toLowerCase(); }
           function includesId(hay, needle){ return normalizeId(hay).indexOf(normalizeId(needle)) !== -1; }
           function includesName(hay, needle){ return (hay||'').toLowerCase().indexOf((needle||'').toLowerCase()) !== -1; }
@@ -8495,7 +8520,8 @@
             try{ input.setSelectionRange(input.value.length, input.value.length); }catch(e){}
           }
           input.addEventListener('input', function(e){ doSearch(e.target.value); updateCommandDisplay(); });
-          input.addEventListener('focus', function(){ if (input.value.trim()) doSearch(input.value); });
+          input.addEventListener('focus', function(){ selectFullItemId(); if (input.value.trim()) doSearch(input.value); });
+          input.addEventListener('click', function(){ selectFullItemId(); });
           input.addEventListener('keydown', function(e){
             if (!visible) return;
             var count = box.querySelectorAll('.item-suggest-item').length;
