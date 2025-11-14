@@ -1,0 +1,2698 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Metadata Generator</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Inter Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        html {
+            box-sizing: border-box;
+            height: 100%;
+        }
+        *, *::before, *::after {
+            box-sizing: inherit;
+        }
+        /* Basic styles same as attached file (metadata_ja.html) */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            padding: 20px;
+            margin: 0;
+            box-sizing: border-box;
+        }
+
+        .container {
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            padding: 24px;
+            width: 100%;
+            max-width: 800px;
+            margin-top: 0;
+        }
+
+        /* ★ Preview Styles */
+        .tooltip-preview {
+            background-color: #656276;
+            border: 2px solid #502D8F;
+            box-shadow: none;
+            color: #ffffff;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            min-height: 150px;
+            font-family: 'Inter', sans-serif;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            transition: background-color 0.2s;
+        }
+
+        /* Avoid forcing colors via classes so that colors specified in decoration codes are reflected inline */
+        .preview-name,
+        .preview-toolranks,
+        .preview-level,
+        .preview-uses,
+        .preview-enchant-header,
+        .preview-enchant-name {
+            color: inherit;
+            font-style: normal;
+            font-weight: inherit;
+            font-size: inherit;
+            margin-left: 0;
+        }
+
+        /* Darken text color on light backgrounds (but inline colors take precedence) */
+        .tooltip-preview.bg-light {
+            background-color: rgb(229 231 235 / 0.95);
+        }
+        .tooltip-preview.bg-light .preview-name,
+        .tooltip-preview.bg-light .preview-toolranks,
+        .tooltip-preview.bg-light .preview-level,
+        .tooltip-preview.bg-light .preview-uses,
+        .tooltip-preview.bg-light .preview-enchant-header,
+        .tooltip-preview.bg-light .preview-enchant-name {
+            color: inherit;
+            font-style: normal;
+        }
+
+        /* Set dark backgrounds closer to black */
+        .tooltip-preview.bg-dark {
+            background-color: rgba(2,6,23,0.95);
+            color: #ffffff;
+        }
+        .tooltip-preview.bg-dark .preview-name,
+        .tooltip-preview.bg-dark .preview-toolranks,
+        .tooltip-preview.bg-dark .preview-level,
+        .tooltip-preview.bg-dark .preview-uses,
+        .tooltip-preview.bg-dark .preview-enchant-header,
+        .tooltip-preview.bg-dark .preview-enchant-name {
+            color: inherit;
+        }
+
+
+        .label-frame {
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .label-frame-title {
+            position: absolute;
+            top: -12px;
+            left: 16px;
+            background-color: #ffffff;
+            padding: 0 8px;
+            font-weight: 600;
+            color: #4b5563;
+        }
+
+        input[type="text"],
+        input[type="number"],
+        textarea,
+        select {
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            padding: 8px 12px;
+            font-size: 1rem;
+            width: 100%;
+            box-sizing: border-box;
+            transition: border-color 0.2s;
+        }
+        
+        select:disabled {
+            background-color: #f3f4f6;
+            color: #9ca3af;
+            cursor: not-allowed;
+        }
+
+        input[type="text"]:focus,
+        input[type="number"]:focus,
+        textarea:focus,
+        select:focus {
+            outline: none;
+            border-color: #0000cd;
+            box-shadow: 0 0 0 2px rgba(197, 73, 182, 0.248);
+        }
+
+        button {
+            background-color: #0000cd;
+            color: white;
+            padding: 10px 18px;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.2s, box-shadow 0.2s;
+            border: none;
+            white-space: nowrap;
+        }
+
+        button:hover {
+            background-color: #0000b9;
+            box-shadow: 0 2px 8px rgba(197, 73, 182, 0.248);
+            color: #FFFFF0;
+        }
+        .color-picker-popover {
+            position: absolute;
+            z-index: 1200;
+            background-color: #ffffff;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            padding: 12px;
+            box-shadow: 0 12px 24px rgba(15, 23, 42, 0.18);
+            width: 200px;
+        }
+        .color-picker-title {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #4b5563;
+            margin-bottom: 8px;
+        }
+        .color-picker-presets {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+        .preset-color-option {
+            width: 28px;
+            height: 28px;
+            border-radius: 6px;
+            border: 1px solid #d1d5db;
+            padding: 0;
+            cursor: pointer;
+        }
+        .preset-color-option:focus-visible {
+            outline: 2px solid #0000cd;
+            outline-offset: 2px;
+        }
+        .color-picker-input {
+            width: 100%;
+            height: 40px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+        
+        button.bg-red-500 { background-color: #ef4444; }
+        button.bg-red-500:hover { background-color: #dc2626; }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.4);
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            padding: 24px;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            max-width: 700px;
+            position: relative;
+            max-height: 90vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        #customItemsModal .modal-content {
+             max-width: 800px;
+        }
+        #itemColorModal .modal-content {
+             max-width: 400px;
+        }
+
+
+        .close-button {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            color: #aaaaaa;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .close-button:hover {
+            color: #777777;
+        }
+
+        .message-box {
+            display: none;
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            z-index: 1001;
+            opacity: 0;
+            transition: opacity 0.3s ease-in-out;
+        }
+
+        .message-box.error {
+            background-color: #f44336;
+        }
+
+        .message-box.show {
+            opacity: 1;
+        }
+
+        .enchant-item {
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 8px;
+            background-color: #f9fafb;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .remove-enchant {
+            background-color: #ef4444;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 4px 8px;
+            font-size: 0.75rem;
+            cursor: pointer;
+        }
+        .remove-enchant:hover {
+            background-color: #dc2626;
+        }
+
+        .tab-container {
+            display: flex;
+            flex-wrap: wrap;
+            border-bottom: 1px solid #d1d5db;
+            margin-bottom: 16px;
+        }
+
+        .tab-link {
+            background-color: transparent;
+            color: #6b7280;
+            border-radius: 6px 6px 0 0;
+            border: 1px solid transparent;
+            border-bottom: none;
+            padding: 8px 12px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            cursor: pointer;
+            margin-bottom: -1px;
+        }
+
+        .tab-link.active {
+            background-color: #ffffff;
+            color: #0000cd;
+            border-color: #d1d5db #d1d5db #ffffff;
+        }
+
+        .tab-panel {
+            display: none;
+        }
+
+        .tab-panel.active {
+            display: block;
+        }
+
+        /* Adjust button size in modal */
+        .modal-button {
+            padding: 5px 10px;
+        }
+
+        .scrollable-content {
+            overflow-y: auto;
+        }
+
+        .scrollable-content::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .scrollable-content::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+
+        .scrollable-content::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 10px;
+        }
+
+        .scrollable-content::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+
+        .button-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .button-container>button {
+            flex: 1 1 140px;
+            text-align: center;
+        }
+
+        .info-tip {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-left: 4px;
+            cursor: help;
+        }
+
+        .info-tip-icon {
+            width: 18px;
+            height: 18px;
+            border-radius: 9999px;
+            background-color: #e0e7ff;
+            color: #1d4ed8;
+            font-size: 0.7rem;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .info-tip-content {
+            display: none;
+            position: absolute;
+            top: 130%;
+            left: 50%;
+            transform: translate(-50%, -6px);
+            background-color: #111827;
+            color: #f9fafb;
+            padding: 8px 10px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            line-height: 1.4;
+            width: max-content;
+            max-width: min(260px, calc(100vw - 40px));
+            box-shadow: 0 12px 24px rgba(15, 23, 42, 0.25);
+            z-index: 30;
+        }
+
+        .info-tip-content::before {
+            content: "";
+            position: absolute;
+            top: -6px;
+            left: 50%;
+            transform: translateX(-50%);
+            border-width: 6px;
+            border-style: solid;
+            border-color: transparent transparent #111827 transparent;
+        }
+
+        .info-tip--right .info-tip-content {
+            left: 0;
+            transform: translate(0, -6px);
+        }
+
+        .info-tip--right .info-tip-content::before {
+            left: 14px;
+            transform: none;
+        }
+
+        .info-tip--left .info-tip-content {
+            right: 0;
+            left: auto;
+            transform: translate(0, -6px);
+        }
+
+        .info-tip--left .info-tip-content::before {
+            right: 14px;
+            left: auto;
+            transform: none;
+        }
+
+        .info-tip:hover .info-tip-content,
+        .info-tip:focus-within .info-tip-content {
+            display: block;
+        }
+
+        body.hide-info-tips .info-tip {
+            display: none;
+        }
+    
+        .item-suggest-box {
+          position: absolute;
+          left: 0;
+          right: 0;
+          top: calc(100% + 2px);
+          background: #fff;
+          border: 1px solid rgba(0,0,0,0.12);
+          box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+          border-radius: 6px;
+          max-height: 260px;
+          overflow-y: auto;
+          z-index: 1000;
+          font-size: 14px;
+        }
+        .item-suggest-hidden { display: none; }
+        .item-suggest-item {
+          padding: 8px 10px;
+          line-height: 1.4;
+          cursor: pointer;
+          display: flex;
+          align-items: baseline;
+          gap: 8px;
+        }
+        .item-suggest-item:hover,
+        .item-suggest-item.active { background: #f3f4f6; }
+        .item-suggest-item .id { color: #6b7280; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+        .item-suggest-item .name { color: #111827; font-weight: 500; }
+        .item-suggest-empty {
+          padding: 10px;
+          color: #6b7280;
+        }
+        
+        .ci-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .ci-table th, .ci-table td {
+            border: 1px solid #e5e7eb;
+            padding: 8px;
+            text-align: left;
+            vertical-align: top;
+        }
+        .ci-table th {
+            background-color: #f9fafb;
+            font-weight: 600;
+        }
+        .ci-table td:first-child {
+            font-weight: 600;
+            width: 100px;
+        }
+        .ci-table select {
+            margin-bottom: 8px;
+        }
+        .ci-table select:last-child {
+            margin-bottom: 0;
+        }
+        
+      @media (max-width: 640px) {
+        .container {
+          padding: 16px;
+          margin-top: 12px;
+        }
+        .label-frame {
+          padding: 12px;
+          margin-bottom: 16px;
+        }
+        #item-name,
+        #amount,
+        #item-wear {
+          width: 100%;
+        }
+        .item-suggest-box {
+          max-height: 200px;
+          font-size: 13px;
+        }
+        .item-suggest-item {
+          padding: 10px;
+        }
+      }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+            <h1 class="text-2xl font-bold text-center mb-6 text-gray-800">Metadata Generator</h1>
+            <div class="flex justify-end items-center gap-6 mb-4 flex-wrap">
+                <label for="tool-ranks-toggle" class="flex items-center gap-2 text-sm text-gray-600 cursor-pointer select-none">
+                    <input type="checkbox" id="tool-ranks-toggle"
+                        class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500" checked>
+                    Tool ranks
+                    <span class="info-tip info-tip--left" tabindex="0">
+                        <span class="info-tip-icon">i</span>
+                        <span class="info-tip-content">Automatically insert Level/Uses lines when the description is filled and the selected item supports tool ranks.</span>
+                    </span>
+                </label>
+                <label for="info-tip-toggle" class="flex items-center gap-2 text-sm text-gray-600 cursor-pointer select-none">
+                    <input type="checkbox" id="info-tip-toggle"
+                        class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500" checked>
+                    Show Details
+                </label>
+            </div>
+            
+            <!-- 1. Item Information -->
+            <div class="label-frame">
+                <div class="label-frame-title">Item Information</div>
+                <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
+                    <div class="md:col-span-3">
+                        <label for="item-name" class="flex items-center gap-2 text-sm font-medium text-gray-700 mb-1">Item Name:
+                            <span class="info-tip" tabindex="0">
+                                <span class="info-tip-icon">i</span>
+                                <span class="info-tip-content">Enter the item ID. You can also search by item name.</span>
+                            </span>
+                        </label>
+                        <div class="relative">
+                            <input type="text" id="item-name" value="default:sword_steel" class="w-full pr-10">
+                            <div id="item-suggest-box" class="item-suggest-box item-suggest-hidden"></div>
+                        </div>
+                    </div>
+                    <div>
+                        <label for="amount" class="flex items-center gap-2 text-sm font-medium text-gray-700 mb-1">Amount:
+                            <span class="info-tip" tabindex="0">
+                                <span class="info-tip-icon">i</span>
+                                <span class="info-tip-content">Enter the stack size. The value range is 0-65535.</span>
+                            </span>
+                        </label>
+                        <input type="number" id="amount" value="1" min="1" class="w-full">
+                    </div>
+                    <div>
+                        <label for="item-wear" class="flex items-center gap-2 text-sm font-medium text-gray-700 mb-1">Wear:
+                            <span class="info-tip info-tip--left" tabindex="0">
+                                <span class="info-tip-icon">i</span>
+                                <span class="info-tip-content">0 is brand new, a higher value means less durability. 0 is fine for non-tools.</span>
+                            </span>
+                        </label>
+                        <input type="number" id="item-wear" value="0" min="0" class="w-full">
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 2. Metadata Modification -->
+            <div class="label-frame">
+                <div class="label-frame-title flex items-center gap-2">Metadata Modification
+                    <span class="info-tip" tabindex="0">
+                        <span class="info-tip-icon">i</span>
+                        <span class="info-tip-content">Click the button for the item you want to edit to open a dedicated settings dialog. You can combine multiple items for customization.</span>
+                    </span>
+                </div>
+                <div class="flex flex-row flex-wrap gap-2 button-container">
+                    <button id="btn-tool-caps">Tool Performance</button>
+                    <button id="btn-desc">Description</button>
+                    <button id="btn-short-desc">Short Description</button>
+                    <button id="btn-item-color">Item Color</button>
+                    <button id="btn-enchant">Enchantment</button>
+                    <button id="btn-custom-items">Custom Items</button>
+                </div>
+            </div>
+
+            <!-- 3. Generated Command -->
+            <div class="label-frame">
+                <div class="label-frame-title flex items-center gap-2">Generated Command:
+                    <span class="info-tip" tabindex="0">
+                        <span class="info-tip-icon">i</span>
+                        <span class="info-tip-content">The command updates immediately when you change values or settings. Copy and paste it into the in-game chat to execute.</span>
+                    </span>
+                </div>
+                <div class="flex items-center justify-end mb-2">
+                    <input type="checkbox" id="slash-toggle"
+                        class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500">
+                    <label for="slash-toggle" class="ml-2 flex items-center gap-2 text-sm text-gray-900">Add / to the beginning of the command
+                        <span class="info-tip info-tip--left" tabindex="0">
+                            <span class="info-tip-icon">i</span>
+                            <span class="info-tip-content">Add / when entering in chat. Remove it when entering in a command block.</span>
+                        </span>
+                    </label>
+                </div>
+                <textarea id="command-display" rows="5" class="bg-gray-100 font-mono text-sm text-gray-700 resize-y"
+                    readonly></textarea>
+                <div class="flex justify-center mt-4"><button id="copy-command-btn">Copy Command</button></div>
+            </div>
+            
+            <!-- ★ 4. Tooltip Preview (Moved to bottom) -->
+            <div class="label-frame">
+                <div class="label-frame-title">Tooltip Preview</div>
+                <!-- ★ Added default background color class -->
+                <div id="preview-box" class="tooltip-preview">
+                    <!-- Preview content is dynamically inserted by JS -->
+                </div>
+            </div>
+
+            <section id="toolmeta_section" class="mt-8">
+                <style>
+                    #toolmeta_section {
+                        --bg: #ffffff;
+                        --fg: #0f172a;
+                        --muted: #64748b;
+                        --border: #e5e7eb;
+                        --header: #f8fafc;
+                        --row: #fcfcff;
+                        --accent: #2563eb;
+                    }
+                    #toolmeta_section details.summarybox > summary {
+                        cursor: pointer;
+                        padding: 12px 16px;
+                        border: 1px solid var(--border);
+                        border-radius: 10px;
+                        background: #fff;
+                        user-select: none;
+                        transition: background 0.15s, color 0.15s, border-color 0.15s;
+                    }
+                    #toolmeta_section details.summarybox > summary:hover {
+                        background: var(--accent);
+                        color: #fff;
+                        border-color: var(--accent);
+                    }
+                    #toolmeta_section details.summarybox[open] > summary {
+                        border-bottom-left-radius: 0;
+                        border-bottom-right-radius: 0;
+                    }
+                    #toolmeta_section .tabs {
+                        border: 1px solid var(--border);
+                        border-radius: 12px;
+                        margin-top: 8px;
+                        overflow: hidden;
+                        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+                    }
+                    #toolmeta_section .tab-buttons {
+                        display: flex;
+                        flex-wrap: wrap;
+                        gap: 8px;
+                        padding: 10px;
+                        background: var(--header);
+                        border-bottom: 1px solid var(--border);
+                    }
+                    #toolmeta_section .tab-btn {
+                        background: #fff;
+                        color: var(--fg);
+                        border: 1px solid var(--border);
+                        padding: 6px 10px;
+                        border-radius: 999px;
+                        cursor: pointer;
+                        transition: background 0.15s, color 0.15s, border-color 0.15s;
+                    }
+                    #toolmeta_section .tab-btn:hover {
+                        background: var(--accent);
+                        color: #fff;
+                        border-color: var(--accent);
+                    }
+                    #toolmeta_section .tab-btn.active {
+                        background: var(--accent);
+                        color: #fff;
+                        border-color: var(--accent);
+                    }
+                    #toolmeta_section .tab-panel {
+                        display: none;
+                        padding: 10px;
+                    }
+                    #toolmeta_section .table-wrap {
+                        overflow: auto;
+                        border: 1px solid var(--border);
+                        border-radius: 12px;
+                        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+                    }
+                    #toolmeta_section table {
+                        border-collapse: separate;
+                        border-spacing: 0;
+                        width: 100%;
+                        min-width: 800px;
+                    }
+                    #toolmeta_section th,
+                    #toolmeta_section td {
+                        padding: 10px 12px;
+                        border-bottom: 1px solid var(--border);
+                        vertical-align: middle;
+                        white-space: nowrap;
+                    }
+                    #toolmeta_section thead th {
+                        background: var(--header);
+                        text-align: left;
+                        font-weight: 600;
+                        position: sticky;
+                        top: 0;
+                    }
+                    #toolmeta_section thead tr:nth-child(2) th {
+                        top: 38px;
+                    }
+                    #toolmeta_section tbody tr:nth-child(odd) {
+                        background: var(--row);
+                    }
+                    #toolmeta_section tbody tr:hover {
+                        background: #eef6ff;
+                    }
+                    #toolmeta_section td.num {
+                        text-align: center;
+                        font-variant-numeric: tabular-nums;
+                    }
+                    #toolmeta_section td.times {
+                        text-align: center;
+                        font-variant-numeric: tabular-nums;
+                    }
+                    #toolmeta_section .badge {
+                        display: inline-block;
+                        padding: 2px 8px;
+                        border-radius: 999px;
+                        background: #eef2ff;
+                        color: #3730a3;
+                        font-size: 12px;
+                    }
+                    #toolmeta_section .col-tool {
+                        white-space: nowrap;
+                    }
+                    #toolmeta_section .th-time {
+                        text-align: center !important;
+                    }
+                    #toolmeta_section .split {
+                        display: flex;
+                        flex-direction: column;
+                    }
+                    #toolmeta_section .split > div + div {
+                        border-top: 1px solid var(--border);
+                        margin-top: 4px;
+                        padding-top: 4px;
+                    }
+                    #toolmeta_section .time-sub {
+                        text-align: center;
+                    }
+                </style>
+                <details class="summarybox">
+                    <summary>Show / Hide Tool Performance Table (Click)</summary>
+                    <div class="tabs">
+                        <div class="tab-buttons">
+                            <button class="tab-btn active" data-tab="axe">Axe</button>
+                            <button class="tab-btn" data-tab="pick">Pickaxe</button>
+                            <button class="tab-btn" data-tab="shovel">Shovel</button>
+                            <button class="tab-btn" data-tab="sword">Sword</button>
+                            <button class="tab-btn" data-tab="other">Other</button>
+                        </div>
+                        <div class="tab-panel" data-tab="axe" style="display:block">
+                            <div class="table-wrap">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th rowspan="2">Tool</th><th rowspan="2">Group</th><th class="th-time" colspan="3">Time</th><th rowspan="2">Max Level</th><th rowspan="2">Durability (uses)</th><th rowspan="2">Max Drop LV</th><th rowspan="2">Damage</th><th rowspan="2">Punch Uses</th><th rowspan="2">Attack Speed</th>
+                                        </tr>
+                                        <tr>
+                                            <th class="time-sub">lv1</th>
+                                            <th class="time-sub">lv2</th>
+                                            <th class="time-sub">lv3</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr><td class="col-tool">Wooden Axe</td><td><span class="badge">Chopping</span></td><td class="times">2.5</td><td class="times">—</td><td class="times">—</td><td class="num">1</td><td class="num">20</td><td class="num">0</td><td class="num">2</td><td class="num">20</td><td class="num">1.0</td></tr>
+                                        <tr><td class="col-tool">Stone Axe</td><td><span class="badge">Chopping</span></td><td class="times">4</td><td class="times">3</td><td class="times">—</td><td class="num">1</td><td class="num">40</td><td class="num">0</td><td class="num">3</td><td class="num">40</td><td class="num">1.2</td></tr>
+                                        <tr><td class="col-tool">Copper Axe</td><td><span class="badge">Chopping</span></td><td class="times">3.5</td><td class="times">2.5</td><td class="times">1.75</td><td class="num">2</td><td class="num">30</td><td class="num">1</td><td class="num">3</td><td class="num">90</td><td class="num">1.1</td></tr>
+                                        <tr><td class="col-tool">Iron Axe</td><td><span class="badge">Chopping</span></td><td class="times">3.25</td><td class="times">2.0</td><td class="times">1.5</td><td class="num">2</td><td class="num">40</td><td class="num">1</td><td class="num">4</td><td class="num">120</td><td class="num">1.0</td></tr>
+                                        <tr><td class="col-tool">Gold Axe</td><td><span class="badge">Chopping</span></td><td class="times">3.0</td><td class="times">1.75</td><td class="times">1.25</td><td class="num">3</td><td class="num">40</td><td class="num">1</td><td class="num">5</td><td class="num">360</td><td class="num">0.9</td></tr>
+                                        <tr><td class="col-tool">Ruby Axe</td><td><span class="badge">Chopping</span></td><td class="times">2.9</td><td class="times">1.65</td><td class="times">1.15</td><td class="num">3</td><td class="num">0</td><td class="num">1</td><td class="num">6</td><td class="num">0</td><td class="num">0.9</td></tr>
+                                        <tr><td class="col-tool">Diamond Axe</td><td><span class="badge">Chopping</span></td><td class="times">2.5</td><td class="times">1.5</td><td class="times">1.0</td><td class="num">3</td><td class="num">80</td><td class="num">1</td><td class="num">6</td><td class="num">720</td><td class="num">0.9</td></tr>
+                                        <tr><td class="col-tool">Emerald Axe</td><td><span class="badge">Chopping</span></td><td class="times">2.5</td><td class="times">1.5</td><td class="times">1.0</td><td class="num">3</td><td class="num">60</td><td class="num">1</td><td class="num">6</td><td class="num">540</td><td class="num">0.9</td></tr>
+                                        <tr><td class="col-tool">dragonhide axe</td><td><span class="badge">Chopping</span></td><td class="times">1.2</td><td class="times">0.8</td><td class="times">0.6</td><td class="num">3</td><td class="num">40</td><td class="num">1</td><td class="num">6</td><td class="num">360</td><td class="num">0.6</td></tr>
+                                        <tr><td class="col-tool">fire/ice_draconic_steel axe</td><td><span class="badge">Chopping</span></td><td class="times">0.3</td><td class="times">0.15</td><td class="times">0.075</td><td class="num">3</td><td class="num">0</td><td class="num">1</td><td class="num">55</td><td class="num">—</td><td class="num">3.0</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="tab-panel" data-tab="pick">
+                            <div class="table-wrap">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th rowspan="2">Tool</th><th rowspan="2">Group</th><th class="th-time" colspan="3">Time</th><th rowspan="2">Max Level</th><th rowspan="2">Durability (uses)</th><th rowspan="2">Max Drop LV</th><th rowspan="2">Damage</th><th rowspan="2">Punch Uses</th><th rowspan="2">Attack Speed</th>
+                                        </tr>
+                                        <tr>
+                                            <th class="time-sub">lv1</th>
+                                            <th class="time-sub">lv2</th>
+                                            <th class="time-sub">lv3</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr><td class="col-tool">Wooden Pickaxe</td><td><span class="badge">Cracky</span></td><td class="times">2.5</td><td class="times">—</td><td class="times">—</td><td class="num">1</td><td class="num">20</td><td class="num">0</td><td class="num">2</td><td class="num">20</td><td class="num">1.2</td></tr>
+                                        <tr><td class="col-tool">Stone Pickaxe</td><td><span class="badge">Cracky</span></td><td class="times">2.5</td><td class="times">2</td><td class="times">—</td><td class="num">1</td><td class="num">40</td><td class="num">0</td><td class="num">3</td><td class="num">40</td><td class="num">1.3</td></tr>
+                                        <tr><td class="col-tool">Copper Pickaxe</td><td><span class="badge">Cracky</span></td><td class="times">4.5</td><td class="times">2.5</td><td class="times">2.25</td><td class="num">2</td><td class="num">30</td><td class="num">1</td><td class="num">4</td><td class="num">90</td><td class="num">1.1</td></tr>
+                                        <tr><td class="col-tool">Iron Pickaxe</td><td><span class="badge">Cracky</span></td><td class="times">4.0</td><td class="times">2.0</td><td class="times">1.75</td><td class="num">2</td><td class="num">40</td><td class="num">1</td><td class="num">4</td><td class="num">120</td><td class="num">1.0</td></tr>
+                                        <tr><td class="col-tool">Gold Pickaxe</td><td><span class="badge">Cracky</span></td><td class="times">2.4</td><td class="times">1.8</td><td class="times">1.5</td><td class="num">3</td><td class="num">40</td><td class="num">3</td><td class="num">4</td><td class="num">360</td><td class="num">0.9</td></tr>
+                                        <tr><td class="col-tool">Ruby Pickaxe</td><td><span class="badge">Cracky</span></td><td class="times">2.3</td><td class="times">1.6</td><td class="times">1.4</td><td class="num">3</td><td class="num">0</td><td class="num">1</td><td class="num">5</td><td class="num">0</td><td class="num">0.8</td></tr>
+                                        <tr><td class="col-tool">Diamond Pickaxe</td><td><span class="badge">Cracky</span></td><td class="times">1.5</td><td class="times">1.4</td><td class="times">1.3</td><td class="num">3</td><td class="num">60</td><td class="num">1</td><td class="num">5</td><td class="num">720</td><td class="num">0.8</td></tr>
+                                        <tr><td class="col-tool">Emerald Pickaxe</td><td><span class="badge">Cracky</span></td><td class="times">1.5</td><td class="times">1.3</td><td class="times">1.2</td><td class="num">3</td><td class="num">80</td><td class="num">1</td><td class="num">5</td><td class="num">600</td><td class="num">0.8</td></tr>
+                                        <tr><td class="col-tool">dragonhide pick</td><td><span class="badge">Cracky</span></td><td class="times">0.6</td><td class="times">0.4</td><td class="times">0.3</td><td class="num">3</td><td class="num">40</td><td class="num">3</td><td class="num">4</td><td class="num">360</td><td class="num">0.6</td></tr>
+                                        <tr><td class="col-tool">fire/ice_draconic_steel pick</td><td><div class="split"><div><span class="badge">Cracky</span></div><div><span class="badge">Crumbly</span></div></div></td><td class="times"><div class="split"><div>0.3</div><div>0.5</div></div></td><td class="times"><div class="split"><div>0.15</div><div>0.25</div></div></td><td class="times"><div class="split"><div>0.075</div><div>0.2</div></div></td><td class="num">3</td><td class="num">0</td><td class="num">3</td><td class="num">35</td><td class="num">—</td><td class="num">4.0</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="tab-panel" data-tab="shovel">
+                            <div class="table-wrap">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th rowspan="2">Tool</th><th rowspan="2">Group</th><th class="th-time" colspan="3">Time</th><th rowspan="2">Max Level</th><th rowspan="2">Durability (uses)</th><th rowspan="2">Max Drop LV</th><th rowspan="2">Damage</th><th rowspan="2">Punch Uses</th><th rowspan="2">Attack Speed</th>
+                                        </tr>
+                                        <tr>
+                                            <th class="time-sub">lv1</th>
+                                            <th class="time-sub">lv2</th>
+                                            <th class="time-sub">lv3</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr><td class="col-tool">Wooden Shovel</td><td><span class="badge">Crumbly</span></td><td class="times">3.0</td><td class="times">—</td><td class="times">—</td><td class="num">1</td><td class="num">20</td><td class="num">0</td><td class="num">2</td><td class="num">20</td><td class="num">1.2</td></tr>
+                                        <tr><td class="col-tool">Stone Shovel</td><td><span class="badge">Crumbly</span></td><td class="times">2.0</td><td class="times">1.75</td><td class="times">—</td><td class="num">1</td><td class="num">40</td><td class="num">0</td><td class="num">2</td><td class="num">40</td><td class="num">1.4</td></tr>
+                                        <tr><td class="col-tool">Copper Shovel</td><td><span class="badge">Crumbly</span></td><td class="times">1.9</td><td class="times">1.6</td><td class="times">1.2</td><td class="num">2</td><td class="num">50</td><td class="num">1</td><td class="num">3</td><td class="num">150</td><td class="num">1.2</td></tr>
+                                        <tr><td class="col-tool">Iron Shovel</td><td><span class="badge">Crumbly</span></td><td class="times">1.8</td><td class="times">1.5</td><td class="times">1.1</td><td class="num">2</td><td class="num">60</td><td class="num">1</td><td class="num">3</td><td class="num">120</td><td class="num">1.0</td></tr>
+                                        <tr><td class="col-tool">Gold Shovel</td><td><span class="badge">Crumbly</span></td><td class="times">1.5</td><td class="times">1.2</td><td class="times">1.0</td><td class="num">3</td><td class="num">40</td><td class="num">3</td><td class="num">3</td><td class="num">360</td><td class="num">1.0</td></tr>
+                                        <tr><td class="col-tool">Ruby Shovel</td><td><span class="badge">Crumbly</span></td><td class="times">1.4</td><td class="times">1.1</td><td class="times">1.0</td><td class="num">3</td><td class="num">0</td><td class="num">1</td><td class="num">4</td><td class="num">0</td><td class="num">1.0</td></tr>
+                                        <tr><td class="col-tool">Diamond Shovel</td><td><span class="badge">Crumbly</span></td><td class="times">1.3</td><td class="times">1.0</td><td class="times">0.9</td><td class="num">3</td><td class="num">60</td><td class="num">1</td><td class="num">3</td><td class="num">180</td><td class="num">1.1</td></tr>
+                                        <tr><td class="col-tool">Emerald Shovel</td><td><span class="badge">Crumbly</span></td><td class="times">1.3</td><td class="times">1.0</td><td class="times">0.9</td><td class="num">3</td><td class="num">80</td><td class="num">1</td><td class="num">4</td><td class="num">720</td><td class="num">1.0</td></tr>
+                                        <tr><td class="col-tool">dragonhide shovel</td><td><span class="badge">Crumbly</span></td><td class="times">0.8</td><td class="times">0.6</td><td class="times">0.4</td><td class="num">3</td><td class="num">40</td><td class="num">1</td><td class="num">4</td><td class="num">360</td><td class="num">0.6</td></tr>
+                                        <tr><td class="col-tool">fire/ice_draconic_steel shovel</td><td><span class="badge">Crumbly</span></td><td class="times">0.4</td><td class="times">0.2</td><td class="times">0.1</td><td class="num">3</td><td class="num">0</td><td class="num">1</td><td class="num">30</td><td class="num">—</td><td class="num">5.5</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="tab-panel" data-tab="sword">
+                            <div class="table-wrap">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th rowspan="2">Tool</th><th rowspan="2">Group</th><th class="th-time" colspan="3">Time</th><th rowspan="2">Max Level</th><th rowspan="2">Durability (uses)</th><th rowspan="2">Max Drop LV</th><th rowspan="2">Damage</th><th rowspan="2">Punch Uses</th><th rowspan="2">Attack Speed</th>
+                                        </tr>
+                                        <tr>
+                                            <th class="time-sub">lv1</th>
+                                            <th class="time-sub">lv2</th>
+                                            <th class="time-sub">lv3</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr><td class="col-tool">Wooden Sword</td><td>—</td><td class="times">—</td><td class="times">—</td><td class="times">—</td><td>—</td><td>—</td><td class="num">0</td><td class="num">3</td><td>—</td><td class="num">1.0</td></tr>
+                                        <tr><td class="col-tool">Stone Sword</td><td>—</td><td class="times">—</td><td class="times">—</td><td class="times">—</td><td>—</td><td>—</td><td class="num">0</td><td class="num">4</td><td>—</td><td class="num">1.2</td></tr>
+                                        <tr><td class="col-tool">Copper Sword</td><td>—</td><td class="times">—</td><td class="times">—</td><td class="times">—</td><td>—</td><td>—</td><td class="num">1</td><td class="num">5</td><td>—</td><td class="num">0.9</td></tr>
+                                        <tr><td class="col-tool">Iron Sword</td><td>—</td><td class="times">—</td><td class="times">—</td><td class="times">—</td><td>—</td><td>—</td><td class="num">1</td><td class="num">6</td><td>—</td><td class="num">0.8</td></tr>
+                                        <tr><td class="col-tool">Gold Sword</td><td>—</td><td class="times">—</td><td class="times">—</td><td class="times">—</td><td>—</td><td>—</td><td class="num">1</td><td class="num">7</td><td>—</td><td class="num">0.7</td></tr>
+                                        <tr><td class="col-tool">Ruby Sword</td><td>—</td><td class="times">—</td><td class="times">—</td><td class="times">—</td><td>—</td><td>—</td><td class="num">1</td><td class="num">7</td><td class="num">0</td><td class="num">0.7</td></tr>
+                                        <tr><td class="col-tool">Diamond Sword</td><td>—</td><td class="times">—</td><td class="times">—</td><td class="times">—</td><td>—</td><td>—</td><td class="num">1</td><td class="num">8</td><td>—</td><td class="num">0.7</td></tr>
+                                        <tr><td class="col-tool">Emerald Sword</td><td>—</td><td class="times">—</td><td class="times">—</td><td class="times">—</td><td>—</td><td>—</td><td class="num">1</td><td class="num">8</td><td>—</td><td class="num">0.7</td></tr>
+                                        <tr><td class="col-tool">dragonhide sword</td><td><span class="badge">Snappy</span></td><td class="times">0.4</td><td class="times">0.2</td><td class="times">0.1</td><td class="num">3</td><td class="num">40</td><td class="num">1</td><td class="num">12</td><td class="num">360</td><td class="num">0.1</td></tr>
+                                        <tr><td class="col-tool">fire/ice_draconic_steel sword</td><td><span class="badge">Snappy</span></td><td class="times">0.05</td><td class="times">0.025</td><td class="times">0.01</td><td class="num">3</td><td class="num">0</td><td class="num">1</td><td class="num">60</td><td class="num">—</td><td class="num">1.2</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="tab-panel" data-tab="other">
+                            <div class="table-wrap">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th rowspan="2">Tool</th><th rowspan="2">Group</th><th class="th-time" colspan="3">Time</th><th rowspan="2">Max Level</th><th rowspan="2">Durability (uses)</th><th rowspan="2">Max Drop LV</th><th rowspan="2">Damage</th><th rowspan="2">Punch Uses</th><th rowspan="2">Attack Speed</th>
+                                        </tr>
+                                        <tr>
+                                            <th class="time-sub">lv1</th>
+                                            <th class="time-sub">lv2</th>
+                                            <th class="time-sub">lv3</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr><td class="col-tool">Magic Wand</td><td>—</td><td class="times">—</td><td class="times">—</td><td class="times">—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td class="num">1.0</td></tr>
+                                        <tr><td class="col-tool">Grappling Hook</td><td>—</td><td class="times">—</td><td class="times">—</td><td class="times">—</td><td>—</td><td>—</td><td class="num">0</td><td class="num">5</td><td>—</td><td class="num">2.0</td></tr>
+                                        <tr><td class="col-tool">Hammer</td><td>—</td><td class="times">—</td><td class="times">—</td><td class="times">—</td><td>—</td><td>—</td><td class="num">0</td><td class="num">6</td><td>—</td><td class="num">1.5</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </details>
+                <script>
+                    (function() {
+                        const section = document.getElementById('toolmeta_section');
+                        if (!section) return;
+                        const buttons = section.querySelectorAll('.tab-btn');
+                        const panels = section.querySelectorAll('.tab-panel');
+                        function showTab(name) {
+                            buttons.forEach(b => b.classList.toggle('active', b.dataset.tab === name));
+                            panels.forEach(p => {
+                                if (p.dataset.tab === name) {
+                                    p.style.display = 'block';
+                                } else {
+                                    p.style.display = 'none';
+                                }
+                            });
+                        }
+                        buttons.forEach(b => {
+                            b.addEventListener('click', () => showTab(b.dataset.tab));
+                        });
+                    })();
+                </script>
+            </section>
+
+            <h3 class="text-center">Original Author: multi-nono / Additional Author: dark / Contributor: 7080</h3>
+    </div>
+
+    <!-- Existing Modal (Text Editor) -->
+    <div id="textEditorModal" class="modal">
+        <div class="modal-content"><span class="close-button" onclick="closeModal('textEditorModal')">&times;</span>
+            <div class="flex items-center gap-2 mb-4">
+                <h2 id="textEditorModalTitle" class="text-xl font-semibold text-gray-800"></h2>
+                <span class="info-tip" tabindex="0">
+                    <span class="info-tip-icon">i</span>
+                    <span class="info-tip-content">Enter text directly and insert colors using the color code buttons as needed. Press Enter to newline, and click Confirm to save the content.</span>
+                </span>
+            </div>
+            <div class="scrollable-content mb-4">
+                <div id="textEditorContentDiv" contentEditable="true"
+                    class="w-full h-64 text-base border border-gray-300 rounded-md p-2 overflow-auto"
+                    style="white-space: pre-wrap;"></div>
+            </div>
+            <div class="flex justify-between items-center pt-4">
+                <div>
+                    <button id="insertColorCodeBtn" class="mr-2 modal-button">Select Text Color</button>
+                    <button id="insertBgColorCodeBtn" class="mr-2 modal-button">Select Background Color</button>
+                    <button id="toggleCodeVisibilityBtn" class="modal-button">Hide Color Codes</button>
+                </div>
+                <button id="confirmTextBtn" class="modal-button">Confirm</button>
+            </div>
+        </div>
+    </div>
+    
+    <div id="itemColorModal" class="modal">
+        <div class="modal-content"><span class="close-button" onclick="closeModal('itemColorModal')">&times;</span>
+            <div class="flex items-center gap-2 mb-4">
+                <h2 class="text-xl font-semibold text-gray-800">Item Color</h2>
+                <span class="info-tip" tabindex="0">
+                    <span class="info-tip-icon">i</span>
+                    <span class="info-tip-content">You can select a color while checking the preview. Press "Remove Color" to remove the existing color.</span>
+                </span>
+            </div>
+            <div class="flex flex-col items-center mb-6">
+                <label class="block text-sm font-medium text-gray-700 mb-2">Selected Color:</label>
+                <div id="colorDisplayLabel" class="w-24 h-12 rounded-lg border border-gray-300 shadow-inner"
+                    style="background-color: #FFFFFF;"></div>
+                <button type="button" id="itemColorPickerButton" class="mt-4 modal-button">Select Color</button>
+            </div>
+            <div class="flex justify-between items-center">
+                <button id="removeItemColorBtn" class="bg-red-500 hover:bg-red-600 modal-button">Remove Color</button>
+                <button id="confirmItemColorBtn" class="modal-button">Confirm</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Existing Modal (Enchantment) -->
+    <div id="enchantModal" class="modal">
+        <div class="modal-content"><span class="close-button" onclick="closeModal('enchantModal')">&times;</span>
+            <div class="flex items-center gap-2 mb-4">
+                <h2 class="text-xl font-semibold text-gray-800">Enchantment</h2>
+                <span class="info-tip" tabindex="0">
+                    <span class="info-tip-icon">i</span>
+                    <span class="info-tip-content">Select the effect you want to add, set the level, and press "Add Enchantment". Adjust the values in the list, then press "Confirm" to save.</span>
+                </span>
+            </div>
+            <div class="scrollable-content flex-1 pt-4">
+                <div class="label-frame mb-4">
+                    <div class="label-frame-title">Add Enchantment</div>
+                    <div class="mb-4">
+                        <label for="enchant-type" class="block text-sm font-medium mb-1">Type:</label>
+                        <select id="enchant-type" class="w-full"></select>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                        <div>
+                            <label for="enchant-level-helper" class="block text-sm font-medium mb-1">Level (Select):</label>
+                            <select id="enchant-level-helper" class="w-full"></select>
+                        </div>
+                        <div>
+                            <label for="enchant-level-input" class="block text-sm font-medium mb-1">Level (Input):</label>
+                            <input type="number" id="enchant-level-input" min="1" value="1" class="w-full"
+                                placeholder="Custom Value">
+                        </div>
+                    </div>
+                    <div class="flex justify-center"><button id="addEnchantBtn" class="modal-button">Add Enchantment</button></div>
+                </div>
+                <div class="label-frame">
+                    <div class="label-frame-title">Current Enchantments</div>
+                    <div id="current-enchants"></div>
+                </div>
+            </div>
+            <div class="flex justify-between items-center mt-6"><button id="clearEnchantsBtn"
+                    class="bg-red-500 hover:bg-red-600 modal-button">Remove All</button><button id="saveEnchantsBtn" class="modal-button">Confirm</button></div>
+        </div>
+    </div>
+    
+    <!-- Existing Modal (Tool Performance) -->
+    <div id="toolCapsModal" class="modal">
+        <div class="modal-content"><span class="close-button" onclick="closeModal('toolCapsModal')">&times;</span>
+            <div class="flex items-center gap-2 mb-4">
+                <h2 class="text-xl font-semibold text-gray-800">Tool Performance</h2>
+                <span class="info-tip" tabindex="0">
+                    <span class="info-tip-icon">i</span>
+                    <span class="info-tip-content">Select the tab for the category you want to edit and enter the values. Empty fields will use default values. Press "Confirm" to save, or "Reset This Tab" to restore the initial state.</span>
+                </span>
+            </div>
+        <!-- ★ Add ID to prevent selector conflicts -->
+        <div class="tab-container" id="toolcaps-tab-container">
+            <button class="tab-link active" data-tab="weapon">Weapon</button>
+            <button class="tab-link" data-tab="cracky">Cracky</button>
+            <button class="tab-link" data-tab="choppy">Choppy</button>
+            <button class="tab-link" data-tab="crumbly">Crumbly</button>
+            <button class="tab-link" data-tab="snappy">Snappy</button>
+            <button class="tab-link" data-tab="drop_level">Other</button>
+        </div>
+            <div class="scrollable-content flex-1 pt-4" id="tool-caps-panels">
+                <div id="tab-panel-weapon" class="tab-panel active"></div>
+                <div id="tab-panel-cracky" class="tab-panel"></div>
+                <div id="tab-panel-choppy" class="tab-panel"></div>
+                <div id="tab-panel-crumbly" class="tab-panel"></div>
+                <div id="tab-panel-snappy" class="tab-panel"></div>
+                <div id="tab-panel-drop_level" class="tab-panel"></div>
+            </div>
+            <div class="flex justify-between items-center mt-6"><button id="resetToolCapsBtn"
+                    class="bg-red-500 hover:bg-red-600 modal-button">Reset This Tab</button><button id="saveToolCapsBtn" class="modal-button">Confirm</button></div>
+        </div>
+    </div>
+    
+    <!-- ★ Fix: Custom Items Modal (Wording Change) -->
+    <div id="customItemsModal" class="modal">
+        <div class="modal-content"><span class="close-button" onclick="closeModal('customItemsModal')">&times;</span>
+            <div class="flex items-center gap-2 mb-4">
+                <!-- ★ Wording Change -->
+                <h2 class="text-xl font-semibold text-gray-800">Custom Items</h2>
+                <span class="info-tip" tabindex="0">
+                    <span class="info-tip-icon">i</span>
+                    <span class="info-tip-content">Set custom items based on existing tools. Empty fields will not be included in the metadata. If necessary, enabling "/ie editing" will add custom_items:version.</span>
+                </span>
+            </div>
+            <div class="scrollable-content flex-1 pt-4 space-y-4">
+                
+                <div class="label-frame">
+                    <!-- ★ Wording Change -->
+                    <div class="label-frame-title">Custom Items</div>
+                    <table class="ci-table">
+                        <thead>
+                            <tr>
+                                <th>Group</th>
+                                <th>Tool</th>
+                                <th>Speed</th>
+                                <th>Durability</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- ★ Wording Change (Newline Added) -->
+                            <tr>
+                                <td>Cracky<br>(Stone type)</td>
+                                <td>
+                                    <select id="ci-cracky-tool" data-type="cracky">
+                                        <option value="">Not Set</option>
+                                        <option value="default:pick_wood">Wooden Pickaxe</option>
+                                        <option value="default:pick_stone">Stone Pickaxe</option>
+                                        <option value="default:pick_steel">Iron Pickaxe</option>
+                                        <option value="default:pick_gold">Gold Pickaxe</option>
+                                        <option value="default:pick_diamond">Diamond Pickaxe</option>
+                                        <option value="default:pick_ruby">Ruby Pickaxe</option>
+                                    </select>
+                                </td>
+                                <td><select id="ci-cracky-speed" data-type="speed"></select></td>
+                                <td><select id="ci-cracky-durability" data-type="durability"></select></td>
+                            </tr>
+                            <tr>
+                                <td>Choppy<br>(Wood type)</td>
+                                <td>
+                                    <select id="ci-choppy-tool" data-type="choppy">
+                                        <option value="">Not Set</option>
+                                        <option value="default:axe_wood">Wooden Axe</option>
+                                        <option value="default:axe_stone">Stone Axe</option>
+                                        <option value="default:axe_steel">Iron Axe</option>
+                                        <option value="default:axe_gold">Gold Axe</option>
+                                        <option value="default:axe_diamond">Diamond Axe</option>
+                                        <option value="default:axe_ruby">Ruby Axe</option>
+                                    </select>
+                                </td>
+                                <td><select id="ci-choppy-speed" data-type="speed"></select></td>
+                                <td><select id="ci-choppy-durability" data-type="durability"></select></td>
+                            </tr>
+                            <tr>
+                                F<td>Crumbly<br>(Soil type)</td>
+                                <td>
+                                    <select id="ci-crumbly-tool" data-type="crumbly">
+                                        <option value="">Not Set</option>
+                                        <option value="default:shovel_wood">Wooden Shovel</option>
+                                        <option value="default:shovel_stone">Stone Shovel</option>
+                                        <option value="default:shovel_steel">Iron Shovel</option>
+                                        <option value="default:shovel_gold">Gold Shovel</option>
+                                        <option value="default:shovel_diamond">Diamond Shovel</option>
+                                        <option value="default:shovel_ruby">Ruby Shovel</option>
+                                    </select>
+                                </td>
+                                <td><select id="ci-crumbly-speed" data-type="speed"></select></td>
+                                <td><select id="ci-crumbly-durability" data-type="durability"></select></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="flex flex-col gap-1">
+                    <label for="ci-enable-ie-edit" class="inline-flex items-center text-sm text-gray-700">
+                        <input type="checkbox" id="ci-enable-ie-edit"
+                            class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500">
+                        <span class="ml-2">Enable /ie editing</span>
+                    </label>
+                    <p class="text-xs text-gray-500">When enabled, custom_items:version will be added to the command.</p>
+                </div>
+            </div>
+            <div class="flex justify-between items-center mt-6">
+                <button id="resetCustomItemsBtn" class="bg-red-500 hover:bg-red-600 modal-button">Reset</button>
+                <button id="saveCustomItemsBtn" class="modal-button">Confirm</button>
+            </div>
+        </div>
+    </div>
+
+
+    <div id="messageBox" class="message-box"></div>
+
+    <script>
+        // =================================================================
+        // ===== Data Definitions (same as v5) =================================
+        // =================================================================
+
+        const allItems = [
+            { id: "default:axe_wood", name: "Wood Axe" },
+            { id: "default:axe_stone", name: "Stone Axe" },
+            { id: "default:axe_copper", name: "Copper Axe" },
+            { id: "default:axe_steel", name: "Steel Axe" },
+            { id: "default:axe_gold", name: "Gold Axe" },
+            { id: "default:axe_ruby", name: "Ruby Axe" },
+            { id: "default:axe_diamond", name: "Diamond Axe" },
+            { id: "default:axe_emerald", name: "Emerald Axe" },
+            { id: "draconis:axe_dragonhide_fire_red", name: "dragonhide axe" },
+            { id: "draconis:axe_fire_draconic_steel", name: "fire/ice_draconic_steel axe" },
+            { id: "default:pick_wood", name: "Wood Pickaxe" },
+            { id: "default:pick_stone", name: "Stone Pickaxe" },
+            { id: "default:pick_copper", name: "Copper Pickaxe" },
+            { id: "default:pick_steel", name: "Steel Pickaxe" },
+            { id: "default:pick_gold", name: "Gold Pickaxe" },
+            { id: "default:pick_ruby", name: "Ruby Pickaxe" },
+            { id: "default:pick_diamond", name: "Diamond Pickaxe" },
+            { id: "default:pick_emerald", name: "Emerald Pickaxe" },
+            { id: "draconis:pick_dragonhide_fire_red", name: "dragonhide pick" },
+            { id: "draconis:pick_fire_draconic_steel", name: "fire/ice_draconic_steel pick" },
+            { id: "default:shovel_wood", name: "Wood Shovel" },
+            { id: "default:shovel_stone", name: "Stone Shovel" },
+            { id: "default:shovel_copper", name: "Copper Shovel" },
+            { id: "default:shovel_steel", name: "Steel Shovel" },
+            { id: "default:shovel_gold", name: "Gold Shovel" },
+            { id: "default:shovel_ruby", name: "Ruby Shovel" },
+            { id: "default:shovel_diamond", name: "Diamond Shovel" },
+            { id: "default:shovel_emerald", name: "Emerald Shovel" },
+            { id: "draconis:shovel_dragonhide_fire_red", name: "dragonhide shovel" },
+            { id: "draconis:shovel_fire_draconic_steel", name: "fire/ice_draconic_steel shovel" },
+            { id: "default:sword_wood", name: "Wood Sword" },
+            { id: "default:sword_stone", name: "Stone Sword" },
+            { id: "default:sword_copper", name: "Copper Sword" },
+            { id: "default:sword_steel", name: "Steel Sword" },
+            { id: "default:sword_gold", name: "Gold Sword" },
+            { id: "default:sword_ruby", name: "Ruby Sword" },
+            { id: "default:sword_diamond", name: "Diamond Sword" },
+            { id: "default:sword_emerald", name: "Emerald Sword" },
+            { id: "draconis:sword_dragonhide_fire_red", name: "dragonhide sword" },
+            { id: "draconis:sword_fire_draconic_steel", name: "fire/ice_draconic_steel sword" },
+            { id: "mobs_witch:magical_stick", name: "Magical Stick" },
+            { id: "summer_weapons:weapon_hook", name: "Grappling Hook" },
+            { id: "workbench:hammer", name: "Hammer" }
+        ];
+
+        const BASE_TOOL_CAPS_DICT = {
+            damage_groups: { fleshy: 1.0 },
+            full_punch_interval: 0.5,
+            punch_attack_uses: null,
+            groupcaps: {
+                cracky: { maxlevel: 0, times: [null, 3.0, 2.0, 1.0], uses: 30 },
+                choppy: { maxlevel: 0, times: [null, 3.0, 2.0, 1.0], uses: 30 },
+                crumbly: { maxlevel: 0, times: [null, 3.0, 2.0, 1.0], uses: 30 },
+                snappy: { maxlevel: 0, times: [null, 3.0, 2.0, 1.0], uses: 30 }
+            },
+            max_drop_level: 0
+        };
+        
+        const PRESET_COLORS = [
+            '#FFFFFF', '#D9DDE3', '#A4A9B1', '#4C5461', '#000000',
+            '#FEE2E2', '#FCA5A5', '#F87171', '#EF4444', '#BE123C',
+            '#FFEDD5', '#FDBA74', '#FB923C', '#F97316', '#C2410C',
+            '#FEF3C7', '#FDE68A', '#FBBF24', '#F59E0B', '#D97706',
+            '#DCFCE7', '#BBF7D0', '#4ADE80', '#22C55E', '#15803D',
+            '#CCFBF1', '#5EEAD4', '#2DD4BF', '#14B8A6', '#0F766E',
+            '#E0F2FE', '#60A5FA', '#3B82F6', '#2563EB', '#1D4ED8',
+            '#F5F3FF', '#DDD6FE', '#C4B5FD', '#A855F7', '#7C3AED'
+        ];
+
+        const TOOL_DEFAULT_USES = {
+            "default:axe_wood": 20,
+            "default:axe_stone": 40,
+            "default:axe_copper": 30,
+            "default:axe_steel": 40,
+            "default:axe_gold": 40,
+            "default:axe_ruby": 0,
+            "default:axe_diamond": 80,
+            "default:axe_emerald": 60,
+            "draconis:axe_dragonhide_fire_red": 40,
+            "draconis:axe_fire_draconic_steel": 0,
+            "default:pick_wood": 20,
+            "default:pick_stone": 40,
+            "default:pick_copper": 30,
+            "default:pick_steel": 40,
+            "default:pick_gold": 40,
+            "default:pick_ruby": 0,
+            "default:pick_diamond": 60,
+            "default:pick_emerald": 80,
+            "draconis:pick_dragonhide_fire_red": 40,
+            "draconis:pick_fire_draconic_steel": 0,
+            "default:shovel_wood": 20,
+            "default:shovel_stone": 40,
+            "default:shovel_copper": 50,
+            "default:shovel_steel": 60,
+            "default:shovel_gold": 40,
+            "default:shovel_ruby": 0,
+            "default:shovel_diamond": 60,
+            "default:shovel_emerald": 80,
+            "draconis:shovel_dragonhide_fire_red": 40,
+            "draconis:shovel_fire_draconic_steel": 0,
+            "default:sword_wood": 0,
+            "default:sword_stone": 0,
+            "default:sword_copper": 0,
+            "default:sword_steel": 0,
+            "default:sword_gold": 0,
+            "default:sword_ruby": 0,
+            "default:sword_diamond": 0,
+            "default:sword_emerald": 0,
+            "draconis:sword_dragonhide_fire_red": 40,
+            "draconis:sword_fire_draconic_steel": 0,
+            "mobs_witch:magical_stick": 0,
+            "summer_weapons:weapon_hook": 0,
+            "workbench:hammer": 0
+        };
+
+        let activeColorPicker = null;
+
+        const DEFAULT_TOOL_CAPS_DICT = {
+            "default:pick_wood": {"damage_groups":{"fleshy":2},"full_punch_interval":1.2,"groupcaps":{"cracky":{"maxlevel":1,"times":[null,2.5,null,null],"uses":20}},"max_drop_level":0,"punch_attack_uses":20},
+            "default:pick_stone": {"damage_groups":{"fleshy":3},"full_punch_interval":1.3,"groupcaps":{"cracky":{"maxlevel":1,"times":[null,2.5,2.0,null],"uses":40}},"max_drop_level":0,"punch_attack_uses":40},
+            "default:pick_copper": {"damage_groups":{"fleshy":4},"full_punch_interval":1.1,"groupcaps":{"cracky":{"maxlevel":2,"times":[null,4.5,2.5,2.25],"uses":30}},"max_drop_level":1,"punch_attack_uses":90},
+            "default:pick_steel": {"damage_groups":{"fleshy":4},"full_punch_interval":1.0,"groupcaps":{"cracky":{"maxlevel":2,"times":[null,4.0,2.0,1.75],"uses":40}},"max_drop_level":1,"punch_attack_uses":120},
+            "default:pick_gold": {"damage_groups":{"fleshy":4},"full_punch_interval":0.9,"groupcaps":{"cracky":{"maxlevel":3,"times":[null,2.4,1.8,1.5],"uses":40}},"max_drop_level":3,"punch_attack_uses":360},
+            "default:pick_ruby": {"damage_groups":{"fleshy":5},"full_punch_interval":0.8,"groupcaps":{"cracky":{"maxlevel":3,"times":[null,2.3,1.6,1.4],"uses":0}},"max_drop_level":1,"punch_attack_uses":0},
+            "default:pick_diamond": {"damage_groups":{"fleshy":5},"full_punch_interval":0.8,"groupcaps":{"cracky":{"maxlevel":3,"times":[null,1.5,1.4,1.3],"uses":60}},"max_drop_level":1,"punch_attack_uses":720},
+            "default:pick_emerald": {"damage_groups":{"fleshy":5},"full_punch_interval":0.8,"groupcaps":{"cracky":{"maxlevel":3,"times":[null,1.5,1.3,1.2],"uses":80}},"max_drop_level":1,"punch_attack_uses":600},
+            "default:axe_wood": {"damage_groups":{"fleshy":2},"full_punch_interval":1.0,"groupcaps":{"choppy":{"maxlevel":1,"times":[null,2.5,null,null],"uses":20}},"max_drop_level":0,"punch_attack_uses":20},
+            "default:axe_stone": {"damage_groups":{"fleshy":3},"full_punch_interval":1.2,"groupcaps":{"choppy":{"maxlevel":1,"times":[null,4.0,3.0,null],"uses":40}},"max_drop_level":0,"punch_attack_uses":40},
+            "default:axe_copper": {"damage_groups":{"fleshy":3},"full_punch_interval":1.1,"groupcaps":{"choppy":{"maxlevel":2,"times":[null,3.5,2.5,1.75],"uses":30}},"max_drop_level":1,"punch_attack_uses":90},
+            "default:axe_steel": {"damage_groups":{"fleshy":4},"full_punch_interval":1.0,"groupcaps":{"choppy":{"maxlevel":2,"times":[null,3.25,2.0,1.5],"uses":40}},"max_drop_level":1,"punch_attack_uses":120},
+            "default:axe_gold": {"damage_groups":{"fleshy":5},"full_punch_interval":0.9,"groupcaps":{"choppy":{"maxlevel":3,"times":[null,3.0,1.75,1.25],"uses":40}},"max_drop_level":1,"punch_attack_uses":360},
+            "default:axe_ruby": {"damage_groups":{"fleshy":6},"full_punch_interval":0.9,"groupcaps":{"choppy":{"maxlevel":3,"times":[null,2.9,1.65,1.15],"uses":0}},"max_drop_level":1,"punch_attack_uses":0},
+            "default:axe_diamond": {"damage_groups":{"fleshy":6},"full_punch_interval":0.9,"groupcaps":{"choppy":{"maxlevel":3,"times":[null,2.5,1.5,1.0],"uses":80}},"max_drop_level":1,"punch_attack_uses":720},
+            "default:axe_emerald": {"damage_groups":{"fleshy":6},"full_punch_interval":0.9,"groupcaps":{"choppy":{"maxlevel":3,"times":[null,2.5,1.5,1.0],"uses":60}},"max_drop_level":1,"punch_attack_uses":540},
+            "default:shovel_wood": {"damage_groups":{"fleshy":2},"full_punch_interval":1.2,"groupcaps":{"crumbly":{"maxlevel":1,"times":[null,3.0,null,null],"uses":20}},"max_drop_level":0,"punch_attack_uses":20},
+            "default:shovel_stone": {"damage_groups":{"fleshy":2},"full_punch_interval":1.4,"groupcaps":{"crumbly":{"maxlevel":1,"times":[null,2.0,1.75,null],"uses":40}},"max_drop_level":0,"punch_attack_uses":40},
+            "default:shovel_copper": {"damage_groups":{"fleshy":3},"full_punch_interval":1.2,"groupcaps":{"crumbly":{"maxlevel":2,"times":[null,1.9,1.6,1.2],"uses":50}},"max_drop_level":1,"punch_attack_uses":150},
+            "default:shovel_steel": {"damage_groups":{"fleshy":3},"full_punch_interval":1.0,"groupcaps":{"crumbly":{"maxlevel":2,"times":[null,1.8,1.5,1.1],"uses":60}},"max_drop_level":1,"punch_attack_uses":120},
+            "default:shovel_gold": {"damage_groups":{"fleshy":3},"full_punch_interval":1.0,"groupcaps":{"crumbly":{"maxlevel":3,"times":[null,1.5,1.2,1.0],"uses":40}},"max_drop_level":3,"punch_attack_uses":360},
+            "default:shovel_ruby": {"damage_groups":{"fleshy":4},"full_punch_interval":1.0,"groupcaps":{"crumbly":{"maxlevel":3,"times":[null,1.4,1.1,1.0],"uses":0}},"max_drop_level":1,"punch_attack_uses":0},
+            "default:shovel_diamond": {"damage_groups":{"fleshy":3},"full_punch_interval":1.1,"groupcaps":{"crumbly":{"maxlevel":3,"times":[null,1.3,1.0,0.9],"uses":60}},"max_drop_level":1,"punch_attack_uses":180},
+            "default:shovel_emerald": {"damage_groups":{"fleshy":4},"full_punch_interval":1.0,"groupcaps":{"crumbly":{"maxlevel":3,"times":[null,1.3,1.0,0.9],"uses":80}},"max_drop_level":1,"punch_attack_uses":720},
+            "default:sword_wood": {"damage_groups":{"fleshy":3},"full_punch_interval":1.0,"groupcaps":{},"max_drop_level":0,"punch_attack_uses":20},
+            "default:sword_stone": {"damage_groups":{"fleshy":4},"full_punch_interval":1.2,"groupcaps":{},"max_drop_level":0,"punch_attack_uses":40},
+            "default:sword_copper": {"damage_groups":{"fleshy":5},"full_punch_interval":0.9,"groupcaps":{},"max_drop_level":1,"punch_attack_uses":null},
+            "default:sword_steel": {"damage_groups":{"fleshy":6},"full_punch_interval":0.8,"groupcaps":{},"max_drop_level":1,"punch_attack_uses":null},
+            "default:sword_gold": {"damage_groups":{"fleshy":7},"full_punch_interval":0.7,"groupcaps":{},"max_drop_level":1,"punch_attack_uses":null},
+            "default:sword_ruby": {"damage_groups":{"fleshy":7},"full_punch_interval":0.7,"groupcaps":{},"max_drop_level":1,"punch_attack_uses":0},
+            "default:sword_diamond": {"damage_groups":{"fleshy":8},"full_punch_interval":0.7,"groupcaps":{},"max_drop_level":1,"punch_attack_uses":null},
+            "default:sword_emerald": {"damage_groups":{"fleshy":8},"full_punch_interval":0.7,"groupcaps":{},"max_drop_level":1,"punch_attack_uses":null},
+        };
+
+        const ENCHANTMENT_DEFS = {
+            sharpness: { name: 'Sharpness', japanese: 'Sharpness', maxLevel: 5, levels: { 1: 1.25, 2: 2.5, 3: 3.75, 4: 5, 5: 6.25 } },
+            unbreaking: { name: 'Unbreaking', japanese: 'Unbreaking', maxLevel: 3, levels: { 1: 100, 2: 200, 3: 300 } },
+            efficiency: { name: 'Efficiency', japanese: 'Efficiency', maxLevel: 5, levels: { 1: 25, 2: 30, 3: 35, 4: 40, 5: 45 } },
+            fortune: { name: 'Fortune', japanese: 'Fortune', maxLevel: 3, levels: { 1: 1, 2: 2, 3: 3 } },
+            silk_touch: { name: 'Silk Touch', japanese: 'Silk Touch', maxLevel: 1, levels: { 1: 1 } },
+            knockback: { name: 'Knockback', japanese: 'Knockback', maxLevel: 2, levels: { 1: 105, 2: 190 } },
+            curse_of_vanishing: { name: 'Curse of Vanishing', japanese: 'Curse of Vanishing', maxLevel: 1, levels: { 1: 1 } },
+            looting: { name: 'Looting', japanese: 'Looting', maxLevel: 3, levels: { 1: 1, 2: 2, 3: 3 } }, 
+            power: { name: 'Power', japanese: 'Power', maxLevel: 5, levels: { 1: 50, 2: 75, 3: 100, 4: 125, 5: 150 } },
+            punch: { name: 'Punch', japanese: 'Punch', maxLevel: 2, levels: { 1: 3, 2: 6 } }, 
+            infinity: { name: 'Infinity', japanese: 'Infinity', maxLevel: 1, levels: { 1: 1 } },
+        };
+
+        const UNVERIFIED_ENCHANT_IDS = ['looting', 'power', 'punch', 'infinity'];
+
+        const HEX_PATTERN = /^#?([0-9a-fA-F]{3,4}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})$/;
+
+        function normalizeHexValue(value) {
+            if (!value) return '';
+            const trimmed = value.trim();
+            const match = trimmed.match(HEX_PATTERN);
+            if (!match) return '';
+            let hex = match[1] || (trimmed.startsWith('#') ? trimmed.slice(1) : trimmed);
+            hex = hex.toUpperCase();
+            if (hex.length === 3 || hex.length === 4) {
+                hex = hex.split('').map(char => char + char).join('');
+            }
+            return `#${hex}`;
+        }
+
+        const MAX_FLOAT_VALUE = 1.7976931348623157e+308;
+
+        function calculateToolLevel(uses) {
+            if (uses === null || uses === undefined) return 1;
+            if (!Number.isFinite(uses)) return 16;
+            if (uses <= 0) return 1;
+            if (uses < 64) return 1;
+            const baseLevel = Math.floor(Math.log2(uses)) - 6;
+            if (!Number.isFinite(baseLevel)) return 16;
+            return Math.max(1, Math.min(16, baseLevel));
+        }
+
+        function formatUsesValue(uses) {
+            if (uses === null || uses === undefined) return '';
+            if (!Number.isFinite(uses) || uses > MAX_FLOAT_VALUE) {
+                return uses < 0 ? '-inf' : 'inf';
+            }
+            if (uses === 0) return '0';
+            const sign = uses < 0 ? '-' : '';
+            const absValue = Math.abs(uses);
+            if (absValue >= 1e13) {
+                const expString = absValue.toExponential(12);
+                let [mantissa, exponent] = expString.split('e');
+                mantissa = mantissa.replace(/(\.\d*?)0+$/, '$1').replace(/\.$/, '');
+                if (mantissa === '1') {
+                    return `${sign}1e${exponent}`;
+                }
+                return `${sign}${mantissa}e${exponent}`;
+            }
+            if (Number.isInteger(uses)) {
+                return `${uses}`;
+            }
+            let plain = `${absValue}`;
+            if (plain.includes('e')) {
+                return `${sign}${plain}`;
+            }
+            plain = plain.replace(/(\.\d*?)0+$/, '$1').replace(/\.$/, '');
+            return `${sign}${plain}`;
+        }
+
+        function closeColorPicker() {
+            if (!activeColorPicker) return;
+            document.removeEventListener('mousedown', activeColorPicker.onMouseDown, true);
+            document.removeEventListener('keydown', activeColorPicker.onKeyDown, true);
+            document.removeEventListener('scroll', activeColorPicker.onViewportChange, true);
+            window.removeEventListener('resize', activeColorPicker.onViewportChange, true);
+            if (activeColorPicker.popover && activeColorPicker.popover.parentNode) {
+                activeColorPicker.popover.parentNode.removeChild(activeColorPicker.popover);
+            }
+            activeColorPicker = null;
+        }
+
+        function openColorPicker(anchorElement, initialColor, callbacks = {}) {
+            if (!anchorElement) return;
+            closeColorPicker();
+
+            const popover = document.createElement('div');
+            popover.className = 'color-picker-popover';
+
+            const presetsTitle = document.createElement('div');
+            presetsTitle.className = 'color-picker-title';
+            presetsTitle.textContent = 'Preset Colors';
+            popover.appendChild(presetsTitle);
+
+            const presetsContainer = document.createElement('div');
+            presetsContainer.className = 'color-picker-presets';
+            PRESET_COLORS.forEach(color => {
+                const button = document.createElement('button');
+                button.type = 'button';
+                button.className = 'preset-color-option';
+                button.style.backgroundColor = color;
+                button.setAttribute('aria-label', color);
+                button.title = color;
+                button.addEventListener('click', () => {
+                    const normalized = normalizeHexValue(color);
+                    if (!normalized) return;
+                    if (typeof callbacks.onPreview === 'function') {
+                        callbacks.onPreview(normalized);
+                    }
+                    if (typeof callbacks.onConfirm === 'function') {
+                        callbacks.onConfirm(normalized);
+                    }
+                    closeColorPicker();
+                });
+                presetsContainer.appendChild(button);
+            });
+            popover.appendChild(presetsContainer);
+
+            const customTitle = document.createElement('div');
+            customTitle.className = 'color-picker-title';
+            customTitle.textContent = 'Custom Color';
+            popover.appendChild(customTitle);
+
+            const colorInput = document.createElement('input');
+            colorInput.type = 'color';
+            colorInput.className = 'color-picker-input';
+            const normalizedInitial = normalizeHexValue(initialColor) || '#FFFFFF';
+            colorInput.value = normalizedInitial;
+            colorInput.addEventListener('input', () => {
+                const normalized = normalizeHexValue(colorInput.value);
+                if (normalized && typeof callbacks.onPreview === 'function') {
+                    callbacks.onPreview(normalized);
+                }
+            });
+            colorInput.addEventListener('change', () => {
+                const normalized = normalizeHexValue(colorInput.value);
+                if (normalized && typeof callbacks.onConfirm === 'function') {
+                    callbacks.onConfirm(normalized);
+                }
+                closeColorPicker();
+            });
+            popover.appendChild(colorInput);
+
+            document.body.appendChild(popover);
+            popover.style.visibility = 'hidden';
+            popover.style.top = '0px';
+            popover.style.left = '0px';
+
+            const anchorRect = anchorElement.getBoundingClientRect();
+            const popRect = popover.getBoundingClientRect();
+            const margin = 16;
+
+            let top = window.scrollY + anchorRect.bottom + 8;
+            if (top + popRect.height + margin > window.scrollY + window.innerHeight) {
+                top = window.scrollY + anchorRect.top - popRect.height - 8;
+            }
+            top = Math.max(window.scrollY + margin, Math.min(top, window.scrollY + window.innerHeight - popRect.height - margin));
+
+            let left = window.scrollX + anchorRect.left + (anchorRect.width / 2) - (popRect.width / 2);
+            left = Math.max(window.scrollX + margin, Math.min(left, window.scrollX + window.innerWidth - popRect.width - margin));
+
+            popover.style.top = `${Math.round(top)}px`;
+            popover.style.left = `${Math.round(left)}px`;
+            popover.style.visibility = 'visible';
+
+            const onMouseDown = (event) => {
+                if (!popover.contains(event.target) && event.target !== anchorElement && !anchorElement.contains(event.target)) {
+                    closeColorPicker();
+                }
+            };
+            const onKeyDown = (event) => {
+                if (event.key === 'Escape') {
+                    closeColorPicker();
+                }
+            };
+            const onViewportChange = () => closeColorPicker();
+
+            document.addEventListener('mousedown', onMouseDown, true);
+            document.addEventListener('keydown', onKeyDown, true);
+            document.addEventListener('scroll', onViewportChange, true);
+            window.addEventListener('resize', onViewportChange, true);
+
+            activeColorPicker = { popover, anchor: anchorElement, onMouseDown, onKeyDown, onViewportChange };
+        }
+
+        // =================================================================
+        // ===== State Variables (same as v5) =====================================
+        // =================================================================
+        
+        function toRoman(num) {
+            num = parseInt(num);
+            if (isNaN(num) || num < 1) return num;
+            const roman = { M: 1000, CM: 900, D: 500, CD: 400, C: 100, XC: 90, L: 50, XL: 40, X: 10, IX: 9, V: 5, IV: 4, I: 1 };
+            let str = '';
+            for (let i of Object.keys(roman)) {
+                let q = Math.floor(num / roman[i]);
+                num -= q * roman[i];
+                str += i.repeat(q);
+            }
+            return str;
+        }
+
+        let descriptionContent = "", shortDescriptionContent = "", itemColorHex = "";
+        let tempItemColorHex = "";
+        let userToolCapabilities = {};
+        let enchantments = {};
+        let toolRange = "";
+        let tempEnchantments = {};
+        let dugValue = "";
+        let includeSlash = false;
+        let customItemsData = {
+            cracky_tool: "", cracky_speed: "", cracky_durability: "",
+            choppy_tool: "", choppy_speed: "", choppy_durability: "",
+            crumbly_tool: "", crumbly_speed: "", crumbly_durability: ""
+        };
+        let customItemsVersionEnabled = false;
+        let toolRanksEnabled = true;
+
+        let lastSavedCaretOffset = null;
+
+
+        const $ = id => document.getElementById(id);
+
+        const INFO_TIP_STORAGE_KEY = 'metadata_generator_show_details';
+        const infoTipToggle = $('info-tip-toggle');
+        const toolRanksToggle = $('tool-ranks-toggle');
+        if (infoTipToggle) {
+            let storedPreference = null;
+            try {
+                storedPreference = window.localStorage.getItem(INFO_TIP_STORAGE_KEY);
+            } catch (error) {
+                storedPreference = null;
+            }
+            if (storedPreference !== null) {
+                infoTipToggle.checked = storedPreference === '1';
+            }
+            document.body.classList.toggle('hide-info-tips', !infoTipToggle.checked);
+            infoTipToggle.addEventListener('change', (event) => {
+                const isChecked = event.target.checked;
+                document.body.classList.toggle('hide-info-tips', !isChecked);
+                try {
+                    window.localStorage.setItem(INFO_TIP_STORAGE_KEY, isChecked ? '1' : '0');
+                } catch (error) {
+                    // Ignore storage errors (e.g., private browsing)
+                }
+            });
+        }
+        if (toolRanksToggle) {
+            toolRanksToggle.checked = toolRanksEnabled;
+            toolRanksToggle.addEventListener('change', (event) => {
+                toolRanksEnabled = event.target.checked;
+                updateCommandDisplay();
+            });
+        }
+
+    function deepMerge(target, ...sources) { for (const source of sources) for (const key in source) if (source.hasOwnProperty(key)) { const sourceVal = source[key], targetVal = target[key]; if (targetVal && typeof targetVal === 'object' && !Array.isArray(targetVal) && sourceVal && typeof sourceVal === 'object' && !Array.isArray(sourceVal)) { target[key] = deepMerge({}, targetVal, sourceVal); } else { target[key] = sourceVal; } } return target; }
+    function showMessageBox(message, isError = false) { const box = $('messageBox'); box.textContent = message; box.className = 'message-box show' + (isError ? ' error' : ''); setTimeout(() => box.classList.remove('show'), 3000); }
+    function clonePlain(value) { if (Array.isArray(value)) { return value.map(clonePlain); } if (value && typeof value === 'object') { const result = {}; for (const key in value) { if (Object.prototype.hasOwnProperty.call(value, key)) { result[key] = clonePlain(value[key]); } } return result; } return value; }
+    function mergeToolCaps(target, updates) { if (!updates || typeof updates !== 'object') { return; } Object.entries(updates).forEach(([key, value]) => { if (value === null || value === undefined || (typeof value === 'number' && Number.isNaN(value))) { if (target && Object.prototype.hasOwnProperty.call(target, key)) { delete target[key]; } return; } if (Array.isArray(value)) { const normalized = value.map(item => { if (item === null || item === undefined || (typeof item === 'number' && Number.isNaN(item))) { return null; } return item; }); const hasNonNull = normalized.some(item => item !== null); if (key === 'times' || hasNonNull) { target[key] = normalized; } else if (target && Object.prototype.hasOwnProperty.call(target, key)) { delete target[key]; } return; } if (typeof value === 'object') { const base = (target && typeof target[key] === 'object' && !Array.isArray(target[key])) ? target[key] : {}; mergeToolCaps(base, value); if (Object.keys(base).length > 0) { target[key] = base; } else if (target && Object.prototype.hasOwnProperty.call(target, key)) { delete target[key]; } return; } target[key] = value; }); }
+    function applyToolCapsUpdates(baseCaps, updates) { const result = clonePlain(baseCaps || {}); mergeToolCaps(result, updates); return result; }
+
+        // =================================================================
+        // ===== updateCommandDisplay (same as v5) =========================
+        // =================================================================
+        function updateCommandDisplay() {
+            let metaParts = [];
+            let enchantDescParts = [];
+            let enchantLuaParts = [];
+
+            // 1. Enchantment-related
+            Object.entries(enchantments).forEach(([type, data]) => {
+                const def = ENCHANTMENT_DEFS[type];
+                if (!def) return;
+                const { level, value } = data;
+                enchantLuaParts.push(`["${type}"]={["value"]=${value}}`);
+                const hasLevels = def.maxLevel > 1;
+                const levelText = hasLevels ? toRoman(level) : '';
+                const enchantLine = hasLevels
+                    ? `\u001b(c@#ffffff)\u001b(T@x_enchanting)${def.name} \u001bE${levelText}`
+                    : `\u001b(c@#ffffff)\u001b(T@x_enchanting)${def.name}\u001bE`;
+                enchantDescParts.push(enchantLine);
+                metaParts.push(`is_${type}\u0002${value}`);
+            });
+
+            const hasEnchants = !!enchantLuaParts.length;
+
+            if (hasEnchants) {
+                metaParts.push(`is_enchanted\u00021`);
+                const xEnchantingData = `return {${enchantLuaParts.join(',')}}`;
+                metaParts.push(`x_enchanting\u0002${xEnchantingData}`);
+            }
+
+            // 2. tool_capabilities
+            const finalCaps = userToolCapabilities;
+            const hasCustomCaps = Object.keys(finalCaps).length > 0;
+            if (hasCustomCaps) {
+                metaParts.push(`tool_capabilities\u0002${JSON.stringify(finalCaps)}`);
+            }
+
+            // 3. Description
+            let enchantDescString = "";
+            if (hasEnchants) {
+                const enchantHeaderText = `\u001b(c@#AE81FF)\u001b(T@x_enchanting)Enchanted\u001bE`;
+                enchantDescString = `${enchantHeaderText}\n${enchantDescParts.join('\n')}`;
+                metaParts.push(`enchant_description\u0002${enchantDescString}`);
+            }
+
+            let finalDesc = descriptionContent; 
+
+            const selectedItemId = $('item-name').value;
+            const hasRegisteredTool = Object.prototype.hasOwnProperty.call(TOOL_DEFAULT_USES, selectedItemId);
+            const defaultUses = hasRegisteredTool ? TOOL_DEFAULT_USES[selectedItemId] : null;
+            const canAutoToolRanks = toolRanksEnabled && hasRegisteredTool;
+
+            let toolUsesValue = null;
+            if (dugValue !== "") {
+                const numericUses = Number(dugValue);
+                if (!Number.isNaN(numericUses)) {
+                    toolUsesValue = numericUses;
+                }
+            } else if (defaultUses !== null && defaultUses !== undefined) {
+                toolUsesValue = defaultUses;
+            }
+
+            if (toolUsesValue !== null) {
+                if (!Number.isFinite(toolUsesValue) || Math.abs(toolUsesValue) > MAX_FLOAT_VALUE) {
+                    toolUsesValue = toolUsesValue < 0 ? -Infinity : Infinity;
+                }
+            }
+
+            const hasBaseDescription = typeof descriptionContent === 'string' && descriptionContent.trim().length > 0;
+            const shouldAppendToolInfo = canAutoToolRanks && toolUsesValue !== null && hasBaseDescription;
+
+            if (shouldAppendToolInfo) {
+                const levelValue = calculateToolLevel(toolUsesValue);
+                const formattedUses = formatUsesValue(toolUsesValue);
+                const levelText = `\u001b(c@#ffdf00)\u001b(T@toolranks)Level: \u001bE${levelValue}`;
+                const usesText = `\u001b(c@#9d9d9d)\u001b(T@toolranks)Uses: \u001bE${formattedUses}`;
+                finalDesc = (finalDesc ? `${finalDesc}\n` : '') + levelText + '\n' + usesText;
+            }
+
+            if (hasEnchants) {
+                finalDesc = (finalDesc ? finalDesc + '\n\n' : '') + enchantDescString;
+            }
+
+            if (finalDesc) {
+                metaParts.push(`description\u0002${finalDesc}`);
+            }
+
+            // 4. Other fields
+            if (shortDescriptionContent) {
+                metaParts.push(`short_description\u0002${shortDescriptionContent}`);
+            }
+            if (descriptionContent) {
+                metaParts.push(`description_override\u0002${descriptionContent}`);
+            }
+            if (dugValue !== "") {
+                metaParts.push(`dug\u0002${dugValue}`);
+            }
+            if (toolRange !== '' && toolRange !== null && toolRange !== undefined) {
+                metaParts.push(`range\u0002${toolRange}`);
+            }
+            if (itemColorHex) {
+                metaParts.push(`color\u0002${itemColorHex}`);
+            }
+
+            // 5. Custom Items (version automation)
+            Object.entries(customItemsData).forEach(([key, value]) => {
+                if (value !== null && value !== "") {
+                    metaParts.push(`custom_items:${key}\u0002${value}`);
+                }
+            });
+            
+            if (customItemsVersionEnabled) {
+                metaParts.push(`custom_items:version\u00021`);
+            }
+
+            // 6. Join (suffix \u0003)
+            let finalMeta = "";
+            if (metaParts.length > 0) {
+                finalMeta = `\u0001${metaParts.join('\u0003')}\u0003`;
+            }
+
+            // 7. Command generation
+            const commandPrefix = includeSlash ? '/giveme' : 'giveme';
+            const wearValue = $('item-wear').value || 0;
+            $('command-display').value = `${commandPrefix} ${$('item-name').value} ${$('amount').value} ${wearValue} "${finalMeta.replace(/"/g, '\\"').replace(/\u0001/g, '\\u0001').replace(/\u0002/g, '\\u0002').replace(/\u0003/g, '\\u0003').replace(/\u001b/g, '\\u001b').replace(/\n/g, '\\n').replace(/\t/g, '\\t')}"`;
+            
+            // ★ Fix preview call
+            try {
+                updatePreview(finalDesc, descriptionContent);
+            } catch (error) {
+                console.error('updatePreview failed', error);
+                const fallbackPreview = $('preview-box');
+                if (fallbackPreview) {
+                    fallbackPreview.classList.remove('bg-dark');
+                    fallbackPreview.classList.add('bg-light');
+                    fallbackPreview.style.backgroundColor = '';
+                    const safeText = (finalDesc || '').replace(/\u001b\([^)]*\)/g, '').replace(/\u001b[EF]/g, '');
+                    fallbackPreview.innerText = safeText;
+                }
+            }
+        }
+        
+        // =================================================================
+        // ===== ★ Fix: updatePreview (Enchantment display fix) =============
+        // =================================================================
+        
+        // Convert hex color code to RGB and calculate brightness
+        function getBrightness(hexColor) {
+            hexColor = hexColor.replace('#', '');
+            const r = parseInt(hexColor.substring(0, 2), 16);
+            const g = parseInt(hexColor.substring(2, 4), 16);
+            const b = parseInt(hexColor.substring(4, 6), 16);
+            // Brightness (YIQ)
+            return (r * 299 + g * 587 + b * 114) / 1000;
+        }
+
+        function extractDescriptionFromCommand(commandText) {
+            if (!commandText) return null;
+            const metaMatch = commandText.match(/"((?:[^"\\]|\\.)*)"$/);
+            if (!metaMatch) return null;
+            const encodedMeta = metaMatch[1];
+            let decodedMeta = '';
+            try {
+                decodedMeta = JSON.parse(`"${encodedMeta.replace(/\\/g, '\\\\').replace(/"/g, '\\"')}"`);
+            } catch (error) {
+                console.warn('Failed to decode command meta for preview', error);
+                return null;
+            }
+            if (!decodedMeta) return null;
+            if (decodedMeta.startsWith('\u0001')) {
+                decodedMeta = decodedMeta.slice(1);
+            }
+            const segments = decodedMeta.split('\u0003').filter(Boolean);
+            let description = '';
+            let descriptionOverride = '';
+            let enchantDescription = '';
+            for (const segment of segments) {
+                const separatorIndex = segment.indexOf('\u0002');
+                if (separatorIndex === -1) continue;
+                const key = segment.slice(0, separatorIndex);
+                const value = segment.slice(separatorIndex + 1);
+                if (key === 'description') {
+                    description = value;
+                } else if (key === 'description_override') {
+                    descriptionOverride = value;
+                } else if (key === 'enchant_description') {
+                    enchantDescription = value;
+                }
+            }
+            return description || descriptionOverride || enchantDescription || null;
+        }
+
+        function updatePreview(generatedDescription, rawDescription) {
+            const preview = $('preview-box');
+            if (!preview) return;
+
+            const ESC = '\u001b';
+            const convertLiteralEscapes = (text) => {
+                if (!text) return '';
+                return text.replace(/\\u001b/g, ESC);
+            };
+            const commandDisplay = $('command-display');
+            const commandText = commandDisplay ? commandDisplay.value : '';
+            const commandDescription = extractDescriptionFromCommand(commandText);
+            const normalizedCommand = convertLiteralEscapes(commandDescription || '');
+            const normalizedGenerated = normalizedCommand || convertLiteralEscapes(generatedDescription || '');
+            const normalizedRaw = convertLiteralEscapes(rawDescription || '');
+
+            const applyPreviewBackground = (color) => {
+                const fallbackColor = '#656276';
+                const resolvedColor = color || fallbackColor;
+                preview.classList.remove('bg-dark', 'bg-light');
+                preview.style.backgroundColor = resolvedColor;
+                const brightness = getBrightness(resolvedColor);
+                preview.classList.add(brightness > 128 ? 'bg-light' : 'bg-dark');
+            };
+
+            const enchantNameMap = {};
+            Object.entries(ENCHANTMENT_DEFS || {}).forEach(([_, def]) => {
+                if (def && def.name) {
+                    enchantNameMap[def.name] = def.japanese || def.name;
+                }
+            });
+
+            const findFirstBackgroundColor = (text) => {
+                if (!text) return '';
+                let firstBackground = '';
+                let currentBackground = '';
+                for (let i = 0; i < text.length;) {
+                    const char = text[i];
+                    if (char === ESC) {
+                        i += 1;
+                        const next = text[i];
+                        if (next === '(') {
+                            const endIndex = text.indexOf(')', i);
+                            if (endIndex === -1) break;
+                            const code = text.slice(i + 1, endIndex);
+                            i = endIndex + 1;
+                            if (code.startsWith('b@')) {
+                                const normalized = normalizeHexValue(code.slice(2));
+                                currentBackground = normalized || '';
+                                if (!firstBackground && normalized) {
+                                    firstBackground = normalized;
+                                }
+                            }
+                            continue;
+                        }
+                        if (next === 'E' || next === 'F') {
+                            i += 1;
+                            currentBackground = '';
+                            continue;
+                        }
+                        continue;
+                    }
+                    i += 1;
+                }
+                return firstBackground || currentBackground || '';
+            };
+
+            const buildPreviewHtml = (text) => {
+                if (!text) return { html: '', firstBackground: '' };
+                let result = '';
+                const state = { color: null, background: null, template: null };
+                let spanOpen = false;
+                let firstBackground = '';
+
+                const closeSpan = () => {
+                    if (spanOpen) {
+                        result += '</span>';
+                        spanOpen = false;
+                    }
+                };
+
+                const openSpan = () => {
+                    if (spanOpen) closeSpan();
+                    const classes = [];
+                    if (state.template) classes.push(state.template);
+                    const styles = [];
+                    if (state.color) styles.push(`color: ${state.color} !important`);
+                    if (state.background) styles.push(`background-color: ${state.background}`);
+                    const classAttr = classes.length ? ` class="${classes.join(' ')}"` : '';
+                    const styleAttr = styles.length ? ` style="${styles.join('; ')}"` : '';
+                    result += `<span${classAttr}${styleAttr}>`;
+                    spanOpen = true;
+                };
+
+                const ensureSpan = () => {
+                    if (!spanOpen) {
+                        openSpan();
+                    }
+                };
+
+                const applyTemplate = (template) => {
+                    switch (template) {
+                        case 'default':
+                            state.template = 'preview-name';
+                            break;
+                        case 'toolranks':
+                            state.template = 'preview-toolranks';
+                            break;
+                        case 'x_enchanting':
+                            state.template = 'preview-enchant-name';
+                            break;
+                        default:
+                            state.template = null;
+                    }
+                };
+
+                for (let i = 0; i < text.length; ) {
+                    const char = text[i];
+                    if (char === ESC) {
+                        i += 1;
+                        const next = text[i];
+                        if (next === '(') {
+                            const endIndex = text.indexOf(')', i);
+                            if (endIndex === -1) break;
+                            const code = text.slice(i + 1, endIndex);
+                            i = endIndex + 1;
+                            if (code.startsWith('c@')) {
+                                const normalized = normalizeHexValue(code.slice(2));
+                                state.color = normalized || null;
+                                closeSpan();
+                            } else if (code.startsWith('b@')) {
+                                const normalized = normalizeHexValue(code.slice(2));
+                                state.background = normalized || null;
+                                if (!firstBackground && normalized) {
+                                    firstBackground = normalized;
+                                }
+                                closeSpan();
+                            } else if (code.startsWith('T@')) {
+                                applyTemplate(code.slice(2));
+                                closeSpan();
+                            }
+                            continue;
+                        }
+                        if (next === 'E' || next === 'F') {
+                            i += 1;
+                            state.color = null;
+                            state.background = null;
+                            state.template = null;
+                            closeSpan();
+                            continue;
+                        }
+                        // Ignore unknown codes
+                        continue;
+                    }
+
+                    ensureSpan();
+                    if (char === '\n') {
+                        result += '<br>';
+                    } else if (char === '\t') {
+                        result += '&nbsp;&nbsp;&nbsp;&nbsp;';
+                    } else if (char === '\r') {
+                        // ignore carriage return
+                    } else {
+                        result += escapeHtml(char);
+                    }
+                    i += 1;
+                }
+
+                closeSpan();
+                return { html: result, firstBackground };
+            };
+
+            const { html, firstBackground } = buildPreviewHtml(normalizedGenerated);
+            const backgroundSource = normalizedCommand || normalizedRaw || normalizedGenerated;
+            const resolvedBackground = firstBackground || findFirstBackgroundColor(backgroundSource);
+            applyPreviewBackground(resolvedBackground);
+
+            preview.innerHTML = html || '<span></span>';
+
+            const mergeNextValueInto = (element) => {
+                let next = element.nextSibling;
+                while (next && next.nodeType === Node.TEXT_NODE && !next.textContent.trim()) {
+                    const removable = next;
+                    next = next.nextSibling;
+                    removable.remove();
+                }
+                if (!next) return '';
+                let valueText = '';
+                if (next.nodeType === Node.TEXT_NODE) {
+                    valueText = next.textContent;
+                    next.remove();
+                } else if (next.nodeType === Node.ELEMENT_NODE) {
+                    valueText = next.textContent;
+                    next.remove();
+                }
+                return valueText.replace(/^[\s:：]+/, '').replace(/\s+/g, '');
+            };
+
+            const ensureBreaksAfter = (element, requiredCount) => {
+                if (!element || !element.parentNode) return;
+                let current = element.nextSibling;
+                const existingBreaks = [];
+                while (current && current.nodeName === 'BR') {
+                    existingBreaks.push(current);
+                    current = current.nextSibling;
+                }
+                const missing = requiredCount - existingBreaks.length;
+                if (missing > 0) {
+                    const referenceNode = existingBreaks.length ? existingBreaks[existingBreaks.length - 1].nextSibling : element.nextSibling;
+                    for (let i = 0; i < missing; i++) {
+                        const br = document.createElement('br');
+                        element.parentNode.insertBefore(br, referenceNode);
+                    }
+                }
+            };
+
+            preview.querySelectorAll('.preview-toolranks').forEach(el => {
+                const original = el.textContent;
+                if (original.includes('Level')) {
+                    const valueText = mergeNextValueInto(el);
+                    el.classList.add('preview-level');
+                    el.textContent = `Level: ${valueText}`;
+                    ensureBreaksAfter(el, 1);
+                } else if (original.includes('Uses')) {
+                    const valueText = mergeNextValueInto(el);
+                    el.classList.add('preview-uses');
+                    el.textContent = `Uses: ${valueText}`;
+                    ensureBreaksAfter(el, 2);
+                }
+            });
+            preview.querySelectorAll('.preview-enchant-name').forEach(el => {
+                const text = el.textContent;
+                if (text.includes('Enchanted')) {
+                    el.classList.add('preview-enchant-header');
+                    el.classList.remove('preview-enchant-name');
+                    el.textContent = text.replace('Enchanted', 'Enchanted');
+                    return;
+                }
+                const matchedName = Object.keys(enchantNameMap).find(name => text.startsWith(name));
+                if (matchedName) {
+                    const localized = enchantNameMap[matchedName];
+                    el.textContent = localized + text.slice(matchedName.length);
+                }
+            });
+
+            preview.querySelectorAll('.preview-enchant-header').forEach(el => {
+                if (el.textContent.includes('Enchanted')) {
+                    el.textContent = el.textContent.replace('Enchanted', 'Enchanted');
+                }
+            });
+            const firstSpan = preview.querySelector('span');
+            if (firstSpan && firstSpan.textContent.trim().length && !firstSpan.classList.contains('preview-name')) {
+                firstSpan.classList.add('preview-name');
+            }
+        }
+
+        
+        // =================================================================
+        // ===== Existing functions (no changes) ====================================
+        // =================================================================
+        function openModal(id) { closeColorPicker(); $(id).style.display = 'flex'; }
+        function closeModal(id) { $(id).style.display = 'none'; closeColorPicker(); }
+
+        $('item-name').addEventListener('input', updateCommandDisplay);
+        $('amount').addEventListener('input', updateCommandDisplay);
+        $('item-wear').addEventListener('input', updateCommandDisplay);
+        $('copy-command-btn').addEventListener('click', () => { $('command-display').select(); document.execCommand('copy') ? showMessageBox("Command copied") : showMessageBox("Failed to copy.", true); });
+
+        $('slash-toggle').addEventListener('change', (event) => {
+            includeSlash = event.target.checked;
+            updateCommandDisplay();
+        });
+
+        // --- Text Editor (no changes) ---
+        let currentTextEditorCallback = null;
+        let showCodesInTextEditor = true;
+        let isComposing = false;
+        function openTextEditorModal(title, initialText, callback) {
+            $('textEditorModalTitle').textContent = title;
+            const editor = $('textEditorContentDiv');
+            editor.textContent = initialText.replace(/\\n/g, '\n'); 
+            currentTextEditorCallback = callback;
+            showCodesInTextEditor = true;
+            $('toggleCodeVisibilityBtn').textContent = "Hide Color Codes";
+            const bgBtn = $('insertBgColorCodeBtn');
+            bgBtn.style.display = (title === "Description") ? 'inline-block' : 'none';
+            applyRichTextFormatting();
+            $('textEditorModal').style.display = 'flex';
+        }
+        function closeTextEditorModal() { $('textEditorModal').style.display = 'none'; }
+        function escapeHtml(text) { const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }; return text.replace(/[&<>"']/g, function (m) { return map[m]; }); }
+        function saveSelection() { const selection = window.getSelection(); if (selection.rangeCount > 0) { const range = selection.getRangeAt(0); const preCaretRange = range.cloneRange(); preCaretRange.selectNodeContents($('textEditorContentDiv')); preCaretRange.setEnd(range.endContainer, range.endOffset); return preCaretRange.toString().length; } return 0; }
+        function restoreSelection(savedCaretOffset) { const selection = window.getSelection(); selection.removeAllRanges(); const range = document.createRange(); range.selectNodeContents($('textEditorContentDiv')); range.collapse(true); let nodeStack = [$('textEditorContentDiv')]; let node, charIndex = 0; let foundStart = false; while (!foundStart && (node = nodeStack.pop())) { if (node.nodeType === 3) { let nextCharIndex = charIndex + node.length; if (!foundStart && savedCaretOffset >= charIndex && savedCaretOffset <= nextCharIndex) { range.setStart(node, savedCaretOffset - charIndex); foundStart = true; } charIndex = nextCharIndex; } else { let i = node.childNodes.length; while (i--) { nodeStack.push(node.childNodes[i]); } } } range.collapse(true); selection.addRange(range); }
+        function applyRichTextFormatting() {
+            if (!$('textEditorModal') || $('textEditorModal').style.display === 'none') return;
+            const savedCaretOffset = saveSelection();
+            const contentDiv = $('textEditorContentDiv');
+            const content = contentDiv.textContent;
+            const colorPattern = /(\\u001b\(([cb])@#([0-9a-fA-F]{3,4}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})\))|(\\u001b\(T@([a-zA-Z0-9_]+)\))|(\\u001b[EF])/g;
+            let htmlContent = '';
+            let lastIndex = 0;
+            let currentColor = 'inherit';
+            let currentBgColor = 'transparent';
+            const matches = Array.from(content.matchAll(colorPattern));
+            for (const match of matches) {
+                const fullCode = match[0];
+                const startIndex = match.index;
+                const textSegment = content.substring(lastIndex, startIndex);
+                if (textSegment) {
+                    htmlContent += `<span style="color: ${currentColor}; background-color: ${currentBgColor};">${escapeHtml(textSegment)}</span>`;
+                }
+                if (showCodesInTextEditor) {
+                    htmlContent += `<span style="color: black; background-color: #f0f0f0; padding: 0 2px; border-radius: 3px;">${escapeHtml(fullCode)}</span>`;
+                } else {
+                    htmlContent += `<span style="font-size: 0; user-select: none;">${escapeHtml(fullCode)}</span>`;
+                }
+                if (match[2] === 'c') {
+                    const normalized = normalizeHexValue(match[3]);
+                    currentColor = normalized || 'inherit';
+                }
+                else if (match[2] === 'b') {
+                    const normalized = normalizeHexValue(match[3]);
+                    currentBgColor = normalized || 'transparent';
+                }
+                else if (fullCode === '\\u001bE') { currentColor = 'inherit'; currentBgColor = 'transparent'; }
+                lastIndex = match.index + fullCode.length;
+            }
+            const remainingText = content.substring(lastIndex);
+            if (remainingText) {
+                htmlContent += `<span style="color: ${currentColor}; background-color: ${currentBgColor};">${escapeHtml(remainingText)}</span>`;
+            }
+            contentDiv.innerHTML = htmlContent;
+            restoreSelection(savedCaretOffset);
+        }
+        // Clone button to remove existing anonymous listeners
+        const replaceButtonToRemoveListeners = (id) => {
+            const original = $(id);
+            if (!original || !original.parentNode) return null;
+            const clone = original.cloneNode(true);
+            original.parentNode.replaceChild(clone, original);
+            return clone;
+        };
+
+        const prepareTextEditorColorInsertion = () => {
+            lastSavedCaretOffset = saveSelection();
+        };
+
+        const insertTextEditorCode = (code) => {
+            const editor = $('textEditorContentDiv');
+            if (!editor) return;
+            editor.focus();
+            if (lastSavedCaretOffset !== null) {
+                restoreSelection(lastSavedCaretOffset);
+            }
+            document.execCommand('insertText', false, code);
+            applyRichTextFormatting();
+            lastSavedCaretOffset = saveSelection();
+        };
+
+        const insertTextEditorNewline = () => {
+            const editor = $('textEditorContentDiv');
+            if (!editor) return;
+            editor.focus();
+            const selection = window.getSelection();
+            if (!selection || selection.rangeCount === 0) {
+                return;
+            }
+            const range = selection.getRangeAt(0);
+            range.deleteContents();
+            const newlineNode = document.createTextNode('\n');
+            range.insertNode(newlineNode);
+            range.setStartAfter(newlineNode);
+            range.collapse(true);
+            selection.removeAllRanges();
+            selection.addRange(range);
+            applyRichTextFormatting();
+            lastSavedCaretOffset = saveSelection();
+        };
+
+        const descriptionColorButton = replaceButtonToRemoveListeners('insertColorCodeBtn');
+        if (descriptionColorButton) {
+            descriptionColorButton.addEventListener('mousedown', prepareTextEditorColorInsertion);
+            descriptionColorButton.addEventListener('click', (event) => {
+                prepareTextEditorColorInsertion();
+                openColorPicker(event.currentTarget, '#FFFFFF', {
+                    onConfirm: (color) => {
+                        const code = `\\u001b(c@${color.toUpperCase()})`;
+                        insertTextEditorCode(code);
+                    }
+                });
+            });
+        }
+
+        const descriptionBgButton = replaceButtonToRemoveListeners('insertBgColorCodeBtn');
+        if (descriptionBgButton) {
+            descriptionBgButton.addEventListener('mousedown', prepareTextEditorColorInsertion);
+            descriptionBgButton.addEventListener('click', (event) => {
+                prepareTextEditorColorInsertion();
+                openColorPicker(event.currentTarget, '#656276', {
+                    onConfirm: (color) => {
+                        const code = `\\u001b(b@${color.toUpperCase()})`;
+                        insertTextEditorCode(code);
+                    }
+                });
+            });
+        }
+        $('toggleCodeVisibilityBtn').addEventListener('click', () => { showCodesInTextEditor = !showCodesInTextEditor; $('toggleCodeVisibilityBtn').textContent = showCodesInTextEditor ? "Hide Color Codes" : "Show Color Codes"; applyRichTextFormatting(); });
+        $('confirmTextBtn').addEventListener('click', () => {
+            const rawContent = $('textEditorContentDiv').textContent;
+            if (currentTextEditorCallback) {
+                currentTextEditorCallback(rawContent);
+            }
+            closeModal('textEditorModal');
+        });
+        const textEditorDiv = $('textEditorContentDiv');
+        textEditorDiv.addEventListener('compositionstart', () => { isComposing = true; });
+        textEditorDiv.addEventListener('compositionend', () => { isComposing = false; applyRichTextFormatting(); });
+        textEditorDiv.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter' && !event.altKey && !event.metaKey && !event.ctrlKey) {
+                event.preventDefault();
+                insertTextEditorNewline();
+            }
+        });
+        textEditorDiv.addEventListener('input', () => { if (!isComposing) { applyRichTextFormatting(); } });
+        $('btn-desc').addEventListener('click', () => openTextEditorModal("Description", descriptionContent, c => { descriptionContent = c; updateCommandDisplay(); }));
+        $('btn-short-desc').addEventListener('click', () => openTextEditorModal("Short Description", shortDescriptionContent, c => { shortDescriptionContent = c; updateCommandDisplay(); }));
+
+        // =================================================================
+        // ===== Item Color (revert to metadata_ja method) =================
+        // =================================================================
+        function openItemColorModal() {
+            const label = $('colorDisplayLabel');
+            const current = itemColorHex || '#FFFFFF';
+            tempItemColorHex = current;
+            if (label) label.style.backgroundColor = current;
+            openModal('itemColorModal');
+        }
+        $('btn-item-color').addEventListener('click', openItemColorModal);
+
+        const itemColorPickerButton = $('itemColorPickerButton');
+        if (itemColorPickerButton) {
+            itemColorPickerButton.addEventListener('click', (event) => {
+                const anchor = event.currentTarget;
+                openColorPicker(anchor, tempItemColorHex || '#FFFFFF', {
+                    onPreview: (color) => {
+                        tempItemColorHex = color;
+                        const label = $('colorDisplayLabel');
+                        if (label) label.style.backgroundColor = color;
+                    },
+                    onConfirm: (color) => {
+                        tempItemColorHex = color;
+                        const label = $('colorDisplayLabel');
+                        if (label) label.style.backgroundColor = color;
+                    }
+                });
+            });
+        }
+
+        $('confirmItemColorBtn').addEventListener('click', () => {
+            itemColorHex = tempItemColorHex ? tempItemColorHex.toUpperCase() : "";
+            closeModal('itemColorModal');
+            updateCommandDisplay();
+        });
+
+        $('removeItemColorBtn').addEventListener('click', () => {
+            itemColorHex = "";
+            tempItemColorHex = '#FFFFFF';
+            const label = $('colorDisplayLabel');
+            if (label) label.style.backgroundColor = '#FFFFFF';
+            closeModal('itemColorModal');
+            updateCommandDisplay();
+            showMessageBox("Item color removed.");
+        });
+        
+        // =================================================================
+        // ===== ★ Fix: Tool Capabilities (same as v5) ===========================
+        // =================================================================
+        function populateToolCapsModal() {
+            const caps = clonePlain(userToolCapabilities) || {};
+            const rangeFieldValue = toolRange === '' ? '' : toolRange;
+            const dugFieldValue = dugValue === '' ? '' : dugValue;
+
+            $('tab-panel-weapon').innerHTML = `<div class="label-frame"><div class="label-frame-title">Weapon</div><div class="space-y-4"><div><label class="flex items-center gap-2 text-sm font-medium mb-1" for="fleshy-damage">Damage: <span class="info-tip info-tip--right" tabindex="0"><span class="info-tip-icon">i</span><span class="info-tip-content">Base damage dealt to entities with 'fleshy' group.</span></span></label><input type="number" step="0.1" id="fleshy-damage" value="${caps.damage_groups?.fleshy ?? ''}" class="w-full" placeholder="e.g., 7"></div><div><label class="flex items-center gap-2 text-sm font-medium mb-1" for="full-punch-interval">Attack Speed: <span class="info-tip info-tip--right" tabindex="0"><span class="info-tip-icon">i</span><span class="info-tip-content">Cooldown in seconds for max damage. Smaller values allow faster attacks.</span></span></label><input type="number" step="0.1" id="full-punch-interval" value="${caps.full_punch_interval ?? ''}" class="w-full" placeholder="e.g., 0.9"></div><div><label class="flex items-center gap-2 text-sm font-medium mb-1" for="weapon-uses">Uses: <span class="info-tip info-tip--right" tabindex="0"><span class="info-tip-icon">i</span><span class="info-tip-content">Remaining attacks. Tool breaks after (value + 1) uses.</span></span></label><input type="number" min="0" step="1" id="weapon-uses" value="${caps.punch_attack_uses ?? ''}" class="w-full" placeholder="e.g., 20"></div></div></div>`;
+
+            $('tab-panel-drop_level').innerHTML = `<div class="label-frame"><div class="label-frame-title">Other</div><div class="space-y-4"><div><label class="flex items-center gap-2 text-sm font-medium mb-1" for="dug-value-input">Uses (Dug):
+                <span class="info-tip info-tip--right" tabindex="0"><span class="info-tip-icon">i</span><span class="info-tip-content">Total uses for the tool. Level is auto-calculated from this.</span></span>
+            </label><input type="number" min="0" id="dug-value-input" value="${dugFieldValue}" class="w-full" placeholder="e.g., 1024"></div><div><label class="flex items-center gap-2 text-sm font-medium mb-1" for="max-drop-level">Max Drop Level: <span class="info-tip info-tip--right" tabindex="0"><span class="info-tip-icon">i</span><span class="info-tip-content">Can only get regular drops from blocks at or below this level.</span></span></label><input type="number" id="max-drop-level" min="0" value="${caps.max_drop_level ?? ''}" class="w-full" placeholder="e.g., 2"></div><div><label class="flex items-center gap-2 text-sm font-medium mb-1" for="tool-range">Range: <span class="info-tip info-tip--right" tabindex="0"><span class="info-tip-icon">i</span><span class="info-tip-content">Tool reach distance. If blank, range info is omitted from command.</span></span></label><input type="number" step="0.1" id="tool-range" value="${rangeFieldValue}" class="w-full" placeholder="e.g., 4"></div></div></div>`;
+
+            const groupTranslations = { "cracky": "Cracky", "choppy": "Choppy", "crumbly": "Crumbly", "snappy": "Snappy" };
+            const groupExamples = { cracky: "e.g., Cobblestone, Ores", choppy: "e.g., Logs, Planks", crumbly: "e.g., Dirt, Sand", snappy: "e.g., Leaves, Grass" };
+            Object.entries(groupTranslations).forEach(([group, name]) => {
+                const data = (caps.groupcaps && caps.groupcaps[group]) ? caps.groupcaps[group] : {};
+                $(`tab-panel-${group}`).innerHTML = `<div class="label-frame"><div class="label-frame-title flex items-center gap-2">${name}<span class="info-tip info-tip--right" tabindex="0"><span class="info-tip-icon">i</span><span class="info-tip-content">Settings for the "${name}" digging group. ${groupExamples[group]}</span></span></div><div class="space-y-4"><div class="grid grid-cols-1 md:grid-cols-2 gap-4"><div><label class="flex items-center gap-2 text-sm font-medium mb-1" for="${group}-maxlevel">Max Level: <span class="info-tip info-tip--right" tabindex="0"><span class="info-tip-icon">i</span><span class="info-tip-content">Max block hardness level this tool can mine.</span></span></label><input type="number" id="${group}-maxlevel" value="${data.maxlevel ?? ''}" class="w-full" placeholder="e.g., 3"></div><div><label class="flex items-center gap-2 text-sm font-medium mb-1" for="${group}-uses">Uses: <span class="info-tip info-tip--left" tabindex="0"><span class="info-tip-icon">i</span><span class="info-tip-content">Remaining uses for this group. Smaller values break faster. Tool breaks after (value + 1) uses.</span></span></label><input type="number" id="${group}-uses" value="${data.uses ?? ''}" class="w-full" placeholder="e.g., 30"></div></div><div><label class="flex items-center gap-2 text-sm font-medium" for="${group}-time1">Time (lv1-3): <span class="info-tip info-tip--right" tabindex="0"><span class="info-tip-icon">i</span><span class="info-tip-content">Digging time in seconds for each hardness level.</span></span></label><div class="grid grid-cols-3 gap-2 text-xs text-gray-500 font-medium uppercase"><span>Lv1</span><span>Lv2</span><span>Lv3</span></div><div class="grid grid-cols-3 gap-2 mt-1">${[1, 2, 3].map(i => `<input type="number" step="0.1" id="${group}-time${i}" value="${((data.times || [])[i] ?? '')}" class="w-full" placeholder="${(i * 1.0).toFixed(1)}">`).join('')}</div></div></div></div>`;
+            });
+        }
+        $('btn-tool-caps').addEventListener('click', () => { populateToolCapsModal(); openModal('toolCapsModal'); });
+        
+        $('saveToolCapsBtn').addEventListener('click', () => {
+            const activeTab = $('toolcaps-tab-container').querySelector('.tab-link.active').dataset.tab;
+            const activeTabName = $('toolcaps-tab-container').querySelector('.tab-link.active').textContent;
+            let updates = {};
+            const getFloat = (id) => { const v = $(id).value.trim(); return v === '' ? null : parseFloat(v); };
+            const getInt = (id) => { const v = $(id).value.trim(); return v === '' ? null : parseInt(v, 10); };
+            try {
+                switch (activeTab) {
+                    case 'weapon': {
+                        updates.damage_groups = { fleshy: getFloat('fleshy-damage') };
+                        updates.full_punch_interval = getFloat('full-punch-interval');
+                        updates.punch_attack_uses = getInt('weapon-uses');
+                        break;
+                    }
+                    case 'drop_level': {
+                        updates.max_drop_level = getInt('max-drop-level');
+                        const rangeValueRaw = $('tool-range').value.trim();
+                        toolRange = (rangeValueRaw === '') ? '' : parseFloat(rangeValueRaw);
+                        if (isNaN(toolRange)) throw new Error('Range is invalid.');
+                        
+                        const dugValueRaw = $('dug-value-input').value.trim();
+                        dugValue = (dugValueRaw === '') ? '' : parseInt(dugValueRaw, 10);
+                        if (isNaN(dugValue)) throw new Error('Uses value is invalid.');
+
+                        break;
+                    }
+                    default: {
+                        if (!updates.groupcaps) updates.groupcaps = {};
+                        updates.groupcaps[activeTab] = {
+                            maxlevel: getInt(`${activeTab}-maxlevel`),
+                            uses: getInt(`${activeTab}-uses`),
+                            times: [ null, getFloat(`${activeTab}-time1`), getFloat(`${activeTab}-time2`), getFloat(`${activeTab}-time3`) ]
+                        };
+                        break;
+                    }
+                }
+            } catch (e) {
+                showMessageBox(e.message || 'Invalid number input.', true);
+                return;
+            }
+            userToolCapabilities = applyToolCapsUpdates(userToolCapabilities, updates);
+            closeModal('toolCapsModal');
+            updateCommandDisplay();
+            showMessageBox(`Updated "${activeTabName}" capabilities.`);
+        });
+        
+        $('resetToolCapsBtn').addEventListener('click', () => {
+            const activeTab = $('toolcaps-tab-container').querySelector('.tab-link.active');
+            const tabId = activeTab.dataset.tab;
+            const tabName = activeTab.textContent;
+            switch (tabId) {
+                case 'weapon':
+                    delete userToolCapabilities.damage_groups;
+                    delete userToolCapabilities.full_punch_interval;
+                    delete userToolCapabilities.punch_attack_uses;
+                    break;
+                case 'drop_level':
+                    delete userToolCapabilities.max_drop_level;
+                    toolRange = '';
+                    dugValue = '';
+                    break;
+                default:
+                    if (userToolCapabilities.groupcaps && userToolCapabilities.groupcaps[tabId]) {
+                        delete userToolCapabilities.groupcaps[tabId];
+                        if (Object.keys(userToolCapabilities.groupcaps).length === 0) {
+                            delete userToolCapabilities.groupcaps;
+                        }
+                    }
+                    break;
+            }
+            updateCommandDisplay();
+            closeModal('toolCapsModal');
+            showMessageBox(`"${tabName}" capabilities reset.`, false);
+        });
+        
+        // ★ Fix: Scope tab listeners by modal ID
+        $('toolcaps-tab-container').querySelectorAll('.tab-link').forEach(tab => tab.addEventListener('click', () => { 
+            $('toolcaps-tab-container').querySelectorAll('.tab-link').forEach(el => el.classList.remove('active'));
+            $('tool-caps-panels').querySelectorAll('.tab-panel').forEach(el => el.classList.remove('active'));
+            tab.classList.add('active'); 
+            $(`tab-panel-${tab.dataset.tab}`).classList.add('active'); 
+        }));
+
+        // --- Enchantments (same as v5) ---
+        const enchantTypeSelect = $('enchant-type');
+        const enchantLevelInput = $('enchant-level-input');
+        const enchantLevelHelper = $('enchant-level-helper');
+
+        function updateEnchantWarningNote() {
+            if (!enchantTypeSelect) return;
+            let note = $('enchant-warning-note');
+            if (!note) {
+                note = document.createElement('div');
+                note.id = 'enchant-warning-note';
+                note.style.color = '#dc2626';
+                note.style.fontSize = '0.75rem';
+                note.style.marginTop = '0.5rem';
+                const parent = enchantTypeSelect.parentElement;
+                if (parent) {
+                    parent.appendChild(note);
+                }
+            }
+            const needsWarning = UNVERIFIED_ENCHANT_IDS.includes(enchantTypeSelect.value);
+            note.textContent = needsWarning ? '*Not verified in MultiCraft' : '';
+            note.style.display = note.textContent ? 'block' : 'none';
+        }
+
+        function populateEnchantTypes() {
+            enchantTypeSelect.innerHTML = '<option value="">Select...</option>' + Object.entries(ENCHANTMENT_DEFS).map(([id, def]) => `<option value="${id}">${def.name} (${def.japanese})</option>`).join('');
+            updateEnchantWarningNote();
+        }
+        function updateEnchantmentInputs() {
+            const type = enchantTypeSelect.value;
+            const def = ENCHANTMENT_DEFS[type];
+            if (!def) {
+                enchantLevelHelper.innerHTML = '';
+                enchantLevelInput.value = 1;
+                updateEnchantWarningNote();
+                return;
+            }
+            enchantLevelHelper.innerHTML = Array.from({ length: def.maxLevel }, (_, i) => `<option value="${i + 1}">${toRoman(i + 1)}</option>`).join('');
+            enchantLevelInput.value = 1;
+            updateEnchantWarningNote();
+        }
+        function updateCurrentEnchantsDisplay() {
+            const container = $('current-enchants');
+            if (Object.keys(tempEnchantments).length === 0) {
+                container.innerHTML = '<p class="text-gray-500 text-center">No enchantments set</p>';
+                return;
+            }
+            container.innerHTML = Object.entries(tempEnchantments).map(([type, data]) => {
+                const def = ENCHANTMENT_DEFS[type];
+                const { level, value } = data;
+                const levelDisplay = def.maxLevel > 1 ? ` ${toRoman(level)}` : '';
+                return `
+                <div class="enchant-item">
+                    <div class="flex-grow mr-4">
+                        <div class="font-medium">${def.name}${levelDisplay} <span class="text-gray-500 font-normal">(${def.japanese})</span></div>
+                        <div class="flex items-center mt-2">
+                            <label for="enchant-val-${type}" class="text-sm mr-2 text-gray-600 whitespace-nowrap">Value:</label>
+                            <input type="number" step="any" id="enchant-val-${type}"
+                                class="w-full border border-d1d5db rounded-md px-2 py-1 text-sm"
+                                value="${value}">
+                        </div>
+                    </div>
+                    <button class="remove-enchant self-center" onclick="removeEnchantment('${type}')">Remove</button>
+                </div>`;
+            }).join('');
+        }
+        function removeEnchantment(type) {
+            const enchantName = ENCHANTMENT_DEFS[type].name;
+            delete tempEnchantments[type];
+            updateCurrentEnchantsDisplay();
+            showMessageBox(`Removed ${enchantName}.`);
+        }
+        window.removeEnchantment = removeEnchantment;
+        $('btn-enchant').addEventListener('click', () => {
+            tempEnchantments = JSON.parse(JSON.stringify(enchantments));
+            updateCurrentEnchantsDisplay();
+            openModal('enchantModal');
+        });
+        enchantTypeSelect.addEventListener('change', () => {
+            updateEnchantmentInputs();
+            updateEnchantWarningNote();
+        });
+        enchantLevelHelper.addEventListener('change', () => {
+            enchantLevelInput.value = enchantLevelHelper.value;
+        });
+        $('addEnchantBtn').addEventListener('click', () => {
+            const type = enchantTypeSelect.value;
+            const level = parseInt(enchantLevelInput.value);
+            if (!type) {
+                showMessageBox('Please select a type.', true);
+                return;
+            }
+            if (isNaN(level) || level < 1) {
+                showMessageBox('Please enter a valid level.', true);
+                return;
+            }
+            const def = ENCHANTMENT_DEFS[type];
+            let value;
+            if (def.levels[level]) {
+                value = def.levels[level];
+            } else {
+                const maxLevelInDefs = Math.max(...Object.keys(def.levels).map(k => parseInt(k)));
+                value = def.levels[maxLevelInDefs] || 0;
+            }
+            tempEnchantments[type] = { level: level, value: value };
+            updateCurrentEnchantsDisplay();
+            const messageLevelPart = def.maxLevel > 1 ? ` level ${toRoman(level)}` : '';
+            showMessageBox(`Added ${def.name}${messageLevelPart}.`);
+        });
+        $('clearEnchantsBtn').addEventListener('click', () => {
+            tempEnchantments = {};
+            updateCurrentEnchantsDisplay();
+            showMessageBox('Removed all enchantments.');
+        });
+        $('saveEnchantsBtn').addEventListener('click', () => {
+            const container = $('current-enchants');
+            if (container) {
+                container.querySelectorAll('.enchant-item input[type="number"]').forEach(input => {
+                    const type = input.id.substring(12); // "enchant-val-".length
+                    const parsedValue = parseFloat(input.value);
+                    if (tempEnchantments[type] && !isNaN(parsedValue)) {
+                        tempEnchantments[type].value = parsedValue;
+                    }
+                });
+            }
+            enchantments = JSON.parse(JSON.stringify(tempEnchantments));
+            updateCommandDisplay();
+            closeModal('enchantModal');
+            showMessageBox('Saved enchantment data.');
+        });
+        
+        // --- Custom Items (same as v5) ---
+        function getSpeedDurabilityOptionsHtml(selectedValue = "") {
+            const options = [
+                { text: 'Not Set', value: '' },
+                { text: '0.33x', value: '0.33333333333333331' },
+                { text: '0.67x', value: '0.66666666666666663' },
+                { text: '1x', value: '1' },
+                { text: '1.33x', value: '1.3333333333333333' },
+                { text: '1.67x', value: '1.6666666666666667' },
+                { text: '2x', value: '2' },
+                { text: '3x', value: '3' },
+                { text: '∞', value: 'inf' }
+            ];
+            
+            return options.map(opt => 
+                `<option value="${opt.value}" ${opt.value === selectedValue ? 'selected' : ''}>${opt.text}</option>`
+            ).join('');
+        }
+        $('btn-custom-items').addEventListener('click', () => {
+            ['cracky', 'choppy', 'crumbly'].forEach(type => {
+                $(`ci-${type}-tool`).value = customItemsData[`${type}_tool`];
+                const speedSelect = $(`ci-${type}-speed`);
+                const duraSelect = $(`ci-${type}-durability`);
+                speedSelect.innerHTML = getSpeedDurabilityOptionsHtml(customItemsData[`${type}_speed`]);
+                duraSelect.innerHTML = getSpeedDurabilityOptionsHtml(customItemsData[`${type}_durability`]);
+                const toolValue = customItemsData[`${type}_tool`];
+                duraSelect.disabled = (toolValue && toolValue.includes('ruby'));
+            });
+            const ieToggle = $('ci-enable-ie-edit');
+            if (ieToggle) {
+                ieToggle.checked = customItemsVersionEnabled;
+            }
+            openModal('customItemsModal');
+        });
+        function handleToolChange(event) {
+            const toolSelect = event.target;
+            const toolValue = toolSelect.value;
+            const type = toolSelect.dataset.type; 
+            const speedSelect = $(`ci-${type}-speed`);
+            const duraSelect = $(`ci-${type}-durability`);
+            
+            if (toolValue === "") {
+                speedSelect.value = "";
+                duraSelect.value = "";
+                duraSelect.disabled = false;
+            } else {
+                speedSelect.value = "1";
+                if (toolValue.includes('ruby')) {
+                    duraSelect.value = "";
+                    duraSelect.disabled = true;
+                } else {
+                    duraSelect.value = "1";
+                    duraSelect.disabled = false;
+                }
+            }
+        }
+        $('ci-cracky-tool').addEventListener('change', handleToolChange);
+        $('ci-choppy-tool').addEventListener('change', handleToolChange);
+        $('ci-crumbly-tool').addEventListener('change', handleToolChange);
+        $('saveCustomItemsBtn').addEventListener('click', () => {
+            customItemsData.cracky_tool = $('ci-cracky-tool').value;
+            customItemsData.cracky_speed = $('ci-cracky-speed').value;
+            customItemsData.cracky_durability = $('ci-cracky-durability').disabled ? "" : $('ci-cracky-durability').value;
+            customItemsData.choppy_tool = $('ci-choppy-tool').value;
+            customItemsData.choppy_speed = $('ci-choppy-speed').value;
+            customItemsData.choppy_durability = $('ci-choppy-durability').disabled ? "" : $('ci-choppy-durability').value;
+            customItemsData.crumbly_tool = $('ci-crumbly-tool').value;
+            customItemsData.crumbly_speed = $('ci-crumbly-speed').value;
+            customItemsData.crumbly_durability = $('ci-crumbly-durability').disabled ? "" : $('ci-crumbly-durability').value;
+            const ieToggle = $('ci-enable-ie-edit');
+            customItemsVersionEnabled = ieToggle ? ieToggle.checked : false;
+            updateCommandDisplay();
+            closeModal('customItemsModal');
+            showMessageBox('Updated custom item info.');
+        });
+        $('resetCustomItemsBtn').addEventListener('click', () => {
+            customItemsData = {
+                cracky_tool: "", cracky_speed: "", cracky_durability: "",
+                choppy_tool: "", choppy_speed: "", choppy_durability: "",
+                crumbly_tool: "", crumbly_speed: "", crumbly_durability: ""
+            };
+            customItemsVersionEnabled = false;
+            ['cracky', 'choppy', 'crumbly'].forEach(type => {
+                $(`ci-${type}-tool`).value = "";
+                $(`ci-${type}-speed`).innerHTML = getSpeedDurabilityOptionsHtml("");
+                $(`ci-${type}-durability`).innerHTML = getSpeedDurabilityOptionsHtml("");
+                $(`ci-${type}-durability`).disabled = false;
+            });
+            const ieToggle = $('ci-enable-ie-edit');
+            if (ieToggle) {
+                ieToggle.checked = false;
+            }
+            updateCommandDisplay();
+            closeModal('customItemsModal');
+            showMessageBox('Reset custom item info.');
+        });
+
+
+        // --- Item Suggest (same as v5) ---
+        (function() {
+          var input = document.getElementById('item-name');
+          var box = document.getElementById('item-suggest-box');
+          if (!input || !box) return;
+          var items = (typeof allItems !== 'undefined' && Array.isArray(allItems)) ? allItems : [];
+          var currentIndex = -1, visible = false, lastResults = [];
+          function normalizeId(s){ return (s||'').toLowerCase(); }
+          function includesId(hay, needle){ return normalizeId(hay).indexOf(normalizeId(needle)) !== -1; }
+          function includesName(hay, needle){ return (hay||'').toLowerCase().indexOf((needle||'').toLowerCase()) !== -1; }
+          function renderList(list){
+            if (!list.length) { box.innerHTML = '<div class="item-suggest-empty">No matching items found</div>'; return; }
+            var html = list.map(function(it, idx){
+              var n = (it.name||'').replace(/[&<>]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+              var id = (it.id||'').replace(/[&<>]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+              return '<div class="item-suggest-item" role="option" data-index="'+idx+'" data-id="'+id+'">'
+                   +   '<span class="name">'+n+'</span>'
+                   +   '<span class="id">'+id+'</span>'
+                   + '</div>';
+            }).join('');
+            box.innerHTML = html;
+          }
+          function show(){ box.classList.remove('item-suggest-hidden'); visible = true; }
+          function hide(){ box.classList.add('item-suggest-hidden'); visible = false; currentIndex = -1;
+            Array.prototype.forEach.call(box.querySelectorAll('.item-suggest-item.active'), function(el){ el.classList.remove('active'); });
+          }
+          function doSearch(q){
+            q = (q||'').trim();
+            if (!q){ hide(); return; }
+            var qId = q.toLowerCase();
+            var exactMatches = [];
+            var partialMatches = [];
+            var qLower = q.toLowerCase();
+            for (var i = 0; i < items.length; i++) {
+              var it = items[i];
+              if (!it) continue;
+              var idLower = (it.id || '').toLowerCase();
+              var nameLower = (it.name || '').toLowerCase();
+              if (qLower && (idLower === qLower || nameLower === qLower)) {
+                exactMatches.push(it);
+              } else if (includesName(it.name, q) || includesId(it.id, qId)) {
+                partialMatches.push(it);
+              }
+            }
+            var res = exactMatches.concat(partialMatches).slice(0, 20);
+            lastResults = res;
+            renderList(res);
+            show();
+          }
+          function updateActive(){
+            var nodes = box.querySelectorAll('.item-suggest-item');
+            Array.prototype.forEach.call(nodes, function(n){ n.classList.remove('active'); });
+            if (currentIndex >= 0 && nodes[currentIndex]) nodes[currentIndex].classList.add('active');
+          }
+          function selectIndex(idx){
+            var it = lastResults[idx]; if (!it) return;
+            input.value = it.id || '';
+            if (typeof updateCommandDisplay === 'function'){ try{ updateCommandDisplay(); }catch(e){} }
+            hide(); input.focus();
+            try{ input.setSelectionRange(input.value.length, input.value.length); }catch(e){}
+          }
+          input.addEventListener('input', function(e){ doSearch(e.target.value); updateCommandDisplay(); });
+          input.addEventListener('focus', function(){ if (input.value.trim()) doSearch(input.value); });
+          input.addEventListener('keydown', function(e){
+            if (!visible) return;
+            var count = box.querySelectorAll('.item-suggest-item').length;
+            if (!count) return;
+            if (e.key === 'ArrowDown'){ e.preventDefault(); currentIndex = (currentIndex + 1) % count; updateActive(); }
+            else if (e.key === 'ArrowUp'){ e.preventDefault(); currentIndex = (currentIndex - 1 + count) % count; updateActive(); }
+            else if (e.key === 'Enter'){ if (currentIndex >= 0){ e.preventDefault(); selectIndex(currentIndex); } }
+            else if (e.key === 'Escape'){ hide(); }
+          });
+          box.addEventListener('mousemove', function(e){
+            var el = e.target.closest('.item-suggest-item'); if (!el) return;
+            var idx = parseInt(el.getAttribute('data-index'), 10);
+            if (!isNaN(idx)){ currentIndex = idx; updateActive(); }
+          });
+          box.addEventListener('mousedown', function(e){ if (e.target.closest('.item-suggest-item')) e.preventDefault(); });
+          box.addEventListener('click', function(e){
+            var el = e.target.closest('.item-suggest-item'); if (!el) return;
+            var idx = parseInt(el.getAttribute('data-index'), 10);
+            if (!isNaN(idx)) selectIndex(idx);
+          });
+          document.addEventListener('click', function(e){
+            if (e.target === input || e.target.closest('#item-suggest-box')) return;
+            hide();
+          });
+        })();
+        
+        // --- Initialization ---
+        window.onload = () => {
+            populateEnchantTypes();
+            updateEnchantmentInputs();
+            document.querySelectorAll('select[data-type="speed"], select[data-type="durability"]').forEach(sel => {
+                sel.innerHTML = getSpeedDurabilityOptionsHtml("");
+            });
+            updateCommandDisplay();
+            updatePreview("", ""); 
+        };
+    </script>
+</body>
+
+</html>
