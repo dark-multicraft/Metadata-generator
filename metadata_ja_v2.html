@@ -7301,6 +7301,33 @@
             return str;
         }
 
+        const createEmptyCustomItemsData = () => ({
+            cracky_tool: "", cracky_speed: "", cracky_durability: "",
+            choppy_tool: "", choppy_speed: "", choppy_durability: "",
+            crumbly_tool: "", crumbly_speed: "", crumbly_durability: ""
+        });
+
+        const ESC_LITERAL_SEQUENCE = '\\u001b';
+        const ESC_RESET_LITERAL = `${ESC_LITERAL_SEQUENCE}E`;
+        const literalFormattingPattern = /\\u001b\((?:c|b|T)@/;
+        const actualFormattingPattern = /\u001b\((?:c|b|T)@/;
+
+        function ensureLiteralFormattingReset(text) {
+            if (typeof text !== 'string' || !text) {
+                return text;
+            }
+            const hasFormatting = literalFormattingPattern.test(text) || actualFormattingPattern.test(text);
+            if (!hasFormatting) {
+                return text;
+            }
+            const endsWithResetLiteral = /(\\u001b[EF])$/.test(text);
+            const endsWithResetActual = /(\u001b[EF])$/.test(text);
+            if (endsWithResetLiteral || endsWithResetActual) {
+                return text;
+            }
+            return `${text}${ESC_RESET_LITERAL}`;
+        }
+
         let descriptionContent = "", shortDescriptionContent = "", itemColorHex = "";
         let tempItemColorHex = "";
         let userToolCapabilities = {};
@@ -7309,11 +7336,7 @@
         let tempEnchantments = {};
         let dugValue = "";
         let includeSlash = false;
-        let customItemsData = {
-            cracky_tool: "", cracky_speed: "", cracky_durability: "",
-            choppy_tool: "", choppy_speed: "", choppy_durability: "",
-            crumbly_tool: "", crumbly_speed: "", crumbly_durability: ""
-        };
+        let customItemsData = createEmptyCustomItemsData();
         let customItemsVersionEnabled = false;
         let toolRanksEnabled = true;
 
@@ -7421,7 +7444,9 @@
                 metaParts.push(`enchant_description\u0002${enchantDescString}`);
             }
 
-            let finalDesc = descriptionContent; 
+            const baseDescriptionRaw = typeof descriptionContent === 'string' ? descriptionContent : '';
+            const normalizedBaseDescription = baseDescriptionRaw ? ensureLiteralFormattingReset(baseDescriptionRaw) : baseDescriptionRaw;
+            let finalDesc = normalizedBaseDescription;
 
             const selectedItemId = $('item-name').value;
             const hasRegisteredTool = Object.prototype.hasOwnProperty.call(TOOL_DEFAULT_USES, selectedItemId);
@@ -7453,8 +7478,8 @@
             if (shouldAppendToolInfo) {
                 const levelValue = calculateToolLevel(toolUsesValue);
                 const formattedUses = formatUsesValue(toolUsesValue);
-                const levelText = `(c@#ffdf00)(T@toolranks)Level: E${levelValue}`;
-                const usesText = `(c@#9d9d9d)(T@toolranks)Uses: E${formattedUses}`;
+                const levelText = `(c@#ffdf00)(T@toolranks)Level: F${levelValue}`;
+                const usesText = `(c@#9d9d9d)(T@toolranks)Uses: F${formattedUses}`;
                 finalDesc = (finalDesc ? `${finalDesc}\n` : '') + levelText + '\n' + usesText;
             }
 
@@ -7468,10 +7493,10 @@
 
             // 4. その他のフィールド
             if (shortDescriptionContent) {
-                metaParts.push(`short_description\u0002${shortDescriptionContent}`);
+                metaParts.push(`short_description\u0002${ensureLiteralFormattingReset(shortDescriptionContent)}`);
             }
             if (descriptionContent) {
-                metaParts.push(`description_override\u0002${descriptionContent}`);
+                metaParts.push(`description_override\u0002${ensureLiteralFormattingReset(descriptionContent)}`);
             }
             if (dugValue !== "") {
                 metaParts.push(`dug\u0002${dugValue}`);
@@ -7572,6 +7597,7 @@
             }
             return description || descriptionOverride || enchantDescription || null;
         }
+
 
         function updatePreview(generatedDescription, rawDescription) {
             const preview = $('preview-box');
@@ -8400,11 +8426,7 @@
             showMessageBox('カスタムアイテムの情報を更新しました。');
         });
         $('resetCustomItemsBtn').addEventListener('click', () => {
-            customItemsData = {
-                cracky_tool: "", cracky_speed: "", cracky_durability: "",
-                choppy_tool: "", choppy_speed: "", choppy_durability: "",
-                crumbly_tool: "", crumbly_speed: "", crumbly_durability: ""
-            };
+            customItemsData = createEmptyCustomItemsData();
             customItemsVersionEnabled = false;
             ['cracky', 'choppy', 'crumbly'].forEach(type => {
                 $(`ci-${type}-tool`).value = "";

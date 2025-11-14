@@ -7350,6 +7350,27 @@
         let customItemsVersionEnabled = false;
         let toolRanksEnabled = true;
 
+        const ESC_LITERAL_SEQUENCE = '\\u001b';
+        const ESC_RESET_LITERAL = `${ESC_LITERAL_SEQUENCE}E`;
+        const literalFormattingPattern = /\\u001b\((?:c|b|T)@/;
+        const actualFormattingPattern = /\u001b\((?:c|b|T)@/;
+
+        function ensureLiteralFormattingReset(text) {
+            if (typeof text !== 'string' || !text) {
+                return text;
+            }
+            const hasFormatting = literalFormattingPattern.test(text) || actualFormattingPattern.test(text);
+            if (!hasFormatting) {
+                return text;
+            }
+            const endsWithResetLiteral = /(\\u001b[EF])$/.test(text);
+            const endsWithResetActual = /(\u001b[EF])$/.test(text);
+            if (endsWithResetLiteral || endsWithResetActual) {
+                return text;
+            }
+            return `${text}${ESC_RESET_LITERAL}`;
+        }
+
         let lastSavedCaretOffset = null;
 
 
@@ -7454,7 +7475,9 @@
                 metaParts.push(`enchant_description\u0002${enchantDescString}`);
             }
 
-            let finalDesc = descriptionContent; 
+            const baseDescriptionRaw = typeof descriptionContent === 'string' ? descriptionContent : '';
+            const normalizedBaseDescription = baseDescriptionRaw ? ensureLiteralFormattingReset(baseDescriptionRaw) : baseDescriptionRaw;
+            let finalDesc = normalizedBaseDescription;
 
             const selectedItemId = $('item-name').value;
             const hasRegisteredTool = Object.prototype.hasOwnProperty.call(TOOL_DEFAULT_USES, selectedItemId);
@@ -7486,8 +7509,8 @@
             if (shouldAppendToolInfo) {
                 const levelValue = calculateToolLevel(toolUsesValue);
                 const formattedUses = formatUsesValue(toolUsesValue);
-                const levelText = `\u001b(c@#ffdf00)\u001b(T@toolranks)Level: \u001bE${levelValue}`;
-                const usesText = `\u001b(c@#9d9d9d)\u001b(T@toolranks)Uses: \u001bE${formattedUses}`;
+                const levelText = `\u001b(c@#ffdf00)\u001b(T@toolranks)Level: \u001bF${levelValue}`;
+                const usesText = `\u001b(c@#9d9d9d)\u001b(T@toolranks)Uses: \u001bF${formattedUses}`;
                 finalDesc = (finalDesc ? `${finalDesc}\n` : '') + levelText + '\n' + usesText;
             }
 
@@ -7501,10 +7524,10 @@
 
             // 4. Other fields
             if (shortDescriptionContent) {
-                metaParts.push(`short_description\u0002${shortDescriptionContent}`);
+                metaParts.push(`short_description\u0002${ensureLiteralFormattingReset(shortDescriptionContent)}`);
             }
             if (descriptionContent) {
-                metaParts.push(`description_override\u0002${descriptionContent}`);
+                metaParts.push(`description_override\u0002${ensureLiteralFormattingReset(descriptionContent)}`);
             }
             if (dugValue !== "") {
                 metaParts.push(`dug\u0002${dugValue}`);
