@@ -1479,7 +1479,7 @@
 </head>
 
 <body class="p-3 md:p-4 lg:p-5 min-h-screen">
-    <div class="max-w-7xl mx-auto space-y-2">
+    <div class="mx-auto space-y-2" style="max-width: 1360px;">
         <header class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-3">
             <div>
                 <h1 class="text-2xl font-extrabold tracking-tight">Metadata Generator</h1>
@@ -1588,22 +1588,22 @@
                 </span>
             </div>
             <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
-                <button id="btn-tool-caps" class="smart-button secondary text-xs">
+                <button id="btn-tool-caps" class="smart-button secondary text-sm">
                     <i data-lucide="hammer" class="w-4 h-4 text-slate-500"></i> Tool Capabilities
                 </button>
-                <button id="btn-desc" class="smart-button secondary text-xs">
+                <button id="btn-desc" class="smart-button secondary text-sm">
                     <i data-lucide="file-text" class="w-4 h-4 text-indigo-500"></i> Description
                 </button>
-                <button id="btn-short-desc" class="smart-button secondary text-xs">
+                <button id="btn-short-desc" class="smart-button secondary text-sm">
                     <i data-lucide="type" class="w-4 h-4 text-blue-500"></i> Short Description
                 </button>
-                <button id="btn-item-color" class="smart-button secondary text-xs">
+                <button id="btn-item-color" class="smart-button secondary text-sm">
                     <i data-lucide="palette" class="w-4 h-4 text-pink-500"></i> Item Color
                 </button>
-                <button id="btn-enchant" class="smart-button secondary text-xs">
+                <button id="btn-enchant" class="smart-button secondary text-sm">
                     <i data-lucide="zap" class="w-4 h-4 text-yellow-500"></i> Enchantment
                 </button>
-                <button id="btn-custom-items" class="smart-button secondary text-xs">
+                <button id="btn-custom-items" class="smart-button secondary text-sm">
                     <i data-lucide="puzzle" class="w-4 h-4 text-emerald-500"></i> Custom
                 </button>
             </div>
@@ -1811,6 +1811,19 @@
                                         <td class="num">0.9</td>
                                     </tr>
                                     <tr>
+                                        <td class="col-tool">Charoite Axe</td>
+                                        <td><span class="badge">Choppy</span></td>
+                                        <td class="times">2.5</td>
+                                        <td class="times">1.5</td>
+                                        <td class="times">1</td>
+                                        <td class="num">3</td>
+                                        <td class="num">50</td>
+                                        <td class="num">1</td>
+                                        <td class="num">6</td>
+                                        <td class="num">450</td>
+                                        <td class="num">0.8</td>
+                                    </tr>
+                                    <tr>
                                         <td class="col-tool">dragonhide axe</td>
                                         <td><span class="badge">Choppy</span></td>
                                         <td class="times">1.2</td>
@@ -1826,15 +1839,15 @@
                                     <tr>
                                         <td class="col-tool">fire/ice_draconic_steel axe</td>
                                         <td><span class="badge">Choppy</span></td>
+                                        <td class="times">0.6</td>
                                         <td class="times">0.3</td>
                                         <td class="times">0.15</td>
-                                        <td class="times">0.075</td>
                                         <td class="num">3</td>
-                                        <td class="num">0</td>
+                                        <td class="num">200</td>
                                         <td class="num">1</td>
                                         <td class="num">55</td>
-                                        <td class="num">—</td>
-                                        <td class="num">3.0</td>
+                                        <td class="num">1800</td>
+                                        <td class="num">3</td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -1931,47 +1944,60 @@
                                         <td class="col-tool">Ruby Pickaxe</td>
                                         <td><span class="badge">Cracky</span></td>
                                         <td class="times">2.3</td>
-                                        <td class="times">1.6</td>
+                                        <td class="times">1.7</td>
                                         <td class="times">1.4</td>
                                         <td class="num">3</td>
                                         <td class="num">0</td>
-                                        <td class="num">1</td>
+                                        <td class="num">3</td>
                                         <td class="num">5</td>
                                         <td class="num">0</td>
-                                        <td class="num">0.8</td>
+                                        <td class="num">0.9</td>
                                     </tr>
                                     <tr>
                                         <td class="col-tool">Diamond Pickaxe</td>
                                         <td><span class="badge">Cracky</span></td>
+                                        <td class="times">2</td>
                                         <td class="times">1.5</td>
-                                        <td class="times">1.4</td>
-                                        <td class="times">1.3</td>
+                                        <td class="times">1</td>
                                         <td class="num">3</td>
                                         <td class="num">60</td>
-                                        <td class="num">1</td>
+                                        <td class="num">3</td>
                                         <td class="num">5</td>
-                                        <td class="num">720</td>
-                                        <td class="num">0.8</td>
+                                        <td class="num">540</td>
+                                        <td class="num">0.9</td>
                                     </tr>
                                     <tr>
                                         <td class="col-tool">Emerald Pickaxe</td>
                                         <td><span class="badge">Cracky</span></td>
+                                        <td class="times">2</td>
                                         <td class="times">1.5</td>
-                                        <td class="times">1.3</td>
-                                        <td class="times">1.2</td>
+                                        <td class="times">1</td>
                                         <td class="num">3</td>
                                         <td class="num">80</td>
-                                        <td class="num">1</td>
+                                        <td class="num">3</td>
                                         <td class="num">5</td>
-                                        <td class="num">600</td>
-                                        <td class="num">0.8</td>
+                                        <td class="num">720</td>
+                                        <td class="num">0.9</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="col-tool">Charoite Pickaxe</td>
+                                        <td><span class="badge">Cracky</span></td>
+                                        <td class="times">2</td>
+                                        <td class="times">1.5</td>
+                                        <td class="times">1</td>
+                                        <td class="num">3</td>
+                                        <td class="num">50</td>
+                                        <td class="num">3</td>
+                                        <td class="num">5</td>
+                                        <td class="num">450</td>
+                                        <td class="num">0.9</td>
                                     </tr>
                                     <tr>
                                         <td class="col-tool">dragonhide pick</td>
                                         <td><span class="badge">Cracky</span></td>
+                                        <td class="times">1.2</td>
+                                        <td class="times">0.8</td>
                                         <td class="times">0.6</td>
-                                        <td class="times">0.4</td>
-                                        <td class="times">0.3</td>
                                         <td class="num">3</td>
                                         <td class="num">40</td>
                                         <td class="num">3</td>
@@ -1989,28 +2015,28 @@
                                         </td>
                                         <td class="times">
                                             <div class="split">
-                                                <div>0.3</div>
+                                                <div>0.6</div>
+                                                <div>0.8</div>
+                                            </div>
+                                        </td>
+                                        <td class="times">
+                                            <div class="split">
+                                                <div>0.4</div>
                                                 <div>0.5</div>
                                             </div>
                                         </td>
                                         <td class="times">
                                             <div class="split">
-                                                <div>0.15</div>
-                                                <div>0.25</div>
-                                            </div>
-                                        </td>
-                                        <td class="times">
-                                            <div class="split">
-                                                <div>0.075</div>
-                                                <div>0.2</div>
+                                                <div>0.3</div>
+                                                <div>0.4</div>
                                             </div>
                                         </td>
                                         <td class="num">3</td>
-                                        <td class="num">0</td>
+                                        <td class="num">200</td>
                                         <td class="num">3</td>
                                         <td class="num">35</td>
-                                        <td class="num">—</td>
-                                        <td class="num">4.0</td>
+                                        <td class="num">1800</td>
+                                        <td class="num">4</td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -2143,6 +2169,19 @@
                                         <td class="num">1.0</td>
                                     </tr>
                                     <tr>
+                                        <td class="col-tool">Charoite Shovel</td>
+                                        <td><span class="badge">Crumbly</span></td>
+                                        <td class="times">1.3</td>
+                                        <td class="times">1</td>
+                                        <td class="times">0.9</td>
+                                        <td class="num">3</td>
+                                        <td class="num">50</td>
+                                        <td class="num">1</td>
+                                        <td class="num">4</td>
+                                        <td class="num">450</td>
+                                        <td class="num">0.9</td>
+                                    </tr>
+                                    <tr>
                                         <td class="col-tool">dragonhide shovel</td>
                                         <td><span class="badge">Crumbly</span></td>
                                         <td class="times">0.8</td>
@@ -2158,14 +2197,14 @@
                                     <tr>
                                         <td class="col-tool">fire/ice_draconic_steel shovel</td>
                                         <td><span class="badge">Crumbly</span></td>
+                                        <td class="times">0.6</td>
                                         <td class="times">0.4</td>
                                         <td class="times">0.2</td>
-                                        <td class="times">0.1</td>
                                         <td class="num">3</td>
-                                        <td class="num">0</td>
+                                        <td class="num">200</td>
                                         <td class="num">1</td>
                                         <td class="num">30</td>
-                                        <td class="num">—</td>
+                                        <td class="num">1800</td>
                                         <td class="num">5.5</td>
                                     </tr>
                                 </tbody>
@@ -2299,11 +2338,24 @@
                                         <td class="num">0.7</td>
                                     </tr>
                                     <tr>
+                                        <td class="col-tool">Charoite Sword</td>
+                                        <td><span class="badge">Snappy</span></td>
+                                        <td class="times">—</td>
+                                        <td class="times">—</td>
+                                        <td class="times">—</td>
+                                        <td>—</td>
+                                        <td>—</td>
+                                        <td class="num">1</td>
+                                        <td class="num">8</td>
+                                        <td class="num">450</td>
+                                        <td class="num">0.6</td>
+                                    </tr>
+                                    <tr>
                                         <td class="col-tool">dragonhide sword</td>
                                         <td><span class="badge">Snappy</span></td>
+                                        <td class="times">0.8</td>
+                                        <td class="times">0.6</td>
                                         <td class="times">0.4</td>
-                                        <td class="times">0.2</td>
-                                        <td class="times">0.1</td>
                                         <td class="num">3</td>
                                         <td class="num">40</td>
                                         <td class="num">1</td>
@@ -2314,14 +2366,14 @@
                                     <tr>
                                         <td class="col-tool">fire/ice_draconic_steel sword</td>
                                         <td><span class="badge">Snappy</span></td>
-                                        <td class="times">0.05</td>
-                                        <td class="times">0.025</td>
-                                        <td class="times">0.01</td>
+                                        <td class="times">0.2</td>
+                                        <td class="times">0.15</td>
+                                        <td class="times">0.1</td>
                                         <td class="num">3</td>
-                                        <td class="num">0</td>
+                                        <td class="num">200</td>
                                         <td class="num">1</td>
                                         <td class="num">60</td>
-                                        <td class="num">—</td>
+                                        <td class="num">1800</td>
                                         <td class="num">1.2</td>
                                     </tr>
                                 </tbody>
@@ -10000,13 +10052,13 @@
             // Infer category from tool name
             Object.keys(Tools).forEach(name => {
                 const nameLower = name.toLowerCase();
-                if (nameLower.includes('Axe') || nameLower.includes('axe')) {
+                if (nameLower.includes('axe') && !nameLower.includes('pickaxe')) {
                     categories['Axe'].push(name);
-                } else if (nameLower.includes('Pickaxe') || nameLower.includes('Pickaxe') || nameLower.includes('pick')) {
+                } else if (nameLower.includes('pickaxe') || nameLower.includes('pick')) {
                     categories['Pickaxe'].push(name);
-                } else if (nameLower.includes('Shovel') || nameLower.includes('shovel')) {
+                } else if (nameLower.includes('shovel')) {
                     categories['Shovel'].push(name);
-                } else if (nameLower.includes('Sword') || nameLower.includes('sword')) {
+                } else if (nameLower.includes('sword')) {
                     categories['Sword'].push(name);
                 } else {
                     categories['Other'].push(name);
