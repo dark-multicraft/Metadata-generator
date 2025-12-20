@@ -16,7 +16,9 @@
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Lucide Icons -->
-    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://unpkg.com/lucide@0.470.0/dist/umd/lucide.min.js"></script>
+    <!-- LZ-String (Share URL Compression) -->
+    <script src="https://cdn.jsdelivr.net/npm/lz-string@1.5.0/libs/lz-string.min.js"></script>
     <!-- Inter Font -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
@@ -71,7 +73,7 @@
 
         /* Colors specified by decoration codes are reflected inline, avoid forcing via classes */
         .preview-name,
-        .preview-Toolranks,
+        .preview-toolranks,
         .preview-level,
         .preview-uses,
         .preview-enchant-header,
@@ -89,7 +91,7 @@
         }
 
         .Tooltip-preview.bg-light .preview-name,
-        .Tooltip-preview.bg-light .preview-Toolranks,
+        .Tooltip-preview.bg-light .preview-toolranks,
         .Tooltip-preview.bg-light .preview-level,
         .Tooltip-preview.bg-light .preview-uses,
         .Tooltip-preview.bg-light .preview-enchant-header,
@@ -105,7 +107,7 @@
         }
 
         .Tooltip-preview.bg-dark .preview-name,
-        .Tooltip-preview.bg-dark .preview-Toolranks,
+        .Tooltip-preview.bg-dark .preview-toolranks,
         .Tooltip-preview.bg-dark .preview-level,
         .Tooltip-preview.bg-dark .preview-uses,
         .Tooltip-preview.bg-dark .preview-enchant-header,
@@ -282,30 +284,6 @@
 
         .close-button:hover {
             color: #777777;
-        }
-
-        .message-box {
-            display: none;
-            position: fixed;
-            top: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            background-color: #4CAF50;
-            color: white;
-            padding: 10px 20px;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-            z-index: 1001;
-            opacity: 0;
-            transition: opacity 0.3s ease-in-out;
-        }
-
-        .message-box.error {
-            background-color: #f44336;
-        }
-
-        .message-box.show {
-            opacity: 1;
         }
 
         .enchant-item {
@@ -933,6 +911,20 @@
             filter: none;
         }
 
+        .smart-button.feedback-success {
+            background: #10b981 !important;
+            border-color: #10b981 !important;
+            color: #fff !important;
+            transition: background 0.15s, border-color 0.15s, color 0.15s;
+        }
+
+        .smart-button.feedback-error {
+            background: #ef4444 !important;
+            border-color: #ef4444 !important;
+            color: #fff !important;
+            transition: background 0.15s, border-color 0.15s, color 0.15s;
+        }
+
         .smart-button.danger {
             background: linear-gradient(to bottom right, #ef4444, #dc2626);
         }
@@ -1004,7 +996,7 @@
             font-family: 'ui-monospace', 'SFMono-Regular', Menlo, Monaco, Consolas, monospace;
             border-radius: 0.75rem;
             padding: 1.25rem;
-            min-height: 100px;
+            min-height: 150px;
             border: 2px solid #3b3b4f;
             overflow-x: auto;
             white-space: pre-wrap;
@@ -1151,27 +1143,33 @@
         }
 
         .message-box {
-            display: none;
+            display: block;
             position: fixed;
-            top: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            background-color: #22c55e;
-            color: white;
-            padding: 10px 20px;
-            border-radius: 8px;
-            box-shadow: 0 8px 20px rgba(15, 23, 42, 0.2);
+            right: 1rem;
+            bottom: 1rem;
+            max-width: min(360px, calc(100vw - 2rem));
+            background-color: rgba(15, 23, 42, 0.9);
+            color: #f8fafc;
+            padding: 0.6rem 0.9rem;
+            border-radius: 0.75rem;
+            border: 1px solid rgba(148, 163, 184, 0.25);
+            box-shadow: 0 12px 24px rgba(15, 23, 42, 0.2);
             z-index: 1001;
             opacity: 0;
-            transition: opacity 0.3s ease-in-out;
+            transform: translateY(8px) scale(0.98);
+            transition: opacity 0.2s ease, transform 0.2s ease;
+            pointer-events: none;
+            backdrop-filter: blur(8px);
         }
 
         .message-box.error {
-            background-color: #ef4444;
+            background-color: rgba(127, 29, 29, 0.9);
+            border-color: rgba(239, 68, 68, 0.5);
         }
 
         .message-box.show {
             opacity: 1;
+            transform: translateY(0) scale(1);
         }
 
         .info-tip-icon {
@@ -1346,17 +1344,17 @@
         }
 
         #toolmeta_section {
-            --Tool-header: #f1f5f9;
-            --Tool-row: #ffffff;
-            --Tool-border: #e2e8f0;
-            --Tool-accent: #4f46e5;
+            --tool-header: #f1f5f9;
+            --tool-row: #ffffff;
+            --tool-border: #e2e8f0;
+            --tool-accent: #4f46e5;
         }
 
         body.dark-mode #toolmeta_section {
-            --Tool-header: #1e293b;
-            --Tool-row: #0f172a;
-            --Tool-border: #334155;
-            --Tool-accent: #6366f1;
+            --tool-header: #1e293b;
+            --tool-row: #0f172a;
+            --tool-border: #334155;
+            --tool-accent: #6366f1;
         }
 
         #toolmeta_section summary::-webkit-details-marker {
@@ -1374,7 +1372,7 @@
         }
 
         #toolmeta_section .tabs {
-            border: 1px solid var(--Tool-border);
+            border: 1px solid var(--tool-border);
             border-radius: 0.75rem;
             overflow: hidden;
             background: var(--card-bg);
@@ -1386,8 +1384,8 @@
             flex-wrap: wrap;
             gap: 0.5rem;
             padding: 0.75rem;
-            background: var(--Tool-header);
-            border-bottom: 1px solid var(--Tool-border);
+            background: var(--tool-header);
+            border-bottom: 1px solid var(--tool-border);
         }
 
         #toolmeta_section .tab-btn {
@@ -1399,18 +1397,18 @@
             border: 1px solid transparent;
             color: var(--text-main);
             background: var(--card-bg);
-            border-color: var(--Tool-border);
+            border-color: var(--tool-border);
         }
 
         #toolmeta_section .tab-btn:hover {
-            border-color: var(--Tool-accent);
-            color: var(--Tool-accent);
+            border-color: var(--tool-accent);
+            color: var(--tool-accent);
         }
 
         #toolmeta_section .tab-btn.active {
-            background: var(--Tool-accent);
+            background: var(--tool-accent);
             color: #ffffff;
-            border-color: var(--Tool-accent);
+            border-color: var(--tool-accent);
         }
 
         #toolmeta_section .tab-panel {
@@ -1420,7 +1418,7 @@
         }
 
         #toolmeta_section .table-wrap {
-            border: 1px solid var(--Tool-border);
+            border: 1px solid var(--tool-border);
             border-radius: 0.75rem;
             overflow: auto;
         }
@@ -1435,13 +1433,13 @@
         #toolmeta_section th,
         #toolmeta_section td {
             padding: 0.75rem;
-            border: 1px solid var(--Tool-border);
+            border: 1px solid var(--tool-border);
             text-align: left;
             vertical-align: middle;
         }
 
         #toolmeta_section th {
-            background-color: var(--Tool-header);
+            background-color: var(--tool-header);
             font-weight: 600;
         }
 
@@ -1472,14 +1470,14 @@
         }
 
         #toolmeta_section .split>div+div {
-            border-top: 1px dashed var(--Tool-border);
+            border-top: 1px dashed var(--tool-border);
             padding-top: 2px;
         }
     </style>
 </head>
 
-<body class="p-3 md:p-4 lg:p-5 min-h-screen">
-    <div class="mx-auto space-y-2" style="max-width: 1360px;">
+<body class="p-2 md:p-3 lg:p-4 min-h-screen">
+    <div class="mx-auto space-y-2" style="max-width: 1600px;">
         <header class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-3">
             <div>
                 <h1 class="text-2xl font-extrabold tracking-tight">Metadata Generator</h1>
@@ -1639,19 +1637,20 @@
                     </label>
                 </div>
             </div>
-            <div class="relative Group">
-                <textarea id="command-display" rows="2"
+            <div class="relative group">
+                <textarea id="command-display" rows="3"
                     class="command-textarea w-full font-mono text-xs leading-relaxed focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all"
                     readonly></textarea>
-                <button id="copy-command-btn"
-                    class="absolute top-2 right-2 p-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-md shadow-sm hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
-                    title="Copy">
-                    <i data-lucide="copy" class="w-3.5 h-3.5"></i>
-                </button>
             </div>
             <div class="mt-2 flex flex-col sm:flex-row gap-2">
+                <button id="copy-command-btn" class="smart-button secondary w-full text-xs py-2.5">
+                    <i data-lucide="copy" class="w-3.5 h-3.5"></i> Copy
+                </button>
+                <button id="share-url-btn" class="smart-button secondary w-full text-xs py-2.5">
+                    <i data-lucide="share-2" class="w-3.5 h-3.5"></i> Share
+                </button>
                 <button id="import-command-btn" class="smart-button secondary w-full text-xs py-2.5">
-                    <i data-lucide="upload" class="w-3.5 h-3.5"></i> Import Command
+                    <i data-lucide="download" class="w-3.5 h-3.5"></i> Import
                 </button>
             </div>
         </section>
@@ -2595,7 +2594,7 @@
                     <select id="Tool-preset-select" class="flex-grow">
                         <option value="">Select...</option>
                     </select>
-                    <button type="button" id="apply-Tool-preset-btn" class="modal-button" disabled>Load</button>
+                    <button type="button" id="apply-tool-preset-btn" class="modal-button" disabled>Load</button>
                 </div>
                 <div id="Tool-preset-preview" class="mt-2 p-2 bg-gray-50 rounded-md text-xs text-gray-600 hidden">
                     <!-- Preview content is dynamically inserted by JS -->
@@ -2655,7 +2654,7 @@
                             <tr>
                                 <td>Cracky<br>(Stone)</td>
                                 <td>
-                                    <select id="ci-cracky-Tool" data-type="cracky">
+                                    <select id="ci-cracky-tool" data-type="cracky">
                                         <option value="">Not Set</option>
                                         <option value="default:pick_wood">Wooden Pickaxe</option>
                                         <option value="default:pick_stone">Stone Pickaxe</option>
@@ -2671,7 +2670,7 @@
                             <tr>
                                 <td>Choppy<br>(Wood)</td>
                                 <td>
-                                    <select id="ci-choppy-Tool" data-type="choppy">
+                                    <select id="ci-choppy-tool" data-type="choppy">
                                         <option value="">Not Set</option>
                                         <option value="default:axe_wood">Wooden Axe</option>
                                         <option value="default:axe_stone">Stone Axe</option>
@@ -2687,7 +2686,7 @@
                             <tr>
                                 <td>Crumbly<br>(Dirt)</td>
                                 <td>
-                                    <select id="ci-crumbly-Tool" data-type="crumbly">
+                                    <select id="ci-crumbly-tool" data-type="crumbly">
                                         <option value="">Not Set</option>
                                         <option value="default:shovel_wood">Wooden Shovel</option>
                                         <option value="default:shovel_stone">Stone Shovel</option>
@@ -8395,7 +8394,7 @@
             { "id": "womens_day_balloons:hot_air_balloon_shell", "name": "Hot Air Balloon Shell" }
         ];
 
-        const BASE_Tool_CAPS_DICT = {
+        const BASE_TOOL_CAPS_DICT = {
             damage_Groups: { fleshy: 1.0 },
             full_punch_interval: 0.5,
             punch_attack_uses: null,
@@ -8419,9 +8418,9 @@
             '#F5F3FF', '#DDD6FE', '#C4B5FD', '#A855F7', '#7C3AED'
         ];
 
-        const Tool_DEFAULT_USES = {
-            // ---Tool---
-            "admin_equipment:super_Tool": 0,
+        const TOOL_DEFAULT_USES = {
+            // ---tool---
+            "admin_equipment:super_tool": 0,
             "compass:4": 0,
             "default:axe_copper": 0,
             "default:axe_diamond": 0,
@@ -8608,7 +8607,7 @@
 
         let activeColorPicker = null;
 
-        const DEFAULT_Tool_CAPS_DICT = {
+        const DEFAULT_TOOL_CAPS_DICT = {
             "default:pick_wood": { "damage_Groups": { "fleshy": 2 }, "full_punch_interval": 1.2, "Groupcaps": { "cracky": { "maxlevel": 1, "times": [null, 2.5, null, null], "uses": 20 } }, "max_drop_level": 0, "punch_attack_uses": 20 },
             "default:pick_stone": { "damage_Groups": { "fleshy": 3 }, "full_punch_interval": 1.3, "Groupcaps": { "cracky": { "maxlevel": 1, "times": [null, 2.5, 2.0, null], "uses": 40 } }, "max_drop_level": 0, "punch_attack_uses": 40 },
             "default:pick_copper": { "damage_Groups": { "fleshy": 4 }, "full_punch_interval": 1.1, "Groupcaps": { "cracky": { "maxlevel": 2, "times": [null, 4.5, 2.5, 2.25], "uses": 30 } }, "max_drop_level": 1, "punch_attack_uses": 90 },
@@ -8847,9 +8846,9 @@
         }
 
         const createEmptyCustomItemsData = () => ({
-            cracky_Tool: "", cracky_speed: "", cracky_durability: "",
-            choppy_Tool: "", choppy_speed: "", choppy_durability: "",
-            crumbly_Tool: "", crumbly_speed: "", crumbly_durability: ""
+            cracky_tool: "", cracky_speed: "", cracky_durability: "",
+            choppy_tool: "", choppy_speed: "", choppy_durability: "",
+            crumbly_tool: "", crumbly_speed: "", crumbly_durability: ""
         });
 
         const ESC_LITERAL_SEQUENCE = '\\u001b';
@@ -8948,13 +8947,13 @@
         let tempItemColorHex = "";
         let userToolCapabilities = {};
         let enchantments = {};
-        let ToolRange = "";
+        let toolRange = "";
         let tempEnchantments = {};
         let dugValue = "";
         let includeSlash = false;
         let customItemsData = createEmptyCustomItemsData();
         let customItemsVersionEnabled = false;
-        let ToolRanksEnabled = true;
+        let toolRanksEnabled = true;
 
         let lastSavedCaretOffset = null;
 
@@ -8962,9 +8961,9 @@
         const $ = id => document.getElementById(id);
 
         const INFO_TIP_STORAGE_KEY = 'metadata_generator_show_details';
-        const Tool_RANKS_STORAGE_KEY = 'metadata_generator_Tool_ranks';
+        const TOOL_RANKS_STORAGE_KEY = 'metadata_generator_tool_ranks';
         const infoTipToggle = $('info-tip-toggle');
-        const ToolRanksToggle = $('tool-ranks-toggle');
+        const toolRanksToggle = $('tool-ranks-toggle');
         if (infoTipToggle) {
             let storedPreference = null;
             try {
@@ -8986,21 +8985,21 @@
                 }
             });
         }
-        if (ToolRanksToggle) {
+        if (toolRanksToggle) {
             let storedToolRanksPreference = null;
             try {
-                storedToolRanksPreference = window.localStorage.getItem(Tool_RANKS_STORAGE_KEY);
+                storedToolRanksPreference = window.localStorage.getItem(TOOL_RANKS_STORAGE_KEY);
             } catch (error) {
                 storedToolRanksPreference = null;
             }
             if (storedToolRanksPreference !== null) {
-                ToolRanksEnabled = storedToolRanksPreference === '1';
+                toolRanksEnabled = storedToolRanksPreference === '1';
             }
-            ToolRanksToggle.checked = ToolRanksEnabled;
-            ToolRanksToggle.addEventListener('change', (event) => {
-                ToolRanksEnabled = event.target.checked;
+            toolRanksToggle.checked = toolRanksEnabled;
+            toolRanksToggle.addEventListener('change', (event) => {
+                toolRanksEnabled = event.target.checked;
                 try {
-                    window.localStorage.setItem(Tool_RANKS_STORAGE_KEY, ToolRanksEnabled ? '1' : '0');
+                    window.localStorage.setItem(TOOL_RANKS_STORAGE_KEY, toolRanksEnabled ? '1' : '0');
                 } catch (error) {
                     // Ignore storage errors
                 }
@@ -9049,7 +9048,7 @@
             const finalCaps = userToolCapabilities;
             const hasCustomCaps = Object.keys(finalCaps).length > 0;
             if (hasCustomCaps) {
-                metaParts.push(`Tool_capabilities\u0002${JSON.stringify(finalCaps)}`);
+                metaParts.push(`tool_capabilities\u0002${JSON.stringify(finalCaps)}`);
             }
 
             // 3. Description
@@ -9067,37 +9066,37 @@
             let finalDesc = normalizedBaseDescription;
 
             const selectedItemId = $('item-name').value;
-            const hasRegisteredTool = Object.prototype.hasOwnProperty.call(Tool_DEFAULT_USES, selectedItemId);
-            const defaultUses = hasRegisteredTool ? Tool_DEFAULT_USES[selectedItemId] : null;
-            const canAutoToolRanks = ToolRanksEnabled && hasRegisteredTool;
+            const hasRegisteredTool = Object.prototype.hasOwnProperty.call(TOOL_DEFAULT_USES, selectedItemId);
+            const defaultUses = hasRegisteredTool ? TOOL_DEFAULT_USES[selectedItemId] : null;
+            const canAutoToolRanks = toolRanksEnabled && hasRegisteredTool;
 
-            let ToolUsesValue = null;
+            let toolUsesValue = null;
             if (dugValue !== "") {
                 const numericUses = Number(dugValue);
                 if (!Number.isNaN(numericUses)) {
-                    ToolUsesValue = numericUses;
+                    toolUsesValue = numericUses;
                 }
             } else if (defaultUses !== null && defaultUses !== undefined) {
-                ToolUsesValue = defaultUses;
+                toolUsesValue = defaultUses;
             }
 
-            if (ToolUsesValue !== null) {
-                if (!Number.isFinite(ToolUsesValue) || Math.abs(ToolUsesValue) > MAX_FLOAT_VALUE) {
-                    ToolUsesValue = ToolUsesValue < 0 ? -Infinity : Infinity;
+            if (toolUsesValue !== null) {
+                if (!Number.isFinite(toolUsesValue) || Math.abs(toolUsesValue) > MAX_FLOAT_VALUE) {
+                    toolUsesValue = toolUsesValue < 0 ? -Infinity : Infinity;
                 }
             }
 
             const hasBaseDescription = typeof descriptionContent === 'string' && descriptionContent.trim().length > 0;
             const hasDugValueInput = dugValue !== "";
-            const shouldAppendToolInfoFromToolRanks = canAutoToolRanks && ToolUsesValue !== null && hasBaseDescription;
-            const shouldAppendToolInfoFromDug = hasDugValueInput && ToolUsesValue !== null;
+            const shouldAppendToolInfoFromToolRanks = canAutoToolRanks && toolUsesValue !== null && hasBaseDescription;
+            const shouldAppendToolInfoFromDug = hasDugValueInput && toolUsesValue !== null;
             const shouldAppendToolInfo = shouldAppendToolInfoFromToolRanks || shouldAppendToolInfoFromDug;
 
             if (shouldAppendToolInfo) {
-                const levelValue = calculateToolLevel(ToolUsesValue);
-                const formattedUses = formatUsesValue(ToolUsesValue);
-                const levelText = `(c@#ffdf00)(T@Toolranks)Level: F${levelValue}`;
-                const usesText = `(c@#9d9d9d)(T@Toolranks)Uses: F${formattedUses}`;
+                const levelValue = calculateToolLevel(toolUsesValue);
+                const formattedUses = formatUsesValue(toolUsesValue);
+                const levelText = `(c@#ffdf00)(T@toolranks)Level: F${levelValue}`;
+                const usesText = `(c@#9d9d9d)(T@toolranks)Uses: F${formattedUses}`;
                 finalDesc = (finalDesc ? `${finalDesc}\n` : '') + levelText + '\n' + usesText;
             }
 
@@ -9121,8 +9120,8 @@
             if (dugValue !== "") {
                 metaParts.push(`dug\u0002${dugValue}`);
             }
-            if (ToolRange !== '' && ToolRange !== null && ToolRange !== undefined) {
-                metaParts.push(`range\u0002${ToolRange}`);
+            if (toolRange !== '' && toolRange !== null && toolRange !== undefined) {
+                metaParts.push(`range\u0002${toolRange}`);
             }
             if (itemColorHex) {
                 metaParts.push(`color\u0002${itemColorHex}`);
@@ -9166,6 +9165,8 @@
                     fallbackPreview.innerText = safeText;
                 }
             }
+
+            saveStateToLocalStorage();
         }
 
         // =================================================================
@@ -9330,8 +9331,8 @@
                         case 'default':
                             state.template = 'preview-name';
                             break;
-                        case 'Toolranks':
-                            state.template = 'preview-Toolranks';
+                        case 'toolranks':
+                            state.template = 'preview-toolranks';
                             break;
                         case 'x_enchanting':
                             state.template = 'preview-enchant-name';
@@ -9443,7 +9444,7 @@
                 }
             };
 
-            preview.querySelectorAll('.preview-Toolranks').forEach(el => {
+            preview.querySelectorAll('.preview-toolranks').forEach(el => {
                 const original = el.textContent;
                 if (original.includes('Level')) {
                     const valueText = mergeNextValueInto(el);
@@ -9456,7 +9457,7 @@
                     el.classList.add('preview-uses');
                     const label = original.replace(/Uses:\s*/, 'Uses');
                     el.textContent = label + valueText;
-                    ensureBreaksAfter(el, 2);
+                    ensureBreaksAfter(el, 1);
                 }
             });
             preview.querySelectorAll('.preview-enchant-name').forEach(el => {
@@ -9487,15 +9488,319 @@
 
 
         // =================================================================
-        // ===== Existing Functions (no changes) ====================================
+        // ===== Existing Functions (partially updated) =====================
         // =================================================================
         function openModal(id) { closeColorPicker(); $(id).style.display = 'flex'; }
         function closeModal(id) { $(id).style.display = 'none'; closeColorPicker(); }
 
+        // Button feedback helper
+        const showButtonFeedback = (buttonId, isSuccess = true) => {
+            const btn = $(buttonId);
+            if (!btn) return;
+            const feedbackClass = isSuccess ? 'feedback-success' : 'feedback-error';
+            btn.classList.add(feedbackClass);
+            setTimeout(() => {
+                btn.classList.remove(feedbackClass);
+            }, 1200);
+        };
+
+        const copyCommandToClipboard = async () => {
+            const commandDisplay = $('command-display');
+            if (!commandDisplay) return;
+            const commandText = commandDisplay.value;
+            commandDisplay.focus();
+            commandDisplay.select();
+            try {
+                if (navigator.clipboard && window.isSecureContext) {
+                    await navigator.clipboard.writeText(commandText);
+                    showButtonFeedback('copy-command-btn', true);
+                    showMessageBox('Command copied.');
+                    return;
+                }
+            } catch (error) {
+            }
+            showButtonFeedback('copy-command-btn', false);
+            showMessageBox('Copy failed. Please copy the selected command manually.', true);
+        };
+
+        const SHARE_URL_PARAM = 'data';
+        const SHARE_URL_VERSION = 2;
+
+        const getDefaultShareState = () => ({
+            itemName: 'default:stone',
+            amount: '1',
+            wear: '0',
+            descriptionContent: '',
+            shortDescriptionContent: '',
+            itemColorHex: '',
+            userToolCapabilities: {},
+            enchantments: {},
+            toolRange: '',
+            dugValue: '',
+            includeSlash: false,
+            toolRanksEnabled: true,
+            customItemsData: createEmptyCustomItemsData(),
+            customItemsVersionEnabled: false
+        });
+
+        const isEmptyObject = (value) => (
+            !value || (typeof value === 'object' && !Array.isArray(value) && Object.keys(value).length === 0)
+        );
+
+        const stripEmptyCustomItems = (data) => {
+            const result = {};
+            if (!data || typeof data !== 'object') return result;
+            Object.entries(data).forEach(([key, value]) => {
+                if (value !== null && value !== undefined && String(value) !== '') {
+                    result[key] = value;
+                }
+            });
+            return result;
+        };
+
+        const buildShareState = () => ({
+            itemName: $('item-name') ? $('item-name').value : '',
+            amount: $('amount') ? $('amount').value : '',
+            wear: $('item-wear') ? $('item-wear').value : '',
+            descriptionContent: typeof descriptionContent === 'string' ? descriptionContent : '',
+            shortDescriptionContent: typeof shortDescriptionContent === 'string' ? shortDescriptionContent : '',
+            itemColorHex: typeof itemColorHex === 'string' ? itemColorHex : '',
+            userToolCapabilities: clonePlain(userToolCapabilities || {}),
+            enchantments: clonePlain(enchantments || {}),
+            toolRange: toolRange !== undefined ? toolRange : '',
+            dugValue: dugValue !== undefined ? dugValue : '',
+            includeSlash: !!includeSlash,
+            toolRanksEnabled: !!toolRanksEnabled,
+            customItemsData: clonePlain(customItemsData || createEmptyCustomItemsData()),
+            customItemsVersionEnabled: !!customItemsVersionEnabled
+        });
+
+        const buildSharePayload = () => {
+            const state = buildShareState();
+            const defaults = getDefaultShareState();
+            const payload = { v: SHARE_URL_VERSION };
+
+            if (state.itemName && state.itemName !== defaults.itemName) payload.i = state.itemName;
+            if (state.amount !== defaults.amount) payload.a = state.amount;
+            if (state.wear !== defaults.wear) payload.w = state.wear;
+            if (state.descriptionContent) payload.d = state.descriptionContent;
+            if (state.shortDescriptionContent) payload.s = state.shortDescriptionContent;
+            if (state.itemColorHex) payload.c = state.itemColorHex;
+            if (!isEmptyObject(state.userToolCapabilities)) payload.t = state.userToolCapabilities;
+            if (!isEmptyObject(state.enchantments)) payload.e = state.enchantments;
+            if (state.toolRange !== defaults.toolRange && state.toolRange !== '' && state.toolRange !== null && state.toolRange !== undefined) payload.r = state.toolRange;
+            if (state.dugValue !== defaults.dugValue && state.dugValue !== '' && state.dugValue !== null && state.dugValue !== undefined) payload.g = state.dugValue;
+            if (state.includeSlash) payload.l = 1;
+            if (state.toolRanksEnabled !== defaults.toolRanksEnabled) payload.k = state.toolRanksEnabled ? 1 : 0;
+
+            const compactCustomItems = stripEmptyCustomItems(state.customItemsData);
+            if (!isEmptyObject(compactCustomItems)) payload.m = compactCustomItems;
+            if (state.customItemsVersionEnabled) payload.x = 1;
+
+            return payload;
+        };
+
+        // =================================================================
+        // ===== Auto-save and restore via localStorage =====================
+        // =================================================================
+        const LOCAL_STORAGE_KEY = 'metadata_generator_state';
+
+        const saveStateToLocalStorage = () => {
+            try {
+                const state = buildShareState();
+                localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(state));
+            } catch (error) {
+                console.error('Failed to save state to localStorage:', error);
+            }
+        };
+
+        const loadStateFromLocalStorage = () => {
+            try {
+                const saved = localStorage.getItem(LOCAL_STORAGE_KEY);
+                if (!saved) return false;
+                const state = JSON.parse(saved);
+                if (!applySharedState(state)) {
+                    return false;
+                }
+                return true;
+            } catch (error) {
+                console.error('Failed to load state from localStorage:', error);
+                return false;
+            }
+        };
+
+        const clearStateFromLocalStorage = () => {
+            try {
+                localStorage.removeItem(LOCAL_STORAGE_KEY);
+            } catch (error) {
+                console.error('Failed to clear state from localStorage:', error);
+            }
+        };
+
+        const expandSharePayload = (payload) => {
+            if (!payload || typeof payload !== 'object') return null;
+            const hasFullKeys = (
+                Object.prototype.hasOwnProperty.call(payload, 'itemName') ||
+                Object.prototype.hasOwnProperty.call(payload, 'descriptionContent') ||
+                Object.prototype.hasOwnProperty.call(payload, 'userToolCapabilities') ||
+                Object.prototype.hasOwnProperty.call(payload, 'enchantments') ||
+                Object.prototype.hasOwnProperty.call(payload, 'customItemsData')
+            );
+            if (hasFullKeys) {
+                return payload;
+            }
+            const defaults = getDefaultShareState();
+            return {
+                itemName: payload.i !== undefined ? String(payload.i) : defaults.itemName,
+                amount: payload.a !== undefined ? String(payload.a) : defaults.amount,
+                wear: payload.w !== undefined ? String(payload.w) : defaults.wear,
+                descriptionContent: payload.d !== undefined ? payload.d : defaults.descriptionContent,
+                shortDescriptionContent: payload.s !== undefined ? payload.s : defaults.shortDescriptionContent,
+                itemColorHex: payload.c !== undefined ? payload.c : defaults.itemColorHex,
+                userToolCapabilities: payload.t && typeof payload.t === 'object' ? payload.t : {},
+                enchantments: payload.e && typeof payload.e === 'object' ? payload.e : {},
+                toolRange: payload.r !== undefined ? payload.r : defaults.toolRange,
+                dugValue: payload.g !== undefined ? payload.g : defaults.dugValue,
+                includeSlash: payload.l === 1 || payload.l === true,
+                toolRanksEnabled: payload.k === undefined ? defaults.toolRanksEnabled : payload.k === 1 || payload.k === true,
+                customItemsData: payload.m && typeof payload.m === 'object' ? payload.m : {},
+                customItemsVersionEnabled: payload.x === 1 || payload.x === true
+            };
+        };
+
+        const buildShareUrl = () => {
+            if (!window.LZString) {
+                throw new Error('LZString is unavailable.');
+            }
+            const payload = buildSharePayload();
+            const json = JSON.stringify(payload);
+            const compressed = LZString.compressToEncodedURIComponent(json);
+            const url = new URL(window.location.href);
+            url.searchParams.set(SHARE_URL_PARAM, compressed);
+            return url.toString();
+        };
+
+        const copyShareUrlToClipboard = async () => {
+            let shareUrl = '';
+            try {
+                shareUrl = buildShareUrl();
+            } catch (error) {
+                showMessageBox('Failed to build a share URL.', true);
+                return;
+            }
+            try {
+                if (navigator.clipboard && window.isSecureContext) {
+                    await navigator.clipboard.writeText(shareUrl);
+                    showButtonFeedback('share-url-btn', true);
+                    showMessageBox('Share URL copied.');
+                    return;
+                }
+            } catch (error) {
+            }
+            const manualCopy = window.prompt('Copy this share URL:', shareUrl);
+            if (manualCopy !== null) {
+                showButtonFeedback('share-url-btn', true);
+                showMessageBox('Share URL ready. Copy it to share.');
+            } else {
+                showButtonFeedback('share-url-btn', false);
+                showMessageBox('Share URL creation canceled.', true);
+            }
+        };
+
+        const applySharedState = (state) => {
+            if (!state || typeof state !== 'object') return false;
+            const itemName = typeof state.itemName === 'string' ? state.itemName : $('item-name').value;
+            const amount = state.amount !== undefined && state.amount !== null ? String(state.amount) : $('amount').value;
+            const wear = state.wear !== undefined && state.wear !== null ? String(state.wear) : $('item-wear').value;
+
+            if ($('item-name')) $('item-name').value = itemName || 'default:stone';
+            if ($('amount')) $('amount').value = amount || '1';
+            if ($('item-wear')) $('item-wear').value = wear || '0';
+
+            descriptionContent = typeof state.descriptionContent === 'string' ? state.descriptionContent : '';
+            shortDescriptionContent = typeof state.shortDescriptionContent === 'string' ? state.shortDescriptionContent : '';
+            itemColorHex = typeof state.itemColorHex === 'string' ? normalizeHexValue(state.itemColorHex) || '' : '';
+            tempItemColorHex = itemColorHex || '#FFFFFF';
+            const colorLabel = $('colorDisplayLabel');
+            if (colorLabel) colorLabel.style.backgroundColor = itemColorHex || '#FFFFFF';
+
+            userToolCapabilities = (state.userToolCapabilities && typeof state.userToolCapabilities === 'object')
+                ? clonePlain(state.userToolCapabilities)
+                : {};
+            enchantments = (state.enchantments && typeof state.enchantments === 'object')
+                ? clonePlain(state.enchantments)
+                : {};
+            tempEnchantments = clonePlain(enchantments);
+            updateCurrentEnchantsDisplay();
+
+            toolRange = state.toolRange !== undefined ? state.toolRange : '';
+            dugValue = state.dugValue !== undefined ? state.dugValue : '';
+
+            includeSlash = !!state.includeSlash;
+            const slashToggle = $('slash-toggle');
+            if (slashToggle) slashToggle.checked = includeSlash;
+
+            if (state.toolRanksEnabled !== undefined) {
+                toolRanksEnabled = !!state.toolRanksEnabled;
+            }
+            if (toolRanksToggle) {
+                toolRanksToggle.checked = toolRanksEnabled;
+            }
+
+            customItemsData = createEmptyCustomItemsData();
+            if (state.customItemsData && typeof state.customItemsData === 'object') {
+                customItemsData = deepMerge(customItemsData, state.customItemsData);
+            }
+            customItemsVersionEnabled = !!state.customItemsVersionEnabled;
+            const ieToggle = $('ci-enable-ie-edit');
+            if (ieToggle) {
+                ieToggle.checked = customItemsVersionEnabled;
+            }
+            return true;
+        };
+
+        const applySharedStateFromUrl = () => {
+            const params = new URLSearchParams(window.location.search);
+            const encoded = params.get(SHARE_URL_PARAM);
+            if (!encoded) return false;
+            if (!window.LZString) {
+                showMessageBox('Failed to load shared URL.', true);
+                return false;
+            }
+            let json = '';
+            try {
+                json = LZString.decompressFromEncodedURIComponent(encoded);
+            } catch (error) {
+            }
+            if (!json) {
+                showMessageBox('Shared URL is invalid. Please paste the full URL.', true);
+                return false;
+            }
+            try {
+                const raw = JSON.parse(json);
+                const state = expandSharePayload(raw);
+                if (!applySharedState(state)) {
+                    showMessageBox('Failed to read shared URL data.', true);
+                    return false;
+                }
+                const cleanUrl = new URL(window.location.href);
+                cleanUrl.searchParams.delete(SHARE_URL_PARAM);
+                window.history.replaceState({}, '', cleanUrl.toString());
+                return true;
+            } catch (error) {
+                showMessageBox('Failed to parse shared URL.', true);
+                return false;
+            }
+        };
+
         $('item-name').addEventListener('input', updateCommandDisplay);
         $('amount').addEventListener('input', updateCommandDisplay);
         $('item-wear').addEventListener('input', updateCommandDisplay);
-        $('copy-command-btn').addEventListener('click', () => { $('command-display').select(); document.execCommand('copy') ? showMessageBox("Command copied") : showMessageBox("Failed to copy.", true); });
+        $('copy-command-btn').addEventListener('click', copyCommandToClipboard);
+        const shareUrlButton = $('share-url-btn');
+        if (shareUrlButton) {
+            shareUrlButton.addEventListener('click', copyShareUrlToClipboard);
+        }
 
         $('slash-toggle').addEventListener('change', (event) => {
             includeSlash = event.target.checked;
@@ -9723,14 +10028,14 @@
         // =================================================================
         function populateToolCapsModal() {
             const caps = clonePlain(userToolCapabilities) || {};
-            const rangeFieldValue = ToolRange === '' ? '' : ToolRange;
+            const rangeFieldValue = toolRange === '' ? '' : toolRange;
             const dugFieldValue = dugValue === '' ? '' : dugValue;
 
             $('tab-panel-weapon').innerHTML = `<div class="label-frame"><div class="label-frame-title">Weapon</div><div class="space-y-4"><div><label class="flex items-center gap-2 text-sm font-medium mb-1" for="fleshy-damage">Damage: <span class="info-tip info-tip--right" tabindex="0"><span class="info-tip-icon">i</span><span class="info-tip-content">Base damage dealt to entities with fleshy Group.</span></span></label><input type="number" step="0.1" id="fleshy-damage" value="${caps.damage_Groups?.fleshy ?? ''}" class="w-full" placeholder="e.g. 7"></div><div><label class="flex items-center gap-2 text-sm font-medium mb-1" for="full-punch-interval">Attack Speed: <span class="info-tip info-tip--right" tabindex="0"><span class="info-tip-icon">i</span><span class="info-tip-content">Cooldown in seconds for max damage. Lower values allow faster attacks.</span></span></label><input type="number" step="0.1" id="full-punch-interval" value="${caps.full_punch_interval ?? ''}" class="w-full" placeholder="e.g. 0.9"></div><div><label class="flex items-center gap-2 text-sm font-medium mb-1" for="weapon-uses">Uses: <span class="info-tip info-tip--right" tabindex="0"><span class="info-tip-icon">i</span><span class="info-tip-content">Remaining attacks. The Tool breaks after uses+1 attacks.</span></span></label><input type="number" min="0" step="1" id="weapon-uses" value="${caps.punch_attack_uses ?? ''}" class="w-full" placeholder="e.g. 20"></div></div></div>`;
 
             $('tab-panel-drop_level').innerHTML = `<div class="label-frame"><div class="label-frame-title">Other</div><div class="space-y-4"><div><label class="flex items-center gap-2 text-sm font-medium mb-1" for="dug-value-input">Uses (Dug):
                 <span class="info-tip info-tip--right" tabindex="0"><span class="info-tip-icon">i</span><span class="info-tip-content">Total Tool uses. Level is calculated from this value.</span></span>
-            </label><input type="number" min="0" id="dug-value-input" value="${dugFieldValue}" class="w-full" placeholder="e.g. 1024"></div><div><label class="flex items-center gap-2 text-sm font-medium mb-1" for="max-drop-level">Max Drop Level: <span class="info-tip info-tip--right" tabindex="0"><span class="info-tip-icon">i</span><span class="info-tip-content">Only blocks at or below this level will drop properly.</span></span></label><input type="number" id="max-drop-level" min="0" value="${caps.max_drop_level ?? ''}" class="w-full" placeholder="e.g. 2"></div><div><label class="flex items-center gap-2 text-sm font-medium mb-1" for="Tool-range">Range: <span class="info-tip info-tip--right" tabindex="0"><span class="info-tip-icon">i</span><span class="info-tip-content">Tool reach distance. Leave empty to exclude range from command.</span></span></label><input type="number" step="0.1" id="Tool-range" value="${rangeFieldValue}" class="w-full" placeholder="e.g. 4"></div></div></div>`;
+            </label><input type="number" min="0" id="dug-value-input" value="${dugFieldValue}" class="w-full" placeholder="e.g. 1024"></div><div><label class="flex items-center gap-2 text-sm font-medium mb-1" for="max-drop-level">Max Drop Level: <span class="info-tip info-tip--right" tabindex="0"><span class="info-tip-icon">i</span><span class="info-tip-content">Only blocks at or below this level will drop properly.</span></span></label><input type="number" id="max-drop-level" min="0" value="${caps.max_drop_level ?? ''}" class="w-full" placeholder="e.g. 2"></div><div><label class="flex items-center gap-2 text-sm font-medium mb-1" for="tool-range">Range: <span class="info-tip info-tip--right" tabindex="0"><span class="info-tip-icon">i</span><span class="info-tip-content">Tool reach distance. Leave empty to exclude range from command.</span></span></label><input type="number" step="0.1" id="tool-range" value="${rangeFieldValue}" class="w-full" placeholder="e.g. 4"></div></div></div>`;
 
             const GroupTranslations = { "cracky": "Cracky", "choppy": "Choppy", "crumbly": "Crumbly", "snappy": "Snappy" };
             const GroupExamples = { cracky: "e.g. Cobblestone, Ores", choppy: "e.g. Logs, Planks", crumbly: "e.g. Dirt, Sand", snappy: "e.g. Leaves, Grass" };
@@ -9753,9 +10058,9 @@
 
                 // 2. Drop Level & Globals
                 updates.max_drop_level = getInt('max-drop-level');
-                const rangeValueRaw = $('Tool-range').value.trim();
-                ToolRange = (rangeValueRaw === '') ? '' : parseFloat(rangeValueRaw);
-                if (isNaN(ToolRange)) throw new Error('Range is invalid.');
+                const rangeValueRaw = $('tool-range').value.trim();
+                toolRange = (rangeValueRaw === '') ? '' : parseFloat(rangeValueRaw);
+                if (isNaN(toolRange)) throw new Error('Range is invalid.');
 
                 const dugValueRaw = $('dug-value-input').value.trim();
                 dugValue = (dugValueRaw === '') ? '' : parseInt(dugValueRaw, 10);
@@ -9798,7 +10103,7 @@
                     break;
                 case 'drop_level':
                     delete userToolCapabilities.max_drop_level;
-                    ToolRange = '';
+                    toolRange = '';
                     dugValue = '';
                     break;
                 default:
@@ -10035,7 +10340,7 @@
 
         function populateToolSelect() {
             const select = document.getElementById('Tool-preset-select');
-            const applyBtn = document.getElementById('apply-Tool-preset-btn');
+            const applyBtn = document.getElementById('apply-tool-preset-btn');
             const previewDiv = document.getElementById('Tool-preset-preview');
             if (!select) return;
             const Tools = parseToolTable();
@@ -10194,7 +10499,7 @@
         }
 
         function updateCustomItemRowState(type) {
-            const ToolSelect = $(`ci-${type}-Tool`);
+            const ToolSelect = $(`ci-${type}-tool`);
             const speedSelect = $(`ci-${type}-speed`);
             const duraSelect = $(`ci-${type}-durability`);
             if (!ToolSelect || !speedSelect || !duraSelect) {
@@ -10230,7 +10535,7 @@
         }
         $('btn-custom-items').addEventListener('click', () => {
             ['cracky', 'choppy', 'crumbly'].forEach(type => {
-                $(`ci-${type}-Tool`).value = customItemsData[`${type}_Tool`];
+                $(`ci-${type}-tool`).value = customItemsData[`${type}_tool`];
                 const speedSelect = $(`ci-${type}-speed`);
                 const duraSelect = $(`ci-${type}-durability`);
                 speedSelect.innerHTML = getSpeedDurabilityOptionsHtml(customItemsData[`${type}_speed`]);
@@ -10247,9 +10552,9 @@
             const type = event.target.dataset.type;
             updateCustomItemRowState(type);
         }
-        $('ci-cracky-Tool').addEventListener('change', handleToolChange);
-        $('ci-choppy-Tool').addEventListener('change', handleToolChange);
-        $('ci-crumbly-Tool').addEventListener('change', handleToolChange);
+        $('ci-cracky-tool').addEventListener('change', handleToolChange);
+        $('ci-choppy-tool').addEventListener('change', handleToolChange);
+        $('ci-crumbly-tool').addEventListener('change', handleToolChange);
         $('saveCustomItemsBtn').addEventListener('click', () => {
             const crackySpeed = $('ci-cracky-speed');
             const crackyDurability = $('ci-cracky-durability');
@@ -10258,13 +10563,13 @@
             const crumblySpeed = $('ci-crumbly-speed');
             const crumblyDurability = $('ci-crumbly-durability');
 
-            customItemsData.cracky_Tool = $('ci-cracky-Tool').value;
+            customItemsData.cracky_tool = $('ci-cracky-tool').value;
             customItemsData.cracky_speed = crackySpeed.disabled ? "" : crackySpeed.value;
             customItemsData.cracky_durability = crackyDurability.disabled ? "" : crackyDurability.value;
-            customItemsData.choppy_Tool = $('ci-choppy-Tool').value;
+            customItemsData.choppy_tool = $('ci-choppy-tool').value;
             customItemsData.choppy_speed = choppySpeed.disabled ? "" : choppySpeed.value;
             customItemsData.choppy_durability = choppyDurability.disabled ? "" : choppyDurability.value;
-            customItemsData.crumbly_Tool = $('ci-crumbly-Tool').value;
+            customItemsData.crumbly_tool = $('ci-crumbly-tool').value;
             customItemsData.crumbly_speed = crumblySpeed.disabled ? "" : crumblySpeed.value;
             customItemsData.crumbly_durability = crumblyDurability.disabled ? "" : crumblyDurability.value;
             const ieToggle = $('ci-enable-ie-edit');
@@ -10277,7 +10582,7 @@
             customItemsData = createEmptyCustomItemsData();
             customItemsVersionEnabled = false;
             ['cracky', 'choppy', 'crumbly'].forEach(type => {
-                $(`ci-${type}-Tool`).value = "";
+                $(`ci-${type}-tool`).value = "";
                 $(`ci-${type}-speed`).innerHTML = getSpeedDurabilityOptionsHtml("");
                 $(`ci-${type}-durability`).innerHTML = getSpeedDurabilityOptionsHtml("");
                 updateCustomItemRowState(type);
@@ -10361,11 +10666,11 @@
                 }
 
                 // 3.3 Tool Capabilities
-                if (metaMap['Tool_capabilities']) {
+                if (metaMap['tool_capabilities']) {
                     try {
-                        userToolCapabilities = JSON.parse(metaMap['Tool_capabilities']);
+                        userToolCapabilities = JSON.parse(metaMap['tool_capabilities']);
                     } catch (e) {
-                        console.error('Failed to parse Tool_capabilities', e);
+                        console.error('Failed to parse tool_capabilities', e);
                         userToolCapabilities = {};
                     }
                 } else {
@@ -10455,10 +10760,10 @@
                     if (enchantDesc) {
                         result = result.split(enchantDesc).join('');
                     }
-                    const ToolranksMarker = `${ESC}(T@Toolranks)`;
+                    const toolranksMarker = `${ESC}(T@toolranks)`;
                     result = result
                         .split('\n')
-                        .filter(line => !line.includes(ToolranksMarker))
+                        .filter(line => !line.includes(toolranksMarker))
                         .join('\n');
                     result = result.replace(/\r/g, '');
                     result = result.replace(/[ \t]+\n/g, '\n');
@@ -10500,12 +10805,12 @@
                 }
 
                 if (metaMap['range']) {
-                    ToolRange = parseFloat(metaMap['range']);
+                    toolRange = parseFloat(metaMap['range']);
                     // If modal is not open, element may not existes not existmay occur
-                    const rangeInput = $('Tool-range');
-                    if (rangeInput) rangeInput.value = ToolRange;
+                    const rangeInput = $('tool-range');
+                    if (rangeInput) rangeInput.value = toolRange;
                 } else {
-                    ToolRange = "";
+                    toolRange = "";
                 }
 
                 // 3.7 Custom Items
@@ -10526,9 +10831,9 @@
                 // Reflect in UI
                 if (hasCustomItems) {
                     ['cracky', 'choppy', 'crumbly'].forEach(type => {
-                        const ToolVal = customItemsData[`${type}_Tool`];
-                        const ToolSelect = $(`ci-${type}-Tool`);
-                        if (ToolVal && ToolSelect) ToolSelect.value = ToolVal;
+                        const toolVal = customItemsData[`${type}_tool`];
+                        const toolSelect = $(`ci-${type}-tool`);
+                        if (toolVal && toolSelect) toolSelect.value = toolVal;
                         // speed/durability reflection needs to be done in updateCustomItemRowState
                         // Here we only update data and expect it to be reflected when modal opens
                     });
@@ -10537,11 +10842,14 @@
 
                 // 4. Update display
                 updateCommandDisplay();
+                showButtonFeedback('import-command-btn', true);
                 showMessageBox('Command imported.');
 
             } catch (e) {
                 console.error('Import failed:', e);
-                showMessageBox('Import failed: ' + e.message, true);
+                const detail = e && e.message ? ` ${e.message}` : '';
+                showButtonFeedback('import-command-btn', false);
+                showMessageBox(`Import failed.${detail}`, true);
             }
         }
 
@@ -10659,9 +10967,17 @@
             document.querySelectorAll('select[data-type="speed"], select[data-type="durability"]').forEach(sel => {
                 sel.innerHTML = getSpeedDurabilityOptionsHtml("");
             });
-            updateCommandDisplay();
-            updatePreview("", "");
             populateToolSelect();
+
+            // Prefer shared URL, fallback to localStorage
+            const loadedFromShare = applySharedStateFromUrl();
+            if (!loadedFromShare) {
+                loadStateFromLocalStorage();
+            }
+            updateCommandDisplay();
+            if (loadedFromShare) {
+                showMessageBox('Shared URL settings loaded.');
+            }
 
             // Restore initial dark mode state
             const savedDarkMode = localStorage.getItem('darkMode');
@@ -10711,7 +11027,7 @@
 
             // Reset other
             dugValue = '';
-            ToolRange = '';
+            toolRange = '';
             itemColorHex = '';
             tempItemColorHex = '#FFFFFF';
 
@@ -10725,7 +11041,7 @@
 
             // Reset toggles to default state
             $('tool-ranks-toggle').checked = true;
-            ToolRanksEnabled = true;
+            toolRanksEnabled = true;
             $('slash-toggle').checked = false;
             includeSlash = false;
             $('command-edit-toggle').checked = false;
@@ -10734,6 +11050,7 @@
 
             // Update display
             updateCommandDisplay();
+            clearStateFromLocalStorage();
             showMessageBox('All settings reset.');
         });
     </script>

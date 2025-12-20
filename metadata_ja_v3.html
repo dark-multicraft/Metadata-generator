@@ -9517,13 +9517,13 @@
                 });
 
             } catch (e) {
-                showMessageBox(e.message || '数値の入力が正しくありません。', true);
+                showMessageBox(e.message || '数値の入力が正しくありません', true);
                 return;
             }
             userToolCapabilities = applyToolCapsUpdates(userToolCapabilities, updates);
             closeModal('toolCapsModal');
             updateCommandDisplay();
-            showMessageBox('ツール性能を保存しました。');
+            showMessageBox('ツール性能を保存しました');
         });
 
         $('resetToolCapsBtn').addEventListener('click', () => {
@@ -10011,7 +10011,7 @@
             customItemsVersionEnabled = ieToggle ? ieToggle.checked : false;
             updateCommandDisplay();
             closeModal('customItemsModal');
-            showMessageBox('カスタムアイテムの情報を更新しました。');
+            showMessageBox('カスタムアイテムの情報を更新しました');
         });
         $('resetCustomItemsBtn').addEventListener('click', () => {
             customItemsData = createEmptyCustomItemsData();
@@ -10028,7 +10028,7 @@
             }
             updateCommandDisplay();
             closeModal('customItemsModal');
-            showMessageBox('カスタムアイテムの情報をリセットしました。');
+            showMessageBox('カスタムアイテムの情報をリセットしました');
         });
 
 
@@ -10041,7 +10041,7 @@
             const commandText = $('command-display').value.trim();
             if (!commandText) {
                 showButtonFeedback('import-command-btn', false);
-                showMessageBox('コマンドが空です。入力してください。', true);
+                showMessageBox('コマンドを入力してください', true);
                 return;
             }
 
