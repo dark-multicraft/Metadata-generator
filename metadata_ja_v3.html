@@ -9,14 +9,16 @@
     <meta property="og:description"
         content="MultiCraftメタデータジェネレーター! エンチャント、色付きテキスト、ユニークなステータスを追加して強力なカスタムアイテムを視覚的に作成できます。" />
     <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://dark-multicraft.github.io/Metadata-generator/metadata_en_v2.html" />
+    <meta property="og:url" content="https://dark-multicraft.github.io/Metadata-generator/metadata_ja_v3.html" />
     <meta property="og:image" content="https://dark-multicraft.github.io/Metadata-generator/sword.png" />
     <meta name="twitter:card" content="summary" />
     <link rel="icon" type="image/png" href="https://dark-multicraft.github.io/Metadata-generator/sword.png">
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Lucide Icons -->
-    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://unpkg.com/lucide@0.470.0/dist/umd/lucide.min.js"></script>
+    <!-- LZ-String (共有URL圧縮) -->
+    <script src="https://cdn.jsdelivr.net/npm/lz-string@1.5.0/libs/lz-string.min.js"></script>
     <!-- Interフォント -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
@@ -29,722 +31,6 @@
         *::before,
         *::after {
             box-sizing: inherit;
-        }
-
-        /* 添付ファイル (metadata_ja.html) と同じ基本スタイル */
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #f3f4f6;
-            display: flex;
-            justify-content: center;
-            align-items: flex-start;
-            min-height: 100vh;
-            padding: 20px;
-            margin: 0;
-            box-sizing: border-box;
-        }
-
-        .container {
-            background-color: #ffffff;
-            border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-            padding: 24px;
-            width: 100%;
-            max-width: 800px;
-            margin-top: 0;
-        }
-
-        /* ★ プレビュー用スタイル */
-        .tooltip-preview {
-            background-color: #656276;
-            border: 2px solid #502D8F;
-            box-shadow: none;
-            color: #ffffff;
-            padding: 0.75rem;
-            border-radius: 0.5rem;
-            min-height: 150px;
-            font-family: 'Inter', sans-serif;
-            white-space: pre-wrap;
-            word-wrap: break-word;
-            transition: background-color 0.2s;
-        }
-
-        /* 装飾コードで指定された色はインラインで反映されるように、クラスでの強制指定は避ける */
-        .preview-name,
-        .preview-toolranks,
-        .preview-level,
-        .preview-uses,
-        .preview-enchant-header,
-        .preview-enchant-name {
-            color: inherit;
-            font-style: normal;
-            font-weight: inherit;
-            font-size: inherit;
-            margin-left: 0;
-        }
-
-        /* ライト背景時は文字色を濃くする（ただしインライン色は優先） */
-        .tooltip-preview.bg-light {
-            background-color: rgb(229 231 235 / 0.95);
-        }
-
-        .tooltip-preview.bg-light .preview-name,
-        .tooltip-preview.bg-light .preview-toolranks,
-        .tooltip-preview.bg-light .preview-level,
-        .tooltip-preview.bg-light .preview-uses,
-        .tooltip-preview.bg-light .preview-enchant-header,
-        .tooltip-preview.bg-light .preview-enchant-name {
-            color: inherit;
-            font-style: normal;
-        }
-
-        /* 暗背景はより黒寄りに設定 */
-        .tooltip-preview.bg-dark {
-            background-color: rgba(2, 6, 23, 0.95);
-            color: #ffffff;
-        }
-
-        .tooltip-preview.bg-dark .preview-name,
-        .tooltip-preview.bg-dark .preview-toolranks,
-        .tooltip-preview.bg-dark .preview-level,
-        .tooltip-preview.bg-dark .preview-uses,
-        .tooltip-preview.bg-dark .preview-enchant-header,
-        .tooltip-preview.bg-dark .preview-enchant-name {
-            color: inherit;
-        }
-
-
-        .label-frame {
-            border: 1px solid #e5e7eb;
-            border-radius: 8px;
-            padding: 16px;
-            margin-bottom: 20px;
-            position: relative;
-        }
-
-        .label-frame-title {
-            position: absolute;
-            top: -12px;
-            left: 16px;
-            background-color: #ffffff;
-            padding: 0 8px;
-            font-weight: 600;
-            color: #4b5563;
-        }
-
-        input[type="text"],
-        input[type="number"],
-        textarea,
-        select {
-            border: 1px solid #d1d5db;
-            border-radius: 6px;
-            padding: 8px 12px;
-            font-size: 1rem;
-            width: 100%;
-            box-sizing: border-box;
-            transition: border-color 0.2s;
-        }
-
-        select:disabled {
-            background-color: #f3f4f6;
-            color: #9ca3af;
-            cursor: not-allowed;
-        }
-
-        input[type="text"]:focus,
-        input[type="number"]:focus,
-        textarea:focus,
-        select:focus {
-            outline: none;
-            border-color: #0000cd;
-            box-shadow: 0 0 0 2px rgba(197, 73, 182, 0.248);
-        }
-
-        button {
-            background-color: #0000cd;
-            color: white;
-            padding: 10px 18px;
-            border-radius: 8px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: background-color 0.2s, box-shadow 0.2s;
-            border: none;
-            white-space: nowrap;
-        }
-
-        button:hover {
-            background-color: #0000b9;
-            box-shadow: 0 2px 8px rgba(197, 73, 182, 0.248);
-            color: #FFFFF0;
-        }
-
-        .color-picker-popover {
-            position: absolute;
-            z-index: 1200;
-            background-color: #ffffff;
-            border: 1px solid #d1d5db;
-            border-radius: 8px;
-            padding: 12px;
-            box-shadow: 0 12px 24px rgba(15, 23, 42, 0.18);
-            width: 200px;
-        }
-
-        .color-picker-title {
-            font-size: 0.75rem;
-            font-weight: 600;
-            color: #4b5563;
-            margin-bottom: 8px;
-        }
-
-        .color-picker-presets {
-            display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            gap: 8px;
-            margin-bottom: 12px;
-        }
-
-        .preset-color-option {
-            width: 28px;
-            height: 28px;
-            border-radius: 6px;
-            border: 1px solid #d1d5db;
-            padding: 0;
-            cursor: pointer;
-        }
-
-        .preset-color-option:focus-visible {
-            outline: 2px solid #0000cd;
-            outline-offset: 2px;
-        }
-
-        .color-picker-input {
-            width: 100%;
-            height: 40px;
-            border: 1px solid #d1d5db;
-            border-radius: 6px;
-            cursor: pointer;
-        }
-
-        button.bg-red-500 {
-            background-color: #ef4444;
-        }
-
-        button.bg-red-500:hover {
-            background-color: #dc2626;
-        }
-
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 1000;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            overflow: auto;
-            background-color: rgba(0, 0, 0, 0.4);
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-        }
-
-        .modal-content {
-            background-color: #fefefe;
-            padding: 24px;
-            border-radius: 12px;
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
-            width: 100%;
-            max-width: 700px;
-            position: relative;
-            max-height: 90vh;
-            display: flex;
-            flex-direction: column;
-        }
-
-        #customItemsModal .modal-content {
-            max-width: 800px;
-        }
-
-        #itemColorModal .modal-content {
-            max-width: 400px;
-        }
-
-
-        .close-button {
-            position: absolute;
-            top: 10px;
-            right: 15px;
-            color: #aaaaaa;
-            font-size: 28px;
-            font-weight: bold;
-            cursor: pointer;
-        }
-
-        .close-button:hover {
-            color: #777777;
-        }
-
-        .message-box {
-            display: none;
-            position: fixed;
-            top: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            background-color: #4CAF50;
-            color: white;
-            padding: 10px 20px;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-            z-index: 1001;
-            opacity: 0;
-            transition: opacity 0.3s ease-in-out;
-        }
-
-        .message-box.error {
-            background-color: #f44336;
-        }
-
-        .message-box.show {
-            opacity: 1;
-        }
-
-        .enchant-item {
-            border: 1px solid #e5e7eb;
-            border-radius: 8px;
-            padding: 12px;
-            margin-bottom: 8px;
-            background-color: #f9fafb;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .remove-enchant {
-            background-color: #ef4444;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            padding: 4px 8px;
-            font-size: 0.75rem;
-            cursor: pointer;
-        }
-
-        .remove-enchant:hover {
-            background-color: #dc2626;
-        }
-
-        .tab-container {
-            display: flex;
-            flex-wrap: wrap;
-            border-bottom: 1px solid #d1d5db;
-            margin-bottom: 16px;
-        }
-
-        .tab-link {
-            background-color: transparent;
-            color: #6b7280;
-            border-radius: 6px 6px 0 0;
-            border: 1px solid transparent;
-            border-bottom: none;
-            padding: 8px 12px;
-            font-size: 0.875rem;
-            font-weight: 600;
-            cursor: pointer;
-            margin-bottom: -1px;
-        }
-
-        .tab-link.active {
-            background-color: #ffffff;
-            color: #0000cd;
-            border-color: #d1d5db #d1d5db #ffffff;
-        }
-
-        .tab-panel {
-            display: none;
-        }
-
-        .tab-panel.active {
-            display: block;
-        }
-
-        /* モーダル内のボタンサイズ調整 */
-        .modal-button {
-            padding: 5px 10px;
-        }
-
-        .scrollable-content {
-            overflow-y: auto;
-        }
-
-        .scrollable-content::-webkit-scrollbar {
-            width: 8px;
-        }
-
-        .scrollable-content::-webkit-scrollbar-track {
-            background: #f1f1f1;
-            border-radius: 10px;
-        }
-
-        .scrollable-content::-webkit-scrollbar-thumb {
-            background: #888;
-            border-radius: 10px;
-        }
-
-        .scrollable-content::-webkit-scrollbar-thumb:hover {
-            background: #555;
-        }
-
-        .button-container {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-        }
-
-        .button-container>button {
-            flex: 1 1 140px;
-            text-align: center;
-        }
-
-        .info-tip {
-            position: relative;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            margin-left: 4px;
-            cursor: help;
-        }
-
-        .info-tip-icon {
-            width: 18px;
-            height: 18px;
-            border-radius: 9999px;
-            background-color: #e0e7ff;
-            color: #1d4ed8;
-            font-size: 0.7rem;
-            font-weight: 600;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .info-tip-content {
-            display: none;
-            position: absolute;
-            top: 130%;
-            left: 50%;
-            transform: translate(-50%, -6px);
-            background-color: #111827;
-            color: #f9fafb;
-            padding: 8px 10px;
-            border-radius: 6px;
-            font-size: 0.75rem;
-            line-height: 1.4;
-            width: max-content;
-            max-width: min(260px, calc(100vw - 40px));
-            box-shadow: 0 12px 24px rgba(15, 23, 42, 0.25);
-            z-index: 30;
-        }
-
-        .info-tip-content::before {
-            content: "";
-            position: absolute;
-            top: -6px;
-            left: 50%;
-            transform: translateX(-50%);
-            border-width: 6px;
-            border-style: solid;
-            border-color: transparent transparent #111827 transparent;
-        }
-
-        .info-tip--right .info-tip-content {
-            left: 0;
-            transform: translate(0, -6px);
-        }
-
-        .info-tip--right .info-tip-content::before {
-            left: 14px;
-            transform: none;
-        }
-
-        .info-tip--left .info-tip-content {
-            right: 0;
-            left: auto;
-            transform: translate(0, -6px);
-        }
-
-        .info-tip--left .info-tip-content::before {
-            right: 14px;
-            left: auto;
-            transform: none;
-        }
-
-        .info-tip:hover .info-tip-content,
-        .info-tip:focus-within .info-tip-content {
-            display: block;
-        }
-
-        body.hide-info-tips .info-tip {
-            display: none;
-        }
-
-        .item-suggest-box {
-            position: absolute;
-            left: 0;
-            right: 0;
-            top: calc(100% + 2px);
-            background: #fff;
-            border: 1px solid rgba(0, 0, 0, 0.12);
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
-            border-radius: 6px;
-            max-height: 260px;
-            overflow-y: auto;
-            z-index: 1000;
-            font-size: 14px;
-        }
-
-        .item-suggest-hidden {
-            display: none;
-        }
-
-        .item-suggest-item {
-            padding: 8px 10px;
-            line-height: 1.4;
-            cursor: pointer;
-            display: flex;
-            align-items: baseline;
-            gap: 8px;
-        }
-
-        .item-suggest-item:hover,
-        .item-suggest-item.active {
-            background: #f3f4f6;
-        }
-
-        .item-suggest-item .id {
-            color: #6b7280;
-            font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-        }
-
-        .item-suggest-item .name {
-            color: #111827;
-            font-weight: 500;
-        }
-
-        .item-suggest-empty {
-            padding: 10px;
-            color: #6b7280;
-        }
-
-        .ci-table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        .ci-table th,
-        .ci-table td {
-            border: 1px solid #e5e7eb;
-            padding: 8px;
-            text-align: left;
-            vertical-align: top;
-        }
-
-        .ci-table th {
-            background-color: #f9fafb;
-            font-weight: 600;
-        }
-
-        .ci-table td:first-child {
-            font-weight: 600;
-            width: 100px;
-        }
-
-        .ci-table select {
-            margin-bottom: 8px;
-        }
-
-        .ci-table select:last-child {
-            margin-bottom: 0;
-        }
-
-        @media (max-width: 640px) {
-            .container {
-                padding: 16px;
-                margin-top: 12px;
-            }
-
-            .label-frame {
-                padding: 12px;
-                margin-bottom: 16px;
-            }
-
-            #item-name,
-            #amount,
-            #item-wear {
-                width: 100%;
-            }
-
-            .item-suggest-box {
-                max-height: 200px;
-                font-size: 13px;
-            }
-
-            .item-suggest-item {
-                padding: 10px;
-            }
-        }
-
-        /* ===== ダークモード ===== */
-        body.dark-mode {
-            background-color: #1a1a2e;
-        }
-
-        body.dark-mode .container {
-            background-color: #16213e;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
-        }
-
-        body.dark-mode h1,
-        body.dark-mode .label-frame-title,
-        body.dark-mode label {
-            color: #e2e8f0;
-        }
-
-        body.dark-mode .label-frame-title {
-            background-color: #16213e;
-        }
-
-        body.dark-mode .label-frame {
-            border-color: #334155;
-        }
-
-        body.dark-mode input[type="text"],
-        body.dark-mode input[type="number"],
-        body.dark-mode textarea,
-        body.dark-mode select {
-            background-color: #0f3460;
-            border-color: #334155;
-            color: #e2e8f0;
-        }
-
-        body.dark-mode input[type="text"]:focus,
-        body.dark-mode input[type="number"]:focus,
-        body.dark-mode textarea:focus,
-        body.dark-mode select:focus {
-            border-color: #6366f1;
-            box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.3);
-        }
-
-        body.dark-mode select:disabled {
-            background-color: #1e293b;
-            color: #64748b;
-        }
-
-        body.dark-mode .info-tip-icon {
-            background-color: #334155;
-            color: #818cf8;
-        }
-
-        body.dark-mode .item-suggest-box {
-            background-color: #16213e;
-            border-color: #334155;
-        }
-
-        body.dark-mode .item-suggest-item:hover,
-        body.dark-mode .item-suggest-item.active {
-            background-color: #1e3a5f;
-        }
-
-        body.dark-mode .item-suggest-item .id {
-            color: #94a3b8;
-        }
-
-        body.dark-mode .item-suggest-item .name {
-            color: #e2e8f0;
-        }
-
-        body.dark-mode .modal-content {
-            background-color: #16213e;
-            color: #e2e8f0;
-        }
-
-        body.dark-mode .enchant-item {
-            background-color: #0f3460;
-            border-color: #334155;
-        }
-
-        body.dark-mode .tab-link {
-            color: #94a3b8;
-        }
-
-        body.dark-mode .tab-link.active {
-            background-color: #16213e;
-            color: #818cf8;
-            border-color: #334155 #334155 #16213e;
-        }
-
-        body.dark-mode .ci-table th {
-            background-color: #0f3460;
-            color: #e2e8f0;
-        }
-
-        body.dark-mode .ci-table td,
-        body.dark-mode .ci-table th {
-            border-color: #334155;
-        }
-
-        body.dark-mode #command-display {
-            background-color: #0f3460;
-            color: #e2e8f0;
-        }
-
-        /* ダークモードトグルボタン */
-        .dark-mode-toggle {
-            background: none;
-            border: 1px solid #d1d5db;
-            border-radius: 6px;
-            padding: 6px 10px;
-            cursor: pointer;
-            font-size: 1.1rem;
-            display: flex;
-            align-items: center;
-            gap: 4px;
-        }
-
-        body.dark-mode .dark-mode-toggle {
-            border-color: #334155;
-            color: #e2e8f0;
-        }
-
-        .dark-mode-toggle:hover {
-            background-color: rgba(99, 102, 241, 0.1);
-        }
-
-        /* リセットボタン */
-        .reset-btn {
-            background-color: #ef4444;
-        }
-
-        .reset-btn:hover {
-            background-color: #dc2626;
-        }
-
-        /* ダークモード ボタン */
-        body.dark-mode button {
-            background-color: #4f46e5;
-            color: #ffffff;
-        }
-
-        body.dark-mode button:hover {
-            background-color: #6366f1;
-            color: #ffffff;
-        }
-
-        body.dark-mode .reset-btn {
-            background-color: #ef4444;
-        }
-
-        body.dark-mode .reset-btn:hover {
-            background-color: #dc2626;
         }
 
         /* === Smart UI refresh (metadata_ja_ui.html reference) === */
@@ -806,6 +92,15 @@
             cursor: not-allowed;
             box-shadow: none;
             transform: none;
+        }
+
+        .modal-button {
+            padding: 5px 10px;
+        }
+
+        #apply-tool-preset-btn {
+            white-space: nowrap;
+            flex-shrink: 0;
         }
 
         input[type="text"],
@@ -933,6 +228,20 @@
             filter: none;
         }
 
+        .smart-button.feedback-success {
+            background: #10b981 !important;
+            border-color: #10b981 !important;
+            color: #fff !important;
+            transition: background 0.15s, border-color 0.15s, color 0.15s;
+        }
+
+        .smart-button.feedback-error {
+            background: #ef4444 !important;
+            border-color: #ef4444 !important;
+            color: #fff !important;
+            transition: background 0.15s, border-color 0.15s, color 0.15s;
+        }
+
         .smart-button.danger {
             background: linear-gradient(to bottom right, #ef4444, #dc2626);
         }
@@ -1022,6 +331,19 @@
         .tooltip-preview.bg-dark {
             background-color: #1e1e2e;
             color: #dcd7ba;
+        }
+
+        .preview-name,
+        .preview-toolranks,
+        .preview-level,
+        .preview-uses,
+        .preview-enchant-header,
+        .preview-enchant-name {
+            color: inherit;
+            font-style: normal;
+            font-weight: inherit;
+            font-size: inherit;
+            margin-left: 0;
         }
 
         .item-suggest-box {
@@ -1151,27 +473,101 @@
         }
 
         .message-box {
-            display: none;
             position: fixed;
-            top: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            background-color: #22c55e;
-            color: white;
-            padding: 10px 20px;
-            border-radius: 8px;
-            box-shadow: 0 8px 20px rgba(15, 23, 42, 0.2);
+            right: 1rem;
+            bottom: 1rem;
+            max-width: min(360px, calc(100vw - 2rem));
+            background-color: rgba(15, 23, 42, 0.9);
+            color: #f8fafc;
+            padding: 0.6rem 0.9rem;
+            border-radius: 0.75rem;
+            border: 1px solid rgba(148, 163, 184, 0.25);
+            box-shadow: 0 12px 24px rgba(15, 23, 42, 0.2);
             z-index: 1001;
             opacity: 0;
-            transition: opacity 0.3s ease-in-out;
+            transform: translateY(8px) scale(0.98);
+            transition: opacity 0.2s ease, transform 0.2s ease;
+            pointer-events: none;
+            backdrop-filter: blur(8px);
         }
 
         .message-box.error {
-            background-color: #ef4444;
+            background-color: rgba(127, 29, 29, 0.9);
+            border-color: rgba(239, 68, 68, 0.5);
         }
 
         .message-box.show {
             opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+
+        .info-tip {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-left: 4px;
+            cursor: help;
+        }
+
+        .info-tip-content {
+            display: none;
+            position: absolute;
+            top: 130%;
+            left: 50%;
+            transform: translate(-50%, -6px);
+            background-color: #111827;
+            color: #f9fafb;
+            padding: 8px 10px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            line-height: 1.4;
+            width: max-content;
+            max-width: min(260px, calc(100vw - 40px));
+            box-shadow: 0 12px 24px rgba(15, 23, 42, 0.25);
+            z-index: 30;
+        }
+
+        .info-tip-content::before {
+            content: "";
+            position: absolute;
+            top: -6px;
+            left: 50%;
+            transform: translateX(-50%);
+            border-width: 6px;
+            border-style: solid;
+            border-color: transparent transparent #111827 transparent;
+        }
+
+        .info-tip--right .info-tip-content {
+            left: 0;
+            transform: translate(0, -6px);
+        }
+
+        .info-tip--right .info-tip-content::before {
+            left: 14px;
+            transform: none;
+        }
+
+        .info-tip--left .info-tip-content {
+            right: 0;
+            left: auto;
+            transform: translate(0, -6px);
+        }
+
+        .info-tip--left .info-tip-content::before {
+            right: 14px;
+            left: auto;
+            transform: none;
+        }
+
+        .info-tip:hover .info-tip-content,
+        .info-tip:focus-within .info-tip-content {
+            display: block;
+        }
+
+        body.hide-info-tips .info-tip {
+            display: none;
         }
 
         .info-tip-icon {
@@ -1190,15 +586,6 @@
         body.dark-mode .info-tip-icon {
             background-color: rgba(99, 102, 241, 0.2);
             color: #c7d2fe;
-        }
-
-        .info-tip-content {
-            background-color: #111827;
-            color: #f9fafb;
-        }
-
-        .info-tip-content::before {
-            border-color: transparent transparent #111827 transparent;
         }
 
         .enchant-item {
@@ -1319,6 +706,28 @@
             font-weight: 600;
             color: #64748b;
             margin-bottom: 8px;
+        }
+
+        .color-picker-presets {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .preset-color-option {
+            width: 28px;
+            height: 28px;
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+            padding: 0;
+            cursor: pointer;
+            background: transparent;
+        }
+
+        .preset-color-option:focus-visible {
+            outline: 2px solid var(--primary);
+            outline-offset: 2px;
         }
 
         .color-picker-input {
@@ -1479,7 +888,7 @@
 </head>
 
 <body class="p-2 md:p-3 lg:p-4 min-h-screen">
-    <div class="mx-auto space-y-2" style="max-width: 1360px;">
+    <div class="mx-auto space-y-2" style="max-width: 1600px;">
         <header class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-3">
             <div>
                 <h1 class="text-2xl font-extrabold tracking-tight">メタデータジェネレーター</h1>
@@ -1634,15 +1043,16 @@
                 <textarea id="command-display" rows="3"
                     class="command-textarea w-full font-mono text-xs leading-relaxed focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all"
                     readonly></textarea>
-                <button id="copy-command-btn"
-                    class="absolute top-2 right-2 p-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-md shadow-sm hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
-                    title="コピー">
-                    <i data-lucide="copy" class="w-3.5 h-3.5"></i>
-                </button>
             </div>
             <div class="mt-2 flex flex-col sm:flex-row gap-2">
+                <button id="copy-command-btn" class="smart-button secondary w-full text-xs py-2.5">
+                    <i data-lucide="copy" class="w-3.5 h-3.5"></i> コピー
+                </button>
+                <button id="share-url-btn" class="smart-button secondary w-full text-xs py-2.5">
+                    <i data-lucide="share-2" class="w-3.5 h-3.5"></i> 共有
+                </button>
                 <button id="import-command-btn" class="smart-button secondary w-full text-xs py-2.5">
-                    <i data-lucide="upload" class="w-3.5 h-3.5"></i> コマンドをインポート
+                    <i data-lucide="download" class="w-3.5 h-3.5"></i> インポート
                 </button>
             </div>
         </section>
@@ -8939,6 +8349,7 @@
         let toolRanksEnabled = true;
 
         let lastSavedCaretOffset = null;
+        let messageBoxTimer = null;
 
 
         const $ = id => document.getElementById(id);
@@ -8991,7 +8402,18 @@
         }
 
         function deepMerge(target, ...sources) { for (const source of sources) for (const key in source) if (source.hasOwnProperty(key)) { const sourceVal = source[key], targetVal = target[key]; if (targetVal && typeof targetVal === 'object' && !Array.isArray(targetVal) && sourceVal && typeof sourceVal === 'object' && !Array.isArray(sourceVal)) { target[key] = deepMerge({}, targetVal, sourceVal); } else { target[key] = sourceVal; } } return target; }
-        function showMessageBox(message, isError = false) { const box = $('messageBox'); box.textContent = message; box.className = 'message-box show' + (isError ? ' error' : ''); setTimeout(() => box.classList.remove('show'), 3000); }
+        function showMessageBox(message, isError = false) {
+            const box = $('messageBox');
+            if (!box) return;
+            box.textContent = message;
+            box.className = 'message-box' + (isError ? ' error' : '');
+            void box.offsetWidth;
+            box.classList.add('show');
+            if (messageBoxTimer) {
+                clearTimeout(messageBoxTimer);
+            }
+            messageBoxTimer = setTimeout(() => box.classList.remove('show'), 2000);
+        }
         function clonePlain(value) { if (Array.isArray(value)) { return value.map(clonePlain); } if (value && typeof value === 'object') { const result = {}; for (const key in value) { if (Object.prototype.hasOwnProperty.call(value, key)) { result[key] = clonePlain(value[key]); } } return result; } return value; }
         function mergeToolCaps(target, updates) { if (!updates || typeof updates !== 'object') { return; } Object.entries(updates).forEach(([key, value]) => { if (value === null || value === undefined || (typeof value === 'number' && Number.isNaN(value))) { if (target && Object.prototype.hasOwnProperty.call(target, key)) { delete target[key]; } return; } if (Array.isArray(value)) { const normalized = value.map(item => { if (item === null || item === undefined || (typeof item === 'number' && Number.isNaN(item))) { return null; } return item; }); const hasNonNull = normalized.some(item => item !== null); if (key === 'times' || hasNonNull) { target[key] = normalized; } else if (target && Object.prototype.hasOwnProperty.call(target, key)) { delete target[key]; } return; } if (typeof value === 'object') { const base = (target && typeof target[key] === 'object' && !Array.isArray(target[key])) ? target[key] : {}; mergeToolCaps(base, value); if (Object.keys(base).length > 0) { target[key] = base; } else if (target && Object.prototype.hasOwnProperty.call(target, key)) { delete target[key]; } return; } target[key] = value; }); }
         function applyToolCapsUpdates(baseCaps, updates) { const result = clonePlain(baseCaps || {}); mergeToolCaps(result, updates); return result; }
@@ -9148,6 +8570,9 @@
                     fallbackPreview.innerText = safeText;
                 }
             }
+
+            // localStorageに自動保存
+            saveStateToLocalStorage();
         }
 
         // =================================================================
@@ -9438,7 +8863,7 @@
                     el.classList.add('preview-uses');
                     const label = original.replace(/Uses:\s*/, '使用方法');
                     el.textContent = label + valueText;
-                    ensureBreaksAfter(el, 2);
+                    ensureBreaksAfter(el, 1);
                 }
             });
             preview.querySelectorAll('.preview-enchant-name').forEach(el => {
@@ -9469,15 +8894,320 @@
 
 
         // =================================================================
-        // ===== 既存の関数 (変更なし) ====================================
+        // ===== 既存の関数 (一部更新) ====================================
         // =================================================================
         function openModal(id) { closeColorPicker(); $(id).style.display = 'flex'; }
         function closeModal(id) { $(id).style.display = 'none'; closeColorPicker(); }
 
+        // ボタンフィードバック用ヘルパー関数
+        const showButtonFeedback = (buttonId, isSuccess = true) => {
+            const btn = $(buttonId);
+            if (!btn) return;
+            const feedbackClass = isSuccess ? 'feedback-success' : 'feedback-error';
+            btn.classList.add(feedbackClass);
+            setTimeout(() => {
+                btn.classList.remove(feedbackClass);
+            }, 1200);
+        };
+
+        const copyCommandToClipboard = async () => {
+            const commandDisplay = $('command-display');
+            if (!commandDisplay) return;
+            const commandText = commandDisplay.value;
+            commandDisplay.focus();
+            commandDisplay.select();
+            try {
+                if (navigator.clipboard && window.isSecureContext) {
+                    await navigator.clipboard.writeText(commandText);
+                    showButtonFeedback('copy-command-btn', true);
+                    showMessageBox("コマンドをコピーしました");
+                    return;
+                }
+            } catch (error) {
+            }
+            showButtonFeedback('copy-command-btn', false);
+            showMessageBox("コピーできませんでした。選択中のコマンドを手動でコピーしてください。", true);
+        };
+
+        const SHARE_URL_PARAM = 'data';
+        const SHARE_URL_VERSION = 2;
+
+        const getDefaultShareState = () => ({
+            itemName: 'default:stone',
+            amount: '1',
+            wear: '0',
+            descriptionContent: '',
+            shortDescriptionContent: '',
+            itemColorHex: '',
+            userToolCapabilities: {},
+            enchantments: {},
+            toolRange: '',
+            dugValue: '',
+            includeSlash: false,
+            toolRanksEnabled: true,
+            customItemsData: createEmptyCustomItemsData(),
+            customItemsVersionEnabled: false
+        });
+
+        const isEmptyObject = (value) => (
+            !value || (typeof value === 'object' && !Array.isArray(value) && Object.keys(value).length === 0)
+        );
+
+        const stripEmptyCustomItems = (data) => {
+            const result = {};
+            if (!data || typeof data !== 'object') return result;
+            Object.entries(data).forEach(([key, value]) => {
+                if (value !== null && value !== undefined && String(value) !== '') {
+                    result[key] = value;
+                }
+            });
+            return result;
+        };
+
+        const buildShareState = () => ({
+            itemName: $('item-name') ? $('item-name').value : '',
+            amount: $('amount') ? $('amount').value : '',
+            wear: $('item-wear') ? $('item-wear').value : '',
+            descriptionContent: typeof descriptionContent === 'string' ? descriptionContent : '',
+            shortDescriptionContent: typeof shortDescriptionContent === 'string' ? shortDescriptionContent : '',
+            itemColorHex: typeof itemColorHex === 'string' ? itemColorHex : '',
+            userToolCapabilities: clonePlain(userToolCapabilities || {}),
+            enchantments: clonePlain(enchantments || {}),
+            toolRange: toolRange !== undefined ? toolRange : '',
+            dugValue: dugValue !== undefined ? dugValue : '',
+            includeSlash: !!includeSlash,
+            toolRanksEnabled: !!toolRanksEnabled,
+            customItemsData: clonePlain(customItemsData || createEmptyCustomItemsData()),
+            customItemsVersionEnabled: !!customItemsVersionEnabled
+        });
+
+        const buildSharePayload = () => {
+            const state = buildShareState();
+            const defaults = getDefaultShareState();
+            const payload = { v: SHARE_URL_VERSION };
+
+            if (state.itemName && state.itemName !== defaults.itemName) payload.i = state.itemName;
+            if (state.amount !== defaults.amount) payload.a = state.amount;
+            if (state.wear !== defaults.wear) payload.w = state.wear;
+            if (state.descriptionContent) payload.d = state.descriptionContent;
+            if (state.shortDescriptionContent) payload.s = state.shortDescriptionContent;
+            if (state.itemColorHex) payload.c = state.itemColorHex;
+            if (!isEmptyObject(state.userToolCapabilities)) payload.t = state.userToolCapabilities;
+            if (!isEmptyObject(state.enchantments)) payload.e = state.enchantments;
+            if (state.toolRange !== defaults.toolRange && state.toolRange !== '' && state.toolRange !== null && state.toolRange !== undefined) payload.r = state.toolRange;
+            if (state.dugValue !== defaults.dugValue && state.dugValue !== '' && state.dugValue !== null && state.dugValue !== undefined) payload.g = state.dugValue;
+            if (state.includeSlash) payload.l = 1;
+            if (state.toolRanksEnabled !== defaults.toolRanksEnabled) payload.k = state.toolRanksEnabled ? 1 : 0;
+
+            const compactCustomItems = stripEmptyCustomItems(state.customItemsData);
+            if (!isEmptyObject(compactCustomItems)) payload.m = compactCustomItems;
+            if (state.customItemsVersionEnabled) payload.x = 1;
+
+            return payload;
+        };
+
+        // =================================================================
+        // ===== localStorageへの自動保存・復元 ===========================
+        // =================================================================
+        const LOCAL_STORAGE_KEY = 'metadata_generator_state';
+
+        const saveStateToLocalStorage = () => {
+            try {
+                const state = buildShareState();
+                localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(state));
+            } catch (error) {
+                console.error('Failed to save state to localStorage:', error);
+            }
+        };
+
+        const loadStateFromLocalStorage = () => {
+            try {
+                const saved = localStorage.getItem(LOCAL_STORAGE_KEY);
+                if (!saved) return false;
+                const state = JSON.parse(saved);
+                if (!applySharedState(state)) {
+                    return false;
+                }
+                return true;
+            } catch (error) {
+                console.error('Failed to load state from localStorage:', error);
+                return false;
+            }
+        };
+
+        const clearStateFromLocalStorage = () => {
+            try {
+                localStorage.removeItem(LOCAL_STORAGE_KEY);
+            } catch (error) {
+                console.error('Failed to clear state from localStorage:', error);
+            }
+        };
+
+        const expandSharePayload = (payload) => {
+            if (!payload || typeof payload !== 'object') return null;
+            const hasFullKeys = (
+                Object.prototype.hasOwnProperty.call(payload, 'itemName') ||
+                Object.prototype.hasOwnProperty.call(payload, 'descriptionContent') ||
+                Object.prototype.hasOwnProperty.call(payload, 'userToolCapabilities') ||
+                Object.prototype.hasOwnProperty.call(payload, 'enchantments') ||
+                Object.prototype.hasOwnProperty.call(payload, 'customItemsData')
+            );
+            if (hasFullKeys) {
+                return payload;
+            }
+            const defaults = getDefaultShareState();
+            return {
+                itemName: payload.i !== undefined ? String(payload.i) : defaults.itemName,
+                amount: payload.a !== undefined ? String(payload.a) : defaults.amount,
+                wear: payload.w !== undefined ? String(payload.w) : defaults.wear,
+                descriptionContent: payload.d !== undefined ? payload.d : defaults.descriptionContent,
+                shortDescriptionContent: payload.s !== undefined ? payload.s : defaults.shortDescriptionContent,
+                itemColorHex: payload.c !== undefined ? payload.c : defaults.itemColorHex,
+                userToolCapabilities: payload.t && typeof payload.t === 'object' ? payload.t : {},
+                enchantments: payload.e && typeof payload.e === 'object' ? payload.e : {},
+                toolRange: payload.r !== undefined ? payload.r : defaults.toolRange,
+                dugValue: payload.g !== undefined ? payload.g : defaults.dugValue,
+                includeSlash: payload.l === 1 || payload.l === true,
+                toolRanksEnabled: payload.k === undefined ? defaults.toolRanksEnabled : payload.k === 1 || payload.k === true,
+                customItemsData: payload.m && typeof payload.m === 'object' ? payload.m : {},
+                customItemsVersionEnabled: payload.x === 1 || payload.x === true
+            };
+        };
+
+        const buildShareUrl = () => {
+            if (!window.LZString) {
+                throw new Error('LZStringが利用できません。');
+            }
+            const payload = buildSharePayload();
+            const json = JSON.stringify(payload);
+            const compressed = LZString.compressToEncodedURIComponent(json);
+            const url = new URL(window.location.href);
+            url.searchParams.set(SHARE_URL_PARAM, compressed);
+            return url.toString();
+        };
+
+        const copyShareUrlToClipboard = async () => {
+            let shareUrl = '';
+            try {
+                shareUrl = buildShareUrl();
+            } catch (error) {
+                showMessageBox('共有URLの生成に失敗しました。', true);
+                return;
+            }
+            try {
+                if (navigator.clipboard && window.isSecureContext) {
+                    await navigator.clipboard.writeText(shareUrl);
+                    showButtonFeedback('share-url-btn', true);
+                    showMessageBox('URLをコピーしました');
+                    return;
+                }
+            } catch (error) {
+            }
+            const manualCopy = window.prompt('共有URLをコピーしてください:', shareUrl);
+            if (manualCopy !== null) {
+                showButtonFeedback('share-url-btn', true);
+                showMessageBox('共有URLを表示しました。コピーして共有してください。');
+            } else {
+                showButtonFeedback('share-url-btn', false);
+                showMessageBox('共有URLの生成をキャンセルしました。', true);
+            }
+        };
+
+        const applySharedState = (state) => {
+            if (!state || typeof state !== 'object') return false;
+            const itemName = typeof state.itemName === 'string' ? state.itemName : $('item-name').value;
+            const amount = state.amount !== undefined && state.amount !== null ? String(state.amount) : $('amount').value;
+            const wear = state.wear !== undefined && state.wear !== null ? String(state.wear) : $('item-wear').value;
+
+            if ($('item-name')) $('item-name').value = itemName || 'default:stone';
+            if ($('amount')) $('amount').value = amount || '1';
+            if ($('item-wear')) $('item-wear').value = wear || '0';
+
+            descriptionContent = typeof state.descriptionContent === 'string' ? state.descriptionContent : '';
+            shortDescriptionContent = typeof state.shortDescriptionContent === 'string' ? state.shortDescriptionContent : '';
+            itemColorHex = typeof state.itemColorHex === 'string' ? normalizeHexValue(state.itemColorHex) || '' : '';
+            tempItemColorHex = itemColorHex || '#FFFFFF';
+            const colorLabel = $('colorDisplayLabel');
+            if (colorLabel) colorLabel.style.backgroundColor = itemColorHex || '#FFFFFF';
+
+            userToolCapabilities = (state.userToolCapabilities && typeof state.userToolCapabilities === 'object')
+                ? clonePlain(state.userToolCapabilities)
+                : {};
+            enchantments = (state.enchantments && typeof state.enchantments === 'object')
+                ? clonePlain(state.enchantments)
+                : {};
+            tempEnchantments = clonePlain(enchantments);
+            updateCurrentEnchantsDisplay();
+
+            toolRange = state.toolRange !== undefined ? state.toolRange : '';
+            dugValue = state.dugValue !== undefined ? state.dugValue : '';
+
+            includeSlash = !!state.includeSlash;
+            const slashToggle = $('slash-toggle');
+            if (slashToggle) slashToggle.checked = includeSlash;
+
+            if (state.toolRanksEnabled !== undefined) {
+                toolRanksEnabled = !!state.toolRanksEnabled;
+            }
+            if (toolRanksToggle) {
+                toolRanksToggle.checked = toolRanksEnabled;
+            }
+
+            customItemsData = createEmptyCustomItemsData();
+            if (state.customItemsData && typeof state.customItemsData === 'object') {
+                customItemsData = deepMerge(customItemsData, state.customItemsData);
+            }
+            customItemsVersionEnabled = !!state.customItemsVersionEnabled;
+            const ieToggle = $('ci-enable-ie-edit');
+            if (ieToggle) {
+                ieToggle.checked = customItemsVersionEnabled;
+            }
+            return true;
+        };
+
+        const applySharedStateFromUrl = () => {
+            const params = new URLSearchParams(window.location.search);
+            const encoded = params.get(SHARE_URL_PARAM);
+            if (!encoded) return false;
+            if (!window.LZString) {
+                showMessageBox('共有URLの読み込みに失敗しました。', true);
+                return false;
+            }
+            let json = '';
+            try {
+                json = LZString.decompressFromEncodedURIComponent(encoded);
+            } catch (error) {
+            }
+            if (!json) {
+                showMessageBox('共有URLが無効です。URL全体を貼り付けてください。', true);
+                return false;
+            }
+            try {
+                const raw = JSON.parse(json);
+                const state = expandSharePayload(raw);
+                if (!applySharedState(state)) {
+                    showMessageBox('共有URLの内容を読み取れませんでした。', true);
+                    return false;
+                }
+                // URLからパラメータを削除（リロード時に再読み込みされないようにする）
+                const cleanUrl = new URL(window.location.href);
+                cleanUrl.searchParams.delete(SHARE_URL_PARAM);
+                window.history.replaceState({}, '', cleanUrl.toString());
+                return true;
+            } catch (error) {
+                showMessageBox('共有URLの解析に失敗しました。', true);
+                return false;
+            }
+        };
+
         $('item-name').addEventListener('input', updateCommandDisplay);
         $('amount').addEventListener('input', updateCommandDisplay);
         $('item-wear').addEventListener('input', updateCommandDisplay);
-        $('copy-command-btn').addEventListener('click', () => { $('command-display').select(); document.execCommand('copy') ? showMessageBox("コマンドをコピーしました") : showMessageBox("コピーに失敗しました。", true); });
+        $('copy-command-btn').addEventListener('click', copyCommandToClipboard);
+        const shareUrlButton = $('share-url-btn');
+        if (shareUrlButton) {
+            shareUrlButton.addEventListener('click', copyShareUrlToClipboard);
+        }
 
         $('slash-toggle').addEventListener('change', (event) => {
             includeSlash = event.target.checked;
@@ -9573,6 +9303,32 @@
             lastSavedCaretOffset = saveSelection();
         };
 
+        const insertTextAtSelection = (text) => {
+            const editor = $('textEditorContentDiv');
+            const selection = window.getSelection();
+            if (!editor || !selection) return false;
+            if (selection.rangeCount === 0) {
+                const range = document.createRange();
+                range.selectNodeContents(editor);
+                range.collapse(false);
+                selection.addRange(range);
+            }
+            let range = selection.getRangeAt(0);
+            if (!editor.contains(range.commonAncestorContainer)) {
+                range = document.createRange();
+                range.selectNodeContents(editor);
+                range.collapse(false);
+            }
+            range.deleteContents();
+            const textNode = document.createTextNode(text);
+            range.insertNode(textNode);
+            range.setStartAfter(textNode);
+            range.collapse(true);
+            selection.removeAllRanges();
+            selection.addRange(range);
+            return true;
+        };
+
         const insertTextEditorCode = (code) => {
             const editor = $('textEditorContentDiv');
             if (!editor) return;
@@ -9580,7 +9336,9 @@
             if (lastSavedCaretOffset !== null) {
                 restoreSelection(lastSavedCaretOffset);
             }
-            document.execCommand('insertText', false, code);
+            if (!insertTextAtSelection(code)) {
+                editor.textContent += code;
+            }
             applyRichTextFormatting();
             lastSavedCaretOffset = saveSelection();
         };
@@ -10282,7 +10040,8 @@
         function executeImport() {
             const commandText = $('command-display').value.trim();
             if (!commandText) {
-                showMessageBox('コマンドを入力してください。', true);
+                showButtonFeedback('import-command-btn', false);
+                showMessageBox('コマンドが空です。入力してください。', true);
                 return;
             }
 
@@ -10291,7 +10050,7 @@
                 // 注意: メタデータにスペースが含まれる可能性があるため、正規表現で慎重に抽出
                 const match = commandText.match(/^(?:\/)?giveme\s+(\S+)\s+(\d+)\s+(\d+)\s+"((?:[^"\\]|\\.)*)"$/);
                 if (!match) {
-                    throw new Error('コマンドの形式が正しくありません。\n対応形式: /giveme <item> <amount> <wear> "<meta>"');
+                    throw new Error('形式が正しくありません。例: /giveme <item> <amount> <wear> "<meta>"');
                 }
 
                 const [, itemId, amount, wear, encodedMeta] = match;
@@ -10519,11 +10278,14 @@
 
                 // 4. 表示更新
                 updateCommandDisplay();
-                showMessageBox('コマンドをインポートしました。');
+                showButtonFeedback('import-command-btn', true);
+                showMessageBox('コマンドをインポートしました');
 
             } catch (e) {
                 console.error('Import failed:', e);
-                showMessageBox('インポートに失敗しました: ' + e.message, true);
+                const detail = e && e.message ? ` ${e.message}` : '';
+                showButtonFeedback('import-command-btn', false);
+                showMessageBox(`インポートに失敗しました。${detail}`, true);
             }
         }
 
@@ -10641,9 +10403,17 @@
             document.querySelectorAll('select[data-type="speed"], select[data-type="durability"]').forEach(sel => {
                 sel.innerHTML = getSpeedDurabilityOptionsHtml("");
             });
-            updateCommandDisplay();
-            updatePreview("", "");
             populateToolSelect();
+
+            // 共有URLを優先、なければlocalStorageから復元
+            const loadedFromShare = applySharedStateFromUrl();
+            if (!loadedFromShare) {
+                loadStateFromLocalStorage();
+            }
+            updateCommandDisplay();
+            if (loadedFromShare) {
+                showMessageBox('共有URLの設定を読み込みました');
+            }
 
             // ダークモードの初期状態を復元
             const savedDarkMode = localStorage.getItem('darkMode');
@@ -10716,7 +10486,11 @@
 
             // 表示更新
             updateCommandDisplay();
-            showMessageBox('全ての設定をリセットしました。');
+
+            // localStorageもクリア
+            clearStateFromLocalStorage();
+
+            showMessageBox('全ての設定をリセットしました');
         });
     </script>
 </body>
