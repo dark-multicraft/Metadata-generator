@@ -8662,6 +8662,60 @@
             updatePreview("", ""); 
         };
     </script>
+
+    <!-- V4 Release Notification Modal -->
+    <div id="v4-notification-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:9999; align-items:center; justify-content:center;">
+        <div style="background:#fff; border-radius:12px; padding:28px; max-width:440px; width:90%; box-shadow:0 20px 60px rgba(0,0,0,0.3); text-align:center; position:relative;">
+            <span id="v4-notification-close" style="position:absolute; top:12px; right:16px; cursor:pointer; font-size:22px; color:#94a3b8; line-height:1;">&times;</span>
+            <div style="font-size:48px; margin-bottom:12px;">🚀</div>
+            <h2 style="font-size:20px; font-weight:700; margin:0 0 12px 0; color:#1e293b;">New Version Available!</h2>
+            <p style="font-size:14px; color:#475569; line-height:1.6; margin:0 0 20px 0;">
+                <strong>Metadata Generator V4</strong> is now available with new features, UI improvements, and more!
+            </p>
+            <a href="https://dark-multicraft.github.io/Metadata-generator/metadata_v4.html" target="_blank" style="display:inline-block; background:#84cc16; color:#fff; padding:10px 24px; border-radius:8px; text-decoration:none; font-weight:600; font-size:14px; margin-bottom:16px;">Open V4 →</a>
+            <label style="display:flex; align-items:center; justify-content:center; gap:8px; font-size:13px; color:#64748b; cursor:pointer;">
+                <input type="checkbox" id="v4-dont-show-again" style="width:16px; height:16px; accent-color:#4f46e5;">
+                Don't show this again
+            </label>
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            const STORAGE_KEY = 'metadata_v4_notified';
+            if (localStorage.getItem(STORAGE_KEY) === '1') return;
+            const modal = document.getElementById('v4-notification-modal');
+            const checkbox = document.getElementById('v4-dont-show-again');
+            if (!modal) return;
+            modal.style.display = 'flex';
+            modal.addEventListener('click', function(e) {
+                if (e.target === modal) {
+                    if (checkbox && checkbox.checked) {
+                        localStorage.setItem(STORAGE_KEY, '1');
+                    }
+                    modal.style.display = 'none';
+                }
+            });
+            // バツボタンで閉じる
+            const closeBtn = document.getElementById('v4-notification-close');
+            if (closeBtn) {
+                closeBtn.addEventListener('click', closeModal);
+            }
+            // Close on checkbox + click outside or any close action
+            const closeModal = () => {
+                if (checkbox && checkbox.checked) {
+                    localStorage.setItem(STORAGE_KEY, '1');
+                }
+                modal.style.display = 'none';
+            };
+            // Close on Escape
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape' && modal.style.display === 'flex') closeModal();
+            });
+            // Close button behavior: clicking the label checkbox doesn't close, but clicking "Open V4" link works
+            // Also close when clicking the background
+        })();
+    </script>
 </body>
 
 </html>
