@@ -8696,18 +8696,18 @@
                     modal.style.display = 'none';
                 }
             });
-            // バツボタンで閉じる
-            const closeBtn = document.getElementById('v4-notification-close');
-            if (closeBtn) {
-                closeBtn.addEventListener('click', closeModal);
-            }
-            // Close on checkbox + click outside or any close action
+            // 閉じる処理
             const closeModal = () => {
                 if (checkbox && checkbox.checked) {
                     localStorage.setItem(STORAGE_KEY, '1');
                 }
                 modal.style.display = 'none';
             };
+            // バツボタンで閉じる
+            const closeBtn = document.getElementById('v4-notification-close');
+            if (closeBtn) {
+                closeBtn.addEventListener('click', closeModal);
+            }
             // Close on Escape
             document.addEventListener('keydown', function(e) {
                 if (e.key === 'Escape' && modal.style.display === 'flex') closeModal();
