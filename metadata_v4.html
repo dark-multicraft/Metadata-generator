@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title data-i18n="pageTitle">メタデータジェネレーター</title>
-    <meta property="og:title" id="og-title" content="メタデータジェネレーター" />
+    <meta property="og:title" id="og-title" content="Metadata Generator" />
     <meta property="og:description" id="og-description"
         content="MultiCraft Metadata Generator. Use this simple web tool to visually craft powerful custom items. Add enchantments, colored text, and unique stats, then instantly copy the ready-to-use /giveme command." />
     <meta property="og:type" content="website" />
@@ -8895,6 +8895,7 @@ const formData = new FormData(form);
         let currentLang = localStorage.getItem('v4_lang') || 'en';
         const translations = {
     pageTitle: { ja: 'メタデータジェネレーター', en: 'Metadata Generator', ru: 'Генератор метаданных', fr: 'Générateur de métadonnées' },
+    ogTitle: { ja: 'Metadata Generator', en: 'Metadata Generator', ru: 'Metadata Generator', fr: 'Metadata Generator' },
     pageSubtitle: { ja: 'MultiCraft用カスタムアイテム設定ツール', en: 'Custom Item Configuration Tool for MultiCraft', ru: 'Инструмент настройки кастомных предметов для MultiCraft', fr: 'Outil de configuration d\'objets personnalisés pour MultiCraft' },
     toolRanks: { ja: 'ツールランク', en: 'Tool Ranks', ru: 'Ранги инструментов', fr: 'Rangs d\'outil' },
     toolRanksTip: { ja: '説明文が入力され、toolranks対応のアイテムIDの場合にレベルと使用回数の行を自動で挿入します。', en: 'Automatically inserts level and uses lines for toolranks-compatible item IDs when description is set.', ru: 'Автоматически вставляет строки уровня и количества использований для ID инструментов, совместимых с toolranks, когда задано описание.', fr: 'Insère automatiquement les lignes de niveau et d\'utilisations pour les ID d\'outils compatibles toolranks lorsque la description est définie.' },
@@ -9279,7 +9280,7 @@ const formData = new FormData(form);
 
             // OG meta タグを更新
             const ogTitle = document.getElementById('og-title');
-            if (ogTitle) ogTitle.setAttribute('content', getTranslation('pageTitle'));
+            if (ogTitle) ogTitle.setAttribute('content', getTranslation('ogTitle'));
             const ogDesc = document.getElementById('og-description');
             if (ogDesc) ogDesc.setAttribute('content', getTranslation('pageSubtitle'));
             const pageTitleEl = document.querySelector('title');
