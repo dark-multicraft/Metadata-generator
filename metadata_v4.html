@@ -4,10 +4,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title data-i18n="pageTitle">Metadata Generator V4</title>
-    <meta property="og:title" id="og-title" content="Metadata Generator V4" />
+    <title data-i18n="pageTitle">メタデータジェネレーター</title>
+    <meta property="og:title" id="og-title" content="メタデータジェネレーター" />
     <meta property="og:description" id="og-description"
-        content="MultiCraft Metadata Generator V4! Use this simple web tool to visually craft powerful custom items. Add enchantments, colored text, and unique stats, then instantly copy the ready-to-use /giveme command." />
+        content="MultiCraft Metadata Generator. Use this simple web tool to visually craft powerful custom items. Add enchantments, colored text, and unique stats, then instantly copy the ready-to-use /giveme command." />
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://dark-multicraft.github.io/Metadata-generator/metadata_v4.html" />
     <meta property="og:image" content="https://dark-multicraft.github.io/Metadata-generator/sword.png" />
@@ -80,15 +80,13 @@
             border-radius: 0.625rem;
             font-weight: 500;
             cursor: pointer;
-            transition: border-color 0.2s, color 0.2s, transform 0.2s, box-shadow 0.2s;
+            transition: border-color 0.15s, color 0.15s, background-color 0.15s;
             box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
         }
 
         button:hover {
             border-color: var(--primary);
             color: var(--primary);
-            box-shadow: 0 8px 18px -10px rgb(15 23 42 / 0.45);
-            transform: translateY(-1px);
         }
 
         body.dark-mode button {
@@ -165,6 +163,158 @@
             box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.3);
         }
 
+        select.native-select-enhanced {
+            position: absolute !important;
+            width: 1px !important;
+            height: 1px !important;
+            opacity: 0 !important;
+            pointer-events: none !important;
+            margin: 0 !important;
+            padding: 0 !important;
+        }
+
+        .custom-select {
+            position: relative;
+            width: 100%;
+        }
+
+        .custom-select-button {
+            width: 100%;
+            min-height: 2.55rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.75rem;
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 0.5rem;
+            color: inherit;
+            cursor: pointer;
+            font-size: 0.9rem;
+            padding: 0.625rem 0.875rem;
+            text-align: left;
+            transition: border-color 0.2s, box-shadow 0.2s, background-color 0.2s;
+        }
+
+        .custom-select-button:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.2);
+        }
+
+        .custom-select-button:hover {
+            color: inherit;
+            transform: none;
+            box-shadow: none;
+            border-color: var(--primary);
+        }
+
+        .custom-select.disabled .custom-select-button {
+            background-color: #f1f5f9;
+            color: #94a3b8;
+            cursor: not-allowed;
+        }
+
+        .custom-select-label {
+            min-width: 0;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .custom-select-arrow {
+            flex: 0 0 auto;
+            color: #64748b;
+            font-size: 0.75rem;
+        }
+
+        .custom-select-menu {
+            position: fixed;
+            z-index: 2000;
+            min-width: 180px;
+            --custom-select-option-height: 2.15rem;
+            --custom-select-visible-items: 8;
+            max-height: min(calc((var(--custom-select-option-height) * var(--custom-select-visible-items)) + 0.7rem), 55vh);
+            overflow-y: auto;
+            overscroll-behavior: contain;
+            -webkit-overflow-scrolling: touch;
+            contain: layout paint;
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 0.65rem;
+            box-shadow: 0 10px 24px -18px rgb(15 23 42 / 0.5);
+            padding: 0.35rem;
+        }
+
+        .custom-select-option,
+        .custom-select-group-label {
+            border-radius: 0.45rem;
+            font-size: 0.875rem;
+            line-height: 1.25rem;
+            min-height: var(--custom-select-option-height);
+            padding: 0.45rem 0.55rem;
+        }
+
+        .custom-select-option {
+            cursor: pointer;
+        }
+
+        .custom-select-option.disabled {
+            color: #94a3b8;
+            cursor: not-allowed;
+        }
+
+        .custom-select-option:hover,
+        .custom-select-option.active {
+            background-color: rgba(79, 70, 229, 0.1);
+        }
+
+        .custom-select-option.disabled:hover,
+        .custom-select-option.disabled.active {
+            background-color: transparent;
+        }
+
+        .custom-select-option.selected {
+            background-color: rgba(79, 70, 229, 0.16);
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        .custom-select-group-label {
+            color: #64748b;
+            font-size: 0.72rem;
+            font-weight: 700;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+        }
+
+        body.dark-mode .custom-select-button,
+        body.dark-mode .custom-select-menu {
+            background-color: var(--card-bg);
+            border-color: var(--border-color);
+            color: var(--text-main);
+        }
+
+        body.dark-mode .custom-select-button:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.3);
+        }
+
+        body.dark-mode .custom-select.disabled .custom-select-button {
+            background-color: #1f2937;
+            color: #64748b;
+        }
+
+        body.dark-mode .custom-select-option:hover,
+        body.dark-mode .custom-select-option.active {
+            background-color: rgba(99, 102, 241, 0.18);
+        }
+
+        body.dark-mode .custom-select-option.selected {
+            background-color: rgba(99, 102, 241, 0.24);
+            color: #c7d2fe;
+        }
+
         body.dark-mode .label-frame {
             background-color: var(--card-bg);
             border-color: var(--border-color);
@@ -217,14 +367,12 @@
             padding: 0.625rem 1.25rem;
             border-radius: 0.625rem;
             font-weight: 500;
-            transition: all 0.2s;
+            transition: background-color 0.15s, border-color 0.15s, color 0.15s, filter 0.15s;
             box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
             width: 100%;
         }
 
         .smart-button:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
             filter: brightness(1.05);
         }
 
@@ -240,8 +388,6 @@
             background-color: var(--card-bg);
             border-color: var(--primary);
             color: var(--primary);
-            box-shadow: 0 8px 18px -10px rgb(15 23 42 / 0.45);
-            transform: translateY(-1px);
         }
 
         .smart-button.danger,
@@ -445,7 +591,6 @@
             height: 100%;
             overflow: auto;
             background-color: rgba(0, 0, 0, 0.5);
-            backdrop-filter: blur(2px);
             align-items: center;
             justify-content: center;
             padding: 1rem;
@@ -1105,15 +1250,21 @@
                     class="command-textarea w-full font-mono text-xs leading-relaxed focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all"
                     readonly></textarea>
             </div>
-            <div class="mt-2 flex flex-col sm:flex-row gap-2">
-                <button id="copy-command-btn" class="smart-button secondary w-full text-xs py-2.5">
+            <div class="mt-2 flex flex-row flex-wrap gap-2">
+                <button id="copy-command-btn" class="smart-button secondary flex-1 min-w-32 text-xs py-2.5">
                     <i data-lucide="copy" class="w-3.5 h-3.5"></i> <span data-i18n="copy">コピー</span>
                 </button>
-                <button id="share-url-btn" class="smart-button secondary w-full text-xs py-2.5">
+                <button id="share-url-btn" class="smart-button secondary flex-1 min-w-32 text-xs py-2.5">
                     <i data-lucide="share-2" class="w-3.5 h-3.5"></i> <span data-i18n="share">共有</span>
                 </button>
-                <button id="import-command-btn" class="smart-button secondary w-full text-xs py-2.5">
+                <button id="import-command-btn" class="smart-button secondary flex-1 min-w-32 text-xs py-2.5">
                     <i data-lucide="download" class="w-3.5 h-3.5"></i> <span data-i18n="import">インポート</span>
+                </button>
+                <button id="save-command-btn" class="smart-button secondary flex-1 min-w-32 text-xs py-2.5">
+                    <i data-lucide="save" class="w-3.5 h-3.5"></i> <span data-i18n="saveCommand">保存</span>
+                </button>
+                <button id="saved-commands-btn" class="smart-button secondary flex-1 min-w-32 text-xs py-2.5">
+                    <i data-lucide="list" class="w-3.5 h-3.5"></i> <span data-i18n="savedCommands">保存一覧</span>
                 </button>
             </div>
         </section>
@@ -1934,7 +2085,7 @@
         <!-- Footer -->
         <div class="flex items-center justify-between text-xs text-slate-400 dark:text-slate-500 mt-6">
             <p class="text-center flex-1">Original Author: multi-nono / Additional Author: dark / Contributor: 7080</p>
-            <span class="ml-auto"><span data-i18n="version">Version</span> 4.0</span>
+            <span class="ml-auto"><span data-i18n="version">Version</span> 4.1</span>
         </div>
     </div>
 
@@ -2186,6 +2337,7 @@
                                 <option value="" data-i18n="notSet">未設定</option>
                                 <option value="burning_players">Burning Players</option>
                                 <option value="lightning">Lightning</option>
+                                <option value="smoke">Smoke</option>
                                 <option value="potion_fire_resistance">Potion Fire Resistance</option>
                                 <option value="blindness">Blindness</option>
                                 <option value="breath">Breath</option>
@@ -2256,6 +2408,13 @@
                 <button id="resetCustomItemsBtn" class="bg-red-500 modal-button" data-i18n="reset">リセット</button>
                 <button id="saveCustomItemsBtn" class="modal-button" data-i18n="confirm">決定</button>
             </div>
+        </div>
+    </div>
+
+    <div id="savedCommandsModal" class="modal">
+        <div class="modal-content"><span class="close-button" onclick="closeModal('savedCommandsModal')">&times;</span>
+            <h2 class="text-xl font-semibold mb-4 text-gray-800" data-i18n="savedCommands">保存一覧</h2>
+            <div id="saved-commands-list" class="scrollable-content space-y-3 pr-2"></div>
         </div>
     </div>
 
@@ -2362,6 +2521,13 @@ const formData = new FormData(form);
         <div class="modal-content"><span class="close-button" onclick="closeModal('releaseNotesModal')">&times;</span>
             <h2 class="text-xl font-semibold mb-4" data-i18n="releaseNotesTitle">Release Notes</h2>
             <div class="space-y-3 text-sm max-h-96 overflow-y-auto">
+                <div>
+                    <h3 class="font-semibold text-indigo-500">v4.1</h3>
+                    <ul class="list-disc list-inside ml-2 space-y-1 text-slate-600 dark:text-slate-400">
+                        <li data-i18n="rn_v41_1">💨 煙エフェクト対応</li>
+                        <li data-i18n="rn_v41_2">💾 コマンドの保存機能</li>
+                    </ul>
+                </div>
                 <div>
                     <h3 class="font-semibold text-indigo-500">v4.0</h3>
                     <ul class="list-disc list-inside ml-2 space-y-1 text-slate-600 dark:text-slate-400">
@@ -8335,6 +8501,7 @@ const formData = new FormData(form);
         const EFFECT_LABELS = {
             burning_players: { en: 'Burning Players', ja: '燃焼プレイヤー', ru: 'Горящие игроки', fr: 'Joueurs en feu' },
             lightning: { en: 'Lightning', ja: '雷', ru: 'Молния', fr: 'Foudre' },
+            smoke: { en: 'Smoke', ja: '煙', ru: 'Smoke', fr: 'Smoke' },
             potion_fire_resistance: { en: 'Potion Fire Resistance', ja: '火炎耐性ポーション', ru: 'Зелье огнестойкости', fr: 'Potion de résistance au feu' },
             blindness: { en: 'Blindness', ja: '盲目', ru: 'Слепота', fr: 'Cécité' },
             breath: { en: 'Breath', ja: '呼吸', ru: 'Дыхание', fr: 'Respiration' },
@@ -8727,7 +8894,7 @@ const formData = new FormData(form);
         // =================================================================
         let currentLang = localStorage.getItem('v4_lang') || 'en';
         const translations = {
-    pageTitle: { ja: 'メタデータジェネレーター V4', en: 'Metadata Generator V4', ru: 'Генератор метаданных V4', fr: 'Générateur de métadonnées V4' },
+    pageTitle: { ja: 'メタデータジェネレーター', en: 'Metadata Generator', ru: 'Генератор метаданных', fr: 'Générateur de métadonnées' },
     pageSubtitle: { ja: 'MultiCraft用カスタムアイテム設定ツール', en: 'Custom Item Configuration Tool for MultiCraft', ru: 'Инструмент настройки кастомных предметов для MultiCraft', fr: 'Outil de configuration d\'objets personnalisés pour MultiCraft' },
     toolRanks: { ja: 'ツールランク', en: 'Tool Ranks', ru: 'Ранги инструментов', fr: 'Rangs d\'outil' },
     toolRanksTip: { ja: '説明文が入力され、toolranks対応のアイテムIDの場合にレベルと使用回数の行を自動で挿入します。', en: 'Automatically inserts level and uses lines for toolranks-compatible item IDs when description is set.', ru: 'Автоматически вставляет строки уровня и количества использований для ID инструментов, совместимых с toolranks, когда задано описание.', fr: 'Insère automatiquement les lignes de niveau et d\'utilisations pour les ID d\'outils compatibles toolranks lorsque la description est définie.' },
@@ -8758,6 +8925,18 @@ const formData = new FormData(form);
     copy: { ja: 'コピー', en: 'Copy', ru: 'Копировать', fr: 'Copier' },
     share: { ja: '共有', en: 'Share', ru: 'Поделиться', fr: 'Partager' },
     import: { ja: 'インポート', en: 'Import', ru: 'Импорт', fr: 'Importer' },
+    saveCommand: { ja: '保存', en: 'Save', ru: 'Сохранить', fr: 'Enregistrer' },
+    savedCommands: { ja: '保存一覧', en: 'Saved Commands', ru: 'Сохранённые команды', fr: 'Commandes enregistrées' },
+    commandSaveNamePrompt: { ja: '保存名を入力してください:', en: 'Enter a save name:', ru: 'Введите имя сохранения:', fr: 'Entrez un nom :' },
+    commandSaveNameRequired: { ja: '保存名を入力してください。', en: 'Save name is required.', ru: 'Нужно имя сохранения.', fr: 'Le nom est requis.' },
+    commandOverwriteConfirm: { ja: '同じ名前の保存があります。上書きしますか？', en: 'A save with this name already exists. Overwrite it?', ru: 'Сохранение с таким именем уже есть. Перезаписать?', fr: 'Un enregistrement avec ce nom existe déjà. Remplacer ?' },
+    commandSaved: { ja: 'コマンドを保存しました', en: 'Command saved', ru: 'Команда сохранена', fr: 'Commande enregistrée' },
+    commandLoaded: { ja: '保存したコマンドを読み込みました', en: 'Saved command loaded', ru: 'Сохранённая команда загружена', fr: 'Commande enregistrée chargée' },
+    commandDeleted: { ja: '保存を削除しました', en: 'Saved command deleted', ru: 'Сохранение удалено', fr: 'Enregistrement supprimé' },
+    noSavedCommands: { ja: '保存されたコマンドはありません', en: 'No saved commands', ru: 'Нет сохранённых команд', fr: 'Aucune commande enregistrée' },
+    savedAt: { ja: '保存日時', en: 'Saved at', ru: 'Сохранено', fr: 'Enregistré le' },
+    load: { ja: '読み込み', en: 'Load', ru: 'Загрузить', fr: 'Charger' },
+    delete: { ja: '削除', en: 'Delete', ru: 'Удалить', fr: 'Supprimer' },
     tooltipPreview: { ja: 'ツールチッププレビュー', en: 'Tooltip Preview', ru: 'Предпросмотр подсказки', fr: 'Aperçu de l\'info-bulle' },
     toggleToolTable: { ja: 'ツール性能表を表示 / 非表示', en: 'Show / Hide Tool Stats Table', ru: 'Показать / Скрыть таблицу характеристик', fr: 'Afficher / Masquer le tableau des stats' },
     tool: { ja: 'ツール', en: 'Tool', ru: 'Инструмент', fr: 'Outil' },
@@ -8827,7 +9006,7 @@ const formData = new FormData(form);
     enableIEEdit: { ja: '/ieでの編集を有効にする', en: 'Enable /ie editing', ru: 'Включить /ie редактирование', fr: 'Activer l\'édition /ie' },
     ieEditTip: { ja: 'オンにすると custom_items:version がコマンドに追加されます。', en: 'When enabled, custom_items:version is added to the command.', ru: 'При включении custom_items:version добавляется в команду.', fr: 'Lorsque activé, custom_items:version est ajouté à la commande.' },
     ciLightTip: { ja: '明るさレベルを0〜15で設定します。値が大きいほど明るくなります。', en: 'Set the light level (0-15). Higher values produce more light.', ru: 'Установите уровень света (0-15). Больше значение = ярче.', fr: 'Définissez le niveau de lumière (0-15). Plus la valeur est élevée, plus il fait clair.' },
-    ciEffectTip: { ja: 'アイテムに特殊効果を追加します。燃焼と雷以外はエフェクト名の前に potion_ が自動付与されます。', en: 'Add a special effect to the item. For effects other than Burning Players and Lightning, potion_ prefix is automatically added.', ru: 'Добавьте особый эффект к предмету. Для эффектов, кроме Burning Players и Lightning, автоматически добавляется префикс potion_.', fr: 'Ajoute un effet spécial à l\'objet. Pour les effets autres que Burning Players et Lightning, le préfixe potion_ est automatiquement ajouté.' },
+    ciEffectTip: { ja: 'アイテムに特殊効果を追加します。燃焼、雷、煙以外はエフェクト名の前に potion_ が自動付与されます。', en: 'Add a special effect to the item. For effects other than Burning Players, Lightning, and Smoke, potion_ prefix is automatically added.', ru: 'Добавьте особый эффект к предмету. Для эффектов, кроме Burning Players, Lightning и Smoke, автоматически добавляется префикс potion_.', fr: 'Ajoute un effet spécial à l\'objet. Pour les effets autres que Burning Players, Lightning et Smoke, le préfixe potion_ est automatiquement ajouté.' },
     ciEffectDurationTip: { ja: 'エフェクトの持続時間（秒）を設定します。雷の場合は持続時間の設定は無効です。', en: 'Set the effect duration in seconds. Duration is disabled for Lightning.', ru: 'Установите длительность эффекта в секундах. Для Молнии длительность отключена.', fr: 'Définissez la durée de l\'effet en secondes. La durée est désactivée pour la Foudre.' },
     ciSatiationTip: { ja: '食べ物としての満腹度を設定します。数値が大きいほどお腹いっぱいになります。', en: 'Set the satiation value for food. Higher values restore more hunger.', ru: 'Установите насыщение для еды. Больше значение = больше утоляет голод.', fr: 'Définissez la satiété de la nourriture. Plus la valeur est élevée, plus elle restaure la faim.' },
     ciPoisonTip: { ja: '食べた時に受ける毒ダメージを設定します。', en: 'Set the poison damage taken when eaten.', ru: 'Установите урон от яда при употреблении.', fr: 'Définissez les dégâts de poison subis lors de la consommation.' },
@@ -8913,6 +9092,8 @@ const formData = new FormData(form);
     feedbackMessageLabel: { ja: '詳細', en: 'Details', ru: 'Подробности', fr: 'Détails' },
     feedbackSubmit: { ja: '送信', en: 'Send', ru: 'Отправить', fr: 'Envoyer' },
     releaseNotesTitle: { ja: 'リリースノート', en: 'Release Notes', ru: 'Примечания к выпуску', fr: 'Notes de version' },
+    rn_v41_1: { ja: '💨 煙エフェクト対応', en: '💨 Smoke effect support', ru: '💨 Поддержка эффекта дыма', fr: '💨 Prise en charge de l’effet de fumée' },
+    rn_v41_2: { ja: '💾 コマンドの保存機能', en: '💾 Command save feature', ru: '💾 Сохранение команд', fr: '💾 Fonction d’enregistrement des commandes' },
     rn_v30_1: { ja: '🌐 言語切替（英語・日本語・フランス語・ロシア語）', en: '🌐 Language switch (EN/JP/FR/RU)', ru: '🌐 Переключение языка (EN/JP/FR/RU)', fr: '🌐 Changement de langue (EN/JP/FR/RU)' },
     rn_v30_1: { ja: '🌐 言語切替（英語・日本語・フランス語・ロシア語）', en: '🌐 Language switch (EN/JP/FR/RU)', ru: '🌐 Переключение языка (EN/JP/FR/RU)', fr: '🌐 Changement de langue (EN/JP/FR/RU)' },
     rn_v30_2: { ja: '🎨 ダークモード対応', en: '🎨 Dark mode support', ru: '🎨 Тёмная тема', fr: '🎨 Mode sombre' },
@@ -8981,6 +9162,7 @@ const formData = new FormData(form);
             select.innerHTML = options.join('');
             select.value = currentValue;
             updateEffectDurationState();
+            syncCustomSelect(select);
         }
 
         function updateTextEditorToggleLabel() {
@@ -9153,6 +9335,7 @@ const formData = new FormData(form);
             if (typeof updateCurrentEnchantsDisplay === 'function' && typeof tempEnchantments !== 'undefined') updateCurrentEnchantsDisplay();
             if (typeof populateToolSelect === 'function') populateToolSelect();
             if (typeof updateCommandDisplay === 'function') updateCommandDisplay();
+            if (typeof syncCustomSelects === 'function') syncCustomSelects();
         }
 
         // 言語トグルイベント（初期化はwindow.onload後に実行）
@@ -9164,6 +9347,330 @@ const formData = new FormData(form);
                     applyLanguage(langSelect.value);
                 });
             }
+        }
+
+        let activeCustomSelect = null;
+
+        function getSelectDisplayText(select) {
+            const option = select && select.options ? select.options[select.selectedIndex] : null;
+            return option ? option.textContent.trim() : '';
+        }
+
+        function closeCustomSelect() {
+            if (!activeCustomSelect) return;
+            activeCustomSelect.root.classList.remove('open');
+            activeCustomSelect.menu.remove();
+            activeCustomSelect = null;
+            removeCustomSelectViewportListeners();
+        }
+
+        function flattenSelectOptions(select) {
+            const items = [];
+            Array.from(select.children).forEach(child => {
+                if (child.tagName === 'OPTGROUP') {
+                    items.push({ type: 'group', label: child.label || '' });
+                    Array.from(child.children).forEach(option => {
+                        if (option.tagName === 'OPTION') {
+                            items.push({ type: 'option', option });
+                        }
+                    });
+                } else if (child.tagName === 'OPTION') {
+                    items.push({ type: 'option', option: child });
+                }
+            });
+            return items;
+        }
+
+        function positionCustomSelectMenu(root, menu) {
+            const button = root.querySelector('.custom-select-button');
+            if (!button) return;
+            const rect = button.getBoundingClientRect();
+            const margin = 8;
+            const menuStyle = getComputedStyle(menu);
+            const optionHeightValue = menuStyle.getPropertyValue('--custom-select-option-height').trim();
+            const rootFontSize = parseFloat(getComputedStyle(document.documentElement).fontSize) || 16;
+            const optionHeight = optionHeightValue.endsWith('rem')
+                ? parseFloat(optionHeightValue) * rootFontSize
+                : parseFloat(optionHeightValue) || 34.4;
+            const maxVisibleItems = parseInt(menuStyle.getPropertyValue('--custom-select-visible-items'), 10) || 8;
+            const menuPadding = 12;
+            const maxMenuHeight = Math.round((optionHeight * maxVisibleItems) + menuPadding);
+            const spaceBelow = window.innerHeight - rect.bottom - (margin * 2);
+            const spaceAbove = rect.top - (margin * 2);
+            const availableHeight = Math.max(120, Math.max(spaceBelow, spaceAbove));
+            menu.style.maxHeight = `${Math.min(maxMenuHeight, availableHeight)}px`;
+            menu.style.minWidth = `${Math.max(180, Math.round(rect.width))}px`;
+            menu.style.left = `${Math.round(Math.max(margin, Math.min(rect.left, window.innerWidth - rect.width - margin)))}px`;
+            menu.style.top = `${Math.round(rect.bottom + margin)}px`;
+            const menuRect = menu.getBoundingClientRect();
+            if (menuRect.bottom > window.innerHeight - margin) {
+                const topAbove = rect.top - menuRect.height - margin;
+                menu.style.top = `${Math.round(Math.max(margin, topAbove))}px`;
+            }
+        }
+
+        function setActiveCustomSelectIndex(index) {
+            if (!activeCustomSelect) return;
+            const options = activeCustomSelect.menu.querySelectorAll('.custom-select-option:not(.disabled)');
+            if (!options.length) return;
+            activeCustomSelect.activeIndex = (index + options.length) % options.length;
+            options.forEach((option, idx) => option.classList.toggle('active', idx === activeCustomSelect.activeIndex));
+            const activeOption = options[activeCustomSelect.activeIndex];
+            if (activeOption) activeOption.scrollIntoView({ block: 'nearest' });
+        }
+
+        function chooseCustomSelectOption(option) {
+            if (!activeCustomSelect || !option || option.disabled) return;
+            const select = activeCustomSelect.select;
+            select.value = option.value;
+            select.dispatchEvent(new Event('change', { bubbles: true }));
+            syncCustomSelect(select);
+            closeCustomSelect();
+        }
+
+        function openCustomSelect(select, root) {
+            if (!select || select.disabled) return;
+            if (activeCustomSelect && activeCustomSelect.select === select) {
+                closeCustomSelect();
+                return;
+            }
+            closeCustomSelect();
+
+            const menu = document.createElement('div');
+            menu.className = 'custom-select-menu';
+            const items = flattenSelectOptions(select);
+            let selectableIndex = -1;
+            let selectedSelectableIndex = 0;
+
+            items.forEach(item => {
+                if (item.type === 'group') {
+                    const group = document.createElement('div');
+                    group.className = 'custom-select-group-label';
+                    group.textContent = item.label;
+                    menu.appendChild(group);
+                    return;
+                }
+                const option = item.option;
+                selectableIndex += 1;
+                const row = document.createElement('div');
+                row.className = 'custom-select-option';
+                row.textContent = option.textContent;
+                row.dataset.value = option.value;
+                row.dataset.index = String(selectableIndex);
+                if (option.disabled) row.classList.add('disabled');
+                if (option.selected) {
+                    row.classList.add('selected', 'active');
+                    selectedSelectableIndex = selectableIndex;
+                }
+                row.addEventListener('mousedown', event => event.preventDefault());
+                row.addEventListener('click', () => chooseCustomSelectOption(option));
+                menu.appendChild(row);
+            });
+
+            document.body.appendChild(menu);
+            activeCustomSelect = { select, root, menu, activeIndex: selectedSelectableIndex };
+            root.classList.add('open');
+            addCustomSelectViewportListeners();
+            positionCustomSelectMenu(root, menu);
+            const selectedOption = menu.querySelector('.custom-select-option.selected');
+            if (selectedOption) selectedOption.scrollIntoView({ block: 'nearest' });
+        }
+
+        function syncCustomSelect(select) {
+            const root = select && select._customSelectRoot;
+            if (!root) return;
+            const label = root.querySelector('.custom-select-label');
+            const button = root.querySelector('.custom-select-button');
+            if (label) label.textContent = getSelectDisplayText(select);
+            if (button) {
+                button.disabled = !!select.disabled;
+                button.setAttribute('aria-disabled', select.disabled ? 'true' : 'false');
+            }
+            root.classList.toggle('disabled', !!select.disabled);
+            if (activeCustomSelect && activeCustomSelect.select === select) {
+                closeCustomSelect();
+            }
+        }
+
+        function syncCustomSelects() {
+            document.querySelectorAll('select.native-select-enhanced').forEach(syncCustomSelect);
+        }
+
+        function initCustomSelects(scope = document) {
+            scope.querySelectorAll('select').forEach(select => {
+                if (select.multiple || select._customSelectRoot) return;
+
+                const root = document.createElement('div');
+                root.className = 'custom-select';
+                if (select.classList.contains('flex-grow')) root.classList.add('flex-grow');
+
+                const button = document.createElement('button');
+                button.type = 'button';
+                button.className = 'custom-select-button';
+                button.setAttribute('aria-haspopup', 'listbox');
+                button.innerHTML = '<span class="custom-select-label"></span><span class="custom-select-arrow">▼</span>';
+
+                root.appendChild(button);
+                select.classList.add('native-select-enhanced');
+                select.insertAdjacentElement('afterend', root);
+                select._customSelectRoot = root;
+
+                button.addEventListener('click', () => openCustomSelect(select, root));
+                button.addEventListener('keydown', event => {
+                    if (event.defaultPrevented) return;
+                    if (event.key === 'ArrowDown' || event.key === 'Enter' || event.key === ' ') {
+                        event.preventDefault();
+                        openCustomSelect(select, root);
+                        setActiveCustomSelectIndex(activeCustomSelect ? activeCustomSelect.activeIndex : 0);
+                    } else if (event.key === 'Escape') {
+                        closeCustomSelect();
+                    }
+                });
+                select.addEventListener('change', () => syncCustomSelect(select));
+
+                const observer = new MutationObserver(() => syncCustomSelect(select));
+                observer.observe(select, { attributes: true, childList: true, subtree: true });
+                select._customSelectObserver = observer;
+                syncCustomSelect(select);
+            });
+        }
+
+        document.addEventListener('mousedown', event => {
+            if (!activeCustomSelect) return;
+            if (activeCustomSelect.menu.contains(event.target) || activeCustomSelect.root.contains(event.target)) return;
+            closeCustomSelect();
+        }, true);
+
+        document.addEventListener('keydown', event => {
+            if (!activeCustomSelect) return;
+            if (event.key === 'Escape') {
+                closeCustomSelect();
+            } else if (event.key === 'ArrowDown') {
+                event.preventDefault();
+                setActiveCustomSelectIndex(activeCustomSelect.activeIndex + 1);
+            } else if (event.key === 'ArrowUp') {
+                event.preventDefault();
+                setActiveCustomSelectIndex(activeCustomSelect.activeIndex - 1);
+            } else if (event.key === 'Enter') {
+                event.preventDefault();
+                const activeOption = activeCustomSelect.menu.querySelector('.custom-select-option.active');
+                if (activeOption) {
+                    const option = Array.from(activeCustomSelect.select.options).find(opt => opt.value === activeOption.dataset.value);
+                    chooseCustomSelectOption(option);
+                }
+            }
+        }, true);
+
+        let customSelectViewportListenersActive = false;
+
+        function handleCustomSelectViewportScroll(event) {
+            if (activeCustomSelect && activeCustomSelect.menu.contains(event.target)) return;
+            closeCustomSelect();
+        }
+
+        function addCustomSelectViewportListeners() {
+            if (customSelectViewportListenersActive) return;
+            customSelectViewportListenersActive = true;
+            window.addEventListener('resize', closeCustomSelect);
+            document.addEventListener('scroll', handleCustomSelectViewportScroll, { capture: true, passive: true });
+        }
+
+        function removeCustomSelectViewportListeners() {
+            if (!customSelectViewportListenersActive) return;
+            customSelectViewportListenersActive = false;
+            window.removeEventListener('resize', closeCustomSelect);
+            document.removeEventListener('scroll', handleCustomSelectViewportScroll, true);
+        }
+
+        const NAMED_COMMANDS_STORAGE_KEY = 'metadata_generator_named_commands';
+
+        function loadNamedCommands() {
+            try {
+                const saved = localStorage.getItem(NAMED_COMMANDS_STORAGE_KEY);
+                const parsed = saved ? JSON.parse(saved) : [];
+                return Array.isArray(parsed) ? parsed : [];
+            } catch (error) {
+                return [];
+            }
+        }
+
+        function saveNamedCommands(entries) {
+            localStorage.setItem(NAMED_COMMANDS_STORAGE_KEY, JSON.stringify(entries));
+        }
+
+        function saveCurrentCommandWithName() {
+            const commandEl = $('command-display');
+            const command = commandEl ? commandEl.value.trim() : '';
+            if (!command) {
+                showMessageBox(getTranslation('importPrompt'), true);
+                return;
+            }
+            const name = (window.prompt(getTranslation('commandSaveNamePrompt')) || '').trim();
+            if (!name) {
+                showMessageBox(getTranslation('commandSaveNameRequired'), true);
+                return;
+            }
+
+            const entries = loadNamedCommands();
+            const existingIndex = entries.findIndex(entry => entry.name === name);
+            if (existingIndex !== -1 && !window.confirm(getTranslation('commandOverwriteConfirm'))) {
+                return;
+            }
+
+            const entry = {
+                name,
+                savedAt: new Date().toISOString(),
+                command,
+                state: buildShareState()
+            };
+
+            if (existingIndex === -1) {
+                entries.unshift(entry);
+            } else {
+                entries.splice(existingIndex, 1, entry);
+            }
+            saveNamedCommands(entries);
+            showMessageBox(getTranslation('commandSaved'));
+        }
+
+        function formatSavedCommandDate(value) {
+            const date = new Date(value);
+            if (Number.isNaN(date.getTime())) return '';
+            const locale = currentLang === 'ja' ? 'ja-JP' : currentLang === 'fr' ? 'fr-FR' : currentLang === 'ru' ? 'ru-RU' : 'en-US';
+            return date.toLocaleString(locale);
+        }
+
+        function renderSavedCommands() {
+            const list = $('saved-commands-list');
+            if (!list) return;
+            const entries = loadNamedCommands();
+            if (!entries.length) {
+                list.innerHTML = `<p class="text-sm text-gray-500 text-center py-6">${escapeHtml(getTranslation('noSavedCommands'))}</p>`;
+                return;
+            }
+            list.innerHTML = entries.map((entry, index) => {
+                const commandPreview = entry.command || '';
+                return `
+                    <div class="border border-gray-300 rounded-lg p-3 bg-gray-50">
+                        <div class="flex flex-wrap items-start justify-between gap-2">
+                            <div>
+                                <div class="font-semibold text-sm text-gray-800">${escapeHtml(entry.name || '')}</div>
+                                <div class="text-xs text-gray-500">${escapeHtml(getTranslation('savedAt'))}: ${escapeHtml(formatSavedCommandDate(entry.savedAt))}</div>
+                            </div>
+                            <div class="flex gap-2">
+                                <button type="button" class="modal-button load-saved-command" data-index="${index}">${escapeHtml(getTranslation('load'))}</button>
+                                <button type="button" class="modal-button bg-red-500 delete-saved-command" data-index="${index}">${escapeHtml(getTranslation('delete'))}</button>
+                            </div>
+                        </div>
+                        <pre class="mt-2 text-xs font-mono whitespace-pre-wrap break-words bg-white border border-gray-300 rounded-md p-2 max-h-24 overflow-auto">${escapeHtml(commandPreview)}</pre>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function openSavedCommandsModal() {
+            renderSavedCommands();
+            openModal('savedCommandsModal');
         }
 
         // =================================================================
@@ -9305,9 +9812,9 @@ const formData = new FormData(form);
             Object.entries(customItemsData).forEach(([key, value]) => {
                 if (value !== null && value !== "") {
                     hasCustomItemMeta = true;
-                    // effectの場合、burning_players/lightning以外はpotion_プレフィックスを自動付与
+                    // effectの場合、一部の直接指定エフェクト以外はpotion_プレフィックスを自動付与
                     let outputValue = value;
-                    if (key === 'effect' && value !== 'burning_players' && value !== 'lightning') {
+                    if (key === 'effect' && !['burning_players', 'lightning', 'smoke'].includes(value)) {
                         outputValue = value.startsWith('potion_') ? value : `potion_${value}`;
                     }
                     metaParts.push(`custom_items:${key}\u0002${outputValue}`);
@@ -9667,8 +10174,8 @@ const formData = new FormData(form);
         // =================================================================
         // ===== 既存の関数 (一部更新) ====================================
         // =================================================================
-        function openModal(id) { closeColorPicker(); $(id).style.display = 'flex'; document.body.style.overflow = 'hidden'; }
-        function closeModal(id) { $(id).style.display = 'none'; closeColorPicker(); const openModals = document.querySelectorAll('.modal[style*="display: flex"]'); if (openModals.length === 0) document.body.style.overflow = ''; }
+        function openModal(id) { closeColorPicker(); closeCustomSelect(); $(id).style.display = 'flex'; document.body.style.overflow = 'hidden'; if (typeof syncCustomSelects === 'function') syncCustomSelects(); }
+        function closeModal(id) { $(id).style.display = 'none'; closeColorPicker(); closeCustomSelect(); const openModals = document.querySelectorAll('.modal[style*="display: flex"]'); if (openModals.length === 0) document.body.style.overflow = ''; }
 
         // ボタンフィードバック用ヘルパー関数
         const showButtonFeedback = (buttonId, isSuccess = true) => {
@@ -9978,6 +10485,42 @@ const formData = new FormData(form);
         const shareUrlButton = $('share-url-btn');
         if (shareUrlButton) {
             shareUrlButton.addEventListener('click', copyShareUrlToClipboard);
+        }
+        const saveCommandButton = $('save-command-btn');
+        if (saveCommandButton) {
+            saveCommandButton.addEventListener('click', saveCurrentCommandWithName);
+        }
+        const savedCommandsButton = $('saved-commands-btn');
+        if (savedCommandsButton) {
+            savedCommandsButton.addEventListener('click', openSavedCommandsModal);
+        }
+        const savedCommandsList = $('saved-commands-list');
+        if (savedCommandsList) {
+            savedCommandsList.addEventListener('click', event => {
+                const loadButton = event.target.closest('.load-saved-command');
+                const deleteButton = event.target.closest('.delete-saved-command');
+                if (!loadButton && !deleteButton) return;
+
+                const entries = loadNamedCommands();
+                const index = parseInt((loadButton || deleteButton).dataset.index, 10);
+                const entry = entries[index];
+                if (!entry) return;
+
+                if (loadButton) {
+                    if (applySharedState(entry.state)) {
+                        updateCommandDisplay();
+                        syncCustomSelects();
+                        closeModal('savedCommandsModal');
+                        showMessageBox(getTranslation('commandLoaded'));
+                    }
+                    return;
+                }
+
+                entries.splice(index, 1);
+                saveNamedCommands(entries);
+                renderSavedCommands();
+                showMessageBox(getTranslation('commandDeleted'));
+            });
         }
 
         $('slash-toggle').addEventListener('change', (event) => {
@@ -10364,6 +10907,7 @@ const formData = new FormData(form);
         function populateEnchantTypes() {
             enchantTypeSelect.innerHTML = `<option value="">${getTranslation('notSet')}</option>` + Object.entries(ENCHANTMENT_DEFS).map(([id]) => `<option value="${id}">${getDropdownEnchantDisplayName(id)}</option>`).join('');
             updateEnchantWarningNote();
+            syncCustomSelect(enchantTypeSelect);
         }
         function updateEnchantmentInputs() {
             const type = enchantTypeSelect.value;
@@ -10372,11 +10916,13 @@ const formData = new FormData(form);
                 enchantLevelHelper.innerHTML = '';
                 enchantLevelInput.value = 1;
                 updateEnchantWarningNote();
+                syncCustomSelect(enchantLevelHelper);
                 return;
             }
             enchantLevelHelper.innerHTML = Array.from({ length: def.maxLevel }, (_, i) => `<option value="${i + 1}">${toRoman(i + 1)}</option>`).join('');
             enchantLevelInput.value = 1;
             updateEnchantWarningNote();
+            syncCustomSelect(enchantLevelHelper);
         }
         function updateCurrentEnchantsDisplay() {
             const container = $('current-enchants');
@@ -10584,6 +11130,7 @@ const formData = new FormData(form);
                 optionsHtml += '</optgroup>';
             });
             select.innerHTML = optionsHtml;
+            syncCustomSelect(select);
 
             // プレビュー更新関数
             const updatePreviewDisplay = (toolData) => {
@@ -10718,6 +11265,8 @@ const formData = new FormData(form);
                 speedSelect.value = "";
                 duraSelect.disabled = true;
                 duraSelect.value = "";
+                syncCustomSelect(speedSelect);
+                syncCustomSelect(duraSelect);
                 return;
             }
 
@@ -10735,6 +11284,8 @@ const formData = new FormData(form);
                     duraSelect.value = "1";
                 }
             }
+            syncCustomSelect(speedSelect);
+            syncCustomSelect(duraSelect);
         }
 
         function updateEffectDurationState() {
@@ -10782,6 +11333,7 @@ const formData = new FormData(form);
             if (poisonEl) poisonEl.value = customItemsData.poison || "";
             const lightSourceEl = $('ci-light-source');
             if (lightSourceEl) lightSourceEl.value = customItemsData.light_source || "";
+            syncCustomSelects();
             openModal('customItemsModal');
         });
         function handleToolChange(event) {
@@ -10844,6 +11396,7 @@ const formData = new FormData(form);
             if (poisonEl) poisonEl.value = "";
             const lightSourceEl = $('ci-light-source');
             if (lightSourceEl) lightSourceEl.value = "";
+            syncCustomSelects();
             updateCommandDisplay();
             closeModal('customItemsModal');
         });
@@ -11275,6 +11828,8 @@ const formData = new FormData(form);
                 sel.innerHTML = getSpeedDurabilityOptionsHtml("");
             });
             populateToolSelect();
+            initCustomSelects();
+            syncCustomSelects();
 
             // アイテムIDが空の場合のみ default:stone を設定
             const itemInput = $('item-name');
